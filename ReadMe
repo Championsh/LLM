@@ -1,0 +1,17 @@
+LLM CA Tasks: Promts -> Outputs.
+LLM Models to test on:
+Llama 2,
+Marcoroni-70B-v1,
+FashionGPT-70B-V1.1,
+Uni-TianYan,
+ORCA_LLaMA_70B_QLoRA,
+Falcon-40B,
+Falcon-180B,
+Starchat,
+Llama2-13B,
+Llama2-70B,
+Gigachat,
+YandexGPT,
+ChatGPT baseline,
+TheB.Ai,
+AutoGen (GPT based)
