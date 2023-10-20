@@ -1,0 +1,10 @@
+The warning BUFFER_OVERFLOW Writing 1 element of type Tizen.Location.Coordinate into buffer listPointer + i * Marshal.SizeOf(coordinates[0]) can exceed its size indicates that a memory buffer may not be large enough to hold the data being written to it, which could result in buffer overflow.
+
+In this case, the programmer is trying to write one element of the Tizen.Location.Coordinate type into a buffer using pointer arithmetic. The memory buffer referred to by the pointer listPointer may not be large enough to hold one element of the Tizen.Location.Coordinate type, as the size of the buffer is calculated as Marshal.SizeOf(coordinates[0]).
+
+To avoid buffer overflow, the programmer should ensure that the buffer is large enough to hold the data being written to it. One way to do this is to resize the buffer before writing the data, or to allocate a new buffer with a larger capacity.
+
+Additionally, the programmer can check if the buffer is large enough before writing to it using conditional statements or by setting a limit on the maximum number of elements that can be written to the buffer.
+
+Overall, addressing this warning
+

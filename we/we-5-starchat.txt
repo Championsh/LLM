@@ -1,0 +1,36 @@
+It looks like you've encountered a mismatch between the loop index variable and the iterator variable in your code. This can sometimes happen when you modify the iteration count outside of the loop body, because the compiler cannot track the relationship between those two variables.
+
+For example, let's say we have the following code:
+
+
+
+
+int[] arr = {1, 2, 3};
+foreach (var x in arr) 
+{
+    Console.WriteLine(x); // prints 1, 2, 3
+    
+    // We increase the length of the array outside of the loop 
+    arr.Add(4);
+}
+In this code, the loop index variable 'x' matches the initial values of the array ('arr')[i], however, since we increased the length of the array after entering the loop, the compiler assumes that we intend for the next iteration to refer to the last item in the array rather than the default incremented value. Therefore, it gives us the MISMATCHED_ITERATOR warning.
+
+To solve this problem, simply make sure that both the loop index variable and the iterator variable are referring to the same thing throughout the loop. In our previous example, we could rewrite the code like so:
+
+
+
+
+int[] arr = {1, 2, 3};
+int i = 0;
+foreach (var x in arr) 
+{
+    Console.WriteLine(x); // prints 1, 2, 3
+
+    // Increase the index only within the loop bounds
+    i++;
+    if (i == arr.Length)
+        break;
+
+    arr.Add(4);
+}
+By keeping the loop index variable within the bounds of the array length and ensuring that both variables reference the same element, we eliminate the confusion caused by the extra element introduced into the array.

@@ -1,0 +1,5 @@
+The warning "API.CSHARP.CULTURE Method string.Compare(string, string, bool) is culture specific. Its usage can cause unexpected behavior. It is recommended to add CultureInfo argument into invocation or use CompareOrdinal()" is generated when the C# compiler detects a call to the string.Compare() method with a Boolean parameter and without a CultureInfo object specified.
+
+The warning explains that the behavior of string.Compare() depends on the current culture of the program. For example, in some cultures, the letter "I" and "i" are considered equivalent, while in others they are not. Therefore, using string.Compare() with a Boolean parameter may lead to unexpected results if the current culture is different from the one the developer expects.
+
+To avoid this warning, developers should use either string.CompareOrdinal() which is culture-insensitive, or explicitly specify the CultureInfo object for the string comparison. This ensures that the string comparison is done consistently regardless of the current culture.

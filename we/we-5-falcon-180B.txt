@@ -1,0 +1,18 @@
+This warning occurs when the variable used for loop iteration in a loop declaration does not match the variable used for incrementing or decrementing in the loop statement.
+
+For example, in the following code, j is declared as the loop iterator, but i is used for incrementing in the for statement:
+
+
+for (int j = 0; i < 10; j++)
+{
+    // Do something
+}
+This can lead to unexpected behavior, as the value of j will never be incremented. The warning is an indication that there may be a problem with the code and should be reviewed to ensure that it functions as intended.
+
+To fix the warning, simply update the loop iterator variable to match the one used for incrementing or decrementing:
+
+
+for (int j = 0; j < 10; j++)
+{
+    // Do something
+}

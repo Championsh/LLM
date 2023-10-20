@@ -1,0 +1,10 @@
+This error message indicates that there was likely a mistake made during copying and pasting code. The line "designTimeControls.ContainsKey(item.Name)" appears to have been copied from somewhere else, but it does not appear to match anything in the surrounding code. There are two possible explanations for why this warning might occur:
+
+
+
+
+ A typo occurred while typing the original code. For example, if the correct code was actually "designTimeToolStripItems.ContainsKey(item.Name)", then a typo such as "designtimeControls" would result in this warning being displayed.
+
+
+
+ The code was incorrectly modified following the copy/paste operation. If another piece of code was added or changed subsequently to the copy/paste operation, this could potentially affect which variables are available within the scope of the original code snippet.

@@ -1,0 +1,3 @@
+In this case, the warning suggests that writing a single instance of the Tizen.Location.Coordinate struct to memory at the specified location (listPointer + i * Marshal.SizeOf(coordinates[0])) may overflow the allocated space, causing undefined behavior.
+
+To fix this issue, you'll want to determine how many elements your array can hold without running out of memory, and adjust the loop condition accordingly. You may also consider restructuring your data so that each coordinate takes up less space than a full Tizen.Location.Coordinate struct.
