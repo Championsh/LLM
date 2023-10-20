@@ -1,0 +1,13 @@
+# Here's the Python code that demonstrates an infinite loop bug:
+
+class Foo: 
+    def foo(n): 
+        i = 0 
+        sum = 0 
+        while i < n: # Wrong loop direction: the loop condition should be i >= n instead of i < n 
+            sum += 1 
+            i -= 1
+
+'''This code creates a method called foo that takes an integer parameter n. The code then initializes two variables i and sum to zero. It then enters an infinite loop where it adds one to the variable sum each time through the loop and subtracts one from the variable i each time through the loop.
+
+The problem with this code is that the loop condition is wrong. The condition should be i >= n instead of i < n because the loop decrements i each time through the loop, but the condition expects the value of i to increase. As a result, the loop will never exit and will keep running indefinitely, causing an infinite loop bug.'''

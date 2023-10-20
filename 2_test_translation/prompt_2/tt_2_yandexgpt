@@ -1,0 +1,24 @@
+class A
+{
+    int square(int x)
+    {
+        return x*x;
+    }
+
+    int example(int a, int b, int c, int x) 
+    { 
+        int result = 0; 
+
+        if (b != 0) 
+        { 
+            result = square(b) + square(x); 
+        }
+
+        if (c != 0) 
+        { 
+            result = square(c) + square(x);  
+        } 
+
+       return result; 
+   } 
+}

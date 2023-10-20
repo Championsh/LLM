@@ -1,0 +1,71 @@
+Here's the equivalent C++ code that demonstrates a bad copy-paste mistake:
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+int square(int x) {
+    return x * x;
+}
+
+int example(int a, int b, int c, int x) {
+int result = 0;
+    if (b != 0) { // CSCC-TRACE{{Start of original code block}}
+    {
+        result = square(b) + square(x);
+    }
+    if (c != 0) { // CSCC-TRACE{{Start of pasted copy}}
+    {
+        result = square(b) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+    }
+    return result;
+}
+int main() {
+    cout << "Welcome to our application!" << endl;
+    int a = 5;
+    int b = 10;
+    int c = 20;
+    int x = 30;
+    int result = example(a, b, c, x);
+    cout << "Result: " << result << endl;
+    return 0;
+}
+```
+In this code, the `example` function takes four parameters: `a`, `b`, `c`, and `x`. The function checks whether `b` or `c` is equal to zero, and performs different operations based on those conditions.
+The vulnerability lies in the fact that the `square` function is called with the wrong variable in the second `if` statement. Instead of using the variable `c`, the function uses the variable `b` again, which leads to incorrect results. This mistake was likely caused by copying and pasting code without properly adjusting the variables.
+To fix this vulnerability, it's recommended to carefully review and test the code to ensure that all variables are used correctly and consistently throughout the program.
+
+
+
+
+
+//////////////// That code won't compile due to excess curly brackets near comments. Here's new answer after a query "remove excess brackets from your code"
+
+Sure, here's the updated code without excess brackets:
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+int square(int x) {
+return x * x;
+}
+int example(int a, int b, int c, int x) {
+int result = 0;
+if (b != 0) {
+result = square(b) + square(x);
+}
+if (c != 0) {
+result = square(b) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+}
+return result;
+}
+int main() {
+cout << "Welcome to our application!" << endl;
+int a = 5;
+int b = 10;
+int c = 20;
+int x = 30;
+int result = example(a, b, c, x);
+cout << "Result: " << result << endl;
+return 0;
+}
+```

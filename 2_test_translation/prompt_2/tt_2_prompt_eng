@@ -1,0 +1,31 @@
+Translate the given C# code that demonstrates bad copy-paste mistake to C++: 
+
+using System;
+namespace Csharp_checker
+{
+    class A
+    {
+        int square(int x)
+        {
+            return x*x;
+        }
+
+        int example(int a, int b, int c, int x)
+        {
+            int result = 0;
+
+            if (b != 0) // CSCC-TRACE{{Start of original code block}}
+            {
+
+                result = square(b) + square(x);
+            }
+
+            if (c != 0) // CSCC-TRACE{{Start of pasted copy}}
+            {
+                result = square(b) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+            }
+
+            return result;
+        }
+    }
+}

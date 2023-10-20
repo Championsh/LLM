@@ -1,0 +1,8 @@
+Here is a possible translation into Python:
+
+def foo(n):
+    i = 0
+    sum = 0
+    while i < n: # Correct loop direction because in python the decrement operator has higher precedence than the comparison operators.
+        sum +=1
+        i -=1

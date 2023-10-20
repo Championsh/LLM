@@ -1,0 +1,24 @@
+Here's the equivalent C++ code that demonstrates the vulnerability of unvalidated loop boundary:
+```cpp
+#include <iostream>
+#include <string>
+#include <environment.h>
+using namespace std;
+int read() {
+    string strNumber = getenv("ADD"); // NCONTROLLED_RESOURCE_CONSUMPTION Input getenv("ADD") is not validated and used in loop condition expression i < numberOfLoops// etenv("ADD") is the origin of the taint// trNumber is tainted int count = 0;
+    if (strNumber != null) {
+        count = atoi(strNumber.c_str()); // trNumber.c_str() is tainted/ toi(strNumber.c_str()) is tainted/ ount is tainted 
+    }
+    return count; // eturn is tainted
+}
+void write(int numberOfLoops) {
+    int i = 0;
+    while (i < numberOfLoops) { // umberOfLoops is passed into sink in expression i < numberOfLoops cout << "hello world " << i << endl;
+        i *= 2;
+    }
+}
+int main() {
+    int data = read() + 1; // ead() is tainted/ ead() + 1 is tainted/ ata is tainted write(data); // umberOfLoops is tainted return 0;
+}
+```
+Note that the C++ code uses `getenv()` to retrieve the value of the environment variable `ADD`, and `atoi()` to convert the string to an integer. The rest of the code is similar to the C# code, with the exception of some minor differences in syntax.

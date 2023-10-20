@@ -1,0 +1,23 @@
+```cpp
+#include <iostream>
+
+class A {
+  public:
+    int square(int x) {
+      return x * x;
+    }
+
+    int example(int a, int b, int c, int x) {
+      int result = 0;
+
+      if (b!= 0) {
+        result = square(b) + square(x);
+      }
+
+      if (c!= 0) {
+        result = square(a) + square(x); // BAD_COPY_PASTE
+      }
+
+      return result;
+    }
+};

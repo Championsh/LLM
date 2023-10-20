@@ -1,0 +1,40 @@
+```cpp
+#include <iostream>
+#include <sstream>
+#include <stdlib.h>
+#include <vector>
+
+class C {
+  public:
+    int read() {
+      std::istringstream iss(std::getenv("ADD")); // Uncontrolled Resource Consumption: `std::getenv` returns an untrusted pointer, which may be controlled by an attacker. The returned value should always be verified before using it.
+
+      int count = 0;
+      if (!iss.str().empty()) {
+        count = std::stoi(iss.str()); // Taint Analysis: `iss.str()` contains user-supplied input, so it is marked as "tainted". Similarly, the output of `std::stoi` is also considered "tainted".
+
+        // Additional checks could be added here to ensure that the number of loops is within acceptable bounds. However, since this is just a simple example, we'll skip them for now.
+      }
+      return count;
+    }
+
+    void write(const int& num_loops) {
+      int i = 0;
+      while (i < num_loops) {
+        std::cout << "Hello World: " << i << '\n';
+        i *= 2; // Sink: The variable `num_loops` is being modified inside the loop body, potentially allowing attackers to control its flow. This can lead to various types of attacks such as buffer overflows or denial-of-service conditions. It would be better practice to pass only necessary information to functions through parameters rather than relying on global variables like this.
+      }
+    }
+
+    void main() {
+      const auto num_loops = static_cast<int>(read()) + 1; // Taint Analysis: Both arguments are tainted - one comes from `read()`, and the other is computed based on it.
+      write(num_loops); // Taint Analysis: `num_loops` is tainted coming into the function call.
+    }
+};
+
+int main() {
+  C c;
+  c.main();
+
+  return 0;
+}
