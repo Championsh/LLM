@@ -1,0 +1,40 @@
+Вот пример того, как можно перевести код на C++, сохраняя семантику и ошибки:
+
+
+#include &lt;iostream&gt;
+#include &lt;cstring&gt;
+
+class C
+{
+public:
+    int Read()
+    {
+        char stringNumber[10];
+        int count = 0;
+        if (getenv("ADD") != nullptr)
+        {
+            count = atoi(stringNumber);
+        }
+        return count;
+    }
+
+    void Write(int numberOfLoops)
+    {
+        int i = 0;
+        while (i < numberOfLoops)
+        {
+            std::cout << "Hello World " << i << std::endl;
+            i *= 2;
+        }
+    }
+
+    int main()
+    {
+        int data = Read() + 1;
+        Write(data);
+        return 0;
+    }
+}
+
+
+В этом коде мы используем функцию getenv для получения значения переменной окружения "ADD". Мы также используем функцию atoi для преобразования строки в целое число. Мы проверяем значение nullptr перед использованием значения переменной, чтобы избежать ошибок NullReferenceException.
