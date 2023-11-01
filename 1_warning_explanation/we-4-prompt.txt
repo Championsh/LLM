@@ -1,1 +1,1 @@
-Imagine you're a teamlead. Explain to your junior programmers the follow C# warning: HANDLE_LEAK.EXCEPTION.TEST new MockAnalyzer(Random()) is not disposed when function CreateTempDir throws exception System.IO.IOException
+Imagine you're a teamlead. Explain to your junior programmers the following C# warning: HANDLE_LEAK.EXCEPTION.TEST new MockAnalyzer(Random()) is not disposed when function CreateTempDir throws exception System.IO.IOException

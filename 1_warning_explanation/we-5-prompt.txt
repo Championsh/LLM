@@ -1,1 +1,1 @@
-Explain the follow C# warning: INFINITE_LOOP [MISMATCHED_ITERATOR] Possibly mismatched loop iterator: variable j in loop declaration does not match incrementor variable v
+Explain the following C# warning: INFINITE_LOOP [MISMATCHED_ITERATOR] Possibly mismatched loop iterator: variable j in loop declaration does not match incrementor variable v

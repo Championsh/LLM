@@ -1,1 +1,1 @@
-Explain the follow C# warning: UNSAFE_REFLECTION User input textBox.Text is used as name to instantiate an object using reflection (parameter type of method System.Activator.CreateInstance(System.Type)) in expression Activator.CreateInstance(valueType)
+Explain the following C# warning: UNSAFE_REFLECTION User input textBox.Text is used as name to instantiate an object using reflection (parameter type of method System.Activator.CreateInstance(System.Type)) in expression Activator.CreateInstance(valueType)

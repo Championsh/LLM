@@ -1,2 +1,1 @@
-
-Explain the follow C# warning: BAD_COPY_PASTE In the expression designTimeControls.ContainsKey(item.Name) variable designTimeControls possibly need to be replaced with designTimeToolStripItems after copy paste
+Explain the following C# warning: BAD_COPY_PASTE In the expression designTimeControls.ContainsKey(item.Name) variable designTimeControls possibly need to be replaced with designTimeToolStripItems after copy paste
