@@ -1,8 +1,11 @@
-Here is a possible translation into Python:
+class Foo:
 
-def foo(n):
-    i = 0
-    sum = 0
-    while i < n: # Correct loop direction because in python the decrement operator has higher precedence than the comparison operators.
-        sum +=1
-        i -=1
+    def foo(self, n):
+        i = 0
+        sum = 0
+        while i < n: # correct loop direction because decrementing is handled by python automatically 
+            sum +=1
+            i+=1
+
+
+In this translated version, we use a `while` loop instead of a `for` loop since the loop variable (`i`) should be increased each iteration rather than decreased as it was in the original C# code. The loop condition also needed to be updated to reflect this change, so we used `i<n` instead of `i>0`. Additionally, we added an assignment statement inside the body of the loop to update the running total (`sum`). Finally, we made sure to handle the case where `n=0`, which would cause an infinite loop in the original code due to the incorrect loop direction.```

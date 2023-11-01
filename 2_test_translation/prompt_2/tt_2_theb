@@ -1,0 +1,39 @@
+Here's the given C# code translated to C++ while preserving the semantics and mistakes present in the code:
+
+cpp
+#include <iostream>
+
+class A {
+    int square(int x) {
+        return x * x;
+    }
+
+    int example(int a, int b, int c, int x) {
+        int result = 0;
+
+        if (b != 0) { // CSCC-TRACE{{Start of original code block}}
+            result = square(b) + square(x);
+        }
+
+        if (c != 0) { // CSCC-TRACE{{Start of pasted copy}}
+            result = square(b) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+        }
+
+        return result;
+    }
+};
+
+int main() {
+    A obj;
+
+    int a = 2;
+    int b = 3;
+    int c = 4;
+    int x = 5;
+
+    int result = obj.example(a, b, c, x);
+    std::cout << "Result: " << result << std::endl;
+
+    return 0;
+}
+Note: The given C# code has been translated to C++ with the utmost care to maintain the original structure and mistakes. However, keep in mind that the mistakes present in the code, such as the bad copy-paste mistake, may still be there and can have unintended consequences. It's always recommended to review and rectify such mistakes for correct program behavior.

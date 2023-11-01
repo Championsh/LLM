@@ -1,24 +1,29 @@
-class A
-{
-    int square(int x)
-    {
-        return x*x;
-    }
+#include<iostream>
 
-    int example(int a, int b, int c, int x) 
-    { 
-        int result = 0; 
-
-        if (b != 0) 
-        { 
-            result = square(b) + square(x); 
-        }
-
-        if (c != 0) 
-        { 
-            result = square(c) + square(x);  
-        } 
-
-       return result; 
-   } 
+int square(int x){
+    return x*x;
 }
+
+int example(int a, int b, int c, int x){
+    int result = 0;
+    if(b != 0){ // Start of original code block
+        result = square(b) + square(x);
+    }
+    if(c != 0){  // Start of pasted copy
+        
+    }
+    return result;
+}
+
+int main(){
+    int a, b, c, x;
+    std::cout << "Enter the values for a, b and c: ";
+    std::cin >> a >> b >> c;
+    std::cout << "\nEnter the value for x: ";
+    std::cin >> x;
+
+    std::cout << example(a, b, c, x);
+
+    return 0;
+}```
+В этом коде копи-паста не закрыта, и соответственно, при выполнении программы и доходе до этой строки произойдет ошибка.

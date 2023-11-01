@@ -1,5 +1,5 @@
-Translate the given C# code that demonstrates bad copy-paste mistake to C++: 
-
+Translate the given C# code that demonstrates bad copy-paste mistake to C++. Preserve semantics and mistakes present in the code. 
+```C#
 using System;
 namespace Csharp_checker
 {
@@ -29,3 +29,4 @@ namespace Csharp_checker
         }
     }
 }
+```

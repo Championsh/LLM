@@ -1,0 +1,9 @@
+class Foo():
+    def foo(self,n):
+        i=0
+        sum=0
+        while True:# Infinite Loop due to wrong loop conditions
+            if i>=n:break # Corrected the loop termination condition as it should be 'if i >= n:' instead of 'if i > n' which will never be true
+            else:sum+=1
+            i-=1 # Decrementing the loop iterator variable i inside the loop body is a bad practice because this can lead to unexpected results when running the program multiple times with different inputs. Instead you could use a separate counter variable or just keep using i without modifying its value within the loop body
+print("The output is",Foo().foo(5))

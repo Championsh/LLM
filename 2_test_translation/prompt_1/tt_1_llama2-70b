@@ -1,12 +1,12 @@
 Sure! Here's the equivalent Python code that demonstrates the same infinite loop bug:
-'''python
+```python
 class Foo:
-    def foo(n):
-        i = 0
-        sum = 0
-        while i < n:
-            sum += 1
-            i -= 1 # This line is equivalent to "i--" in C#
-'''
-
-In both codes, the loop invariant is `i < n`, but the loop increment operation `i-=` in C# or `i -= 1` in Python actually decreases the value of `i`, which means the loop will never terminate.
+def foo(self, n):
+i = 0
+sum = 0
+while i < n:
+sum += 1
+i -= 1 # Same mistake as in C# code, i.e., loop incrementor decreases the loop iterator variable i, but condition i < n expects the value of i to increase
+```
+Note that I've used a Python `while` loop instead of a `for` loop to translate the C# code directly. This is because the C# `for` loop is actually a shorthand for a `while` loop with a hidden iteration variable, and the mistake in the code is related to the update of the iteration variable.
+In both languages, the mistake is that the loop incrementor (`-= 1` in Python or `--i` in C#) decreases the value of the loop iterator variable (`i`), but the loop condition (`i < n`) still expects the value of `i` to increase on each iteration. As a result, the loop never terminates, causing an infinite loop.

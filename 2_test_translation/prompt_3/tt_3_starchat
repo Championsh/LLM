@@ -38,3 +38,59 @@ int main() {
 
   return 0;
 }
+
+
+////////////////////////
+
+```cpp
+#include <iostream>
+#include <sstream>
+#include <stdlib.h>
+#include <vector>
+
+std::istream& getline(std::istream& input, std::string &str) {
+  str.clear();
+
+  static const int bufsize = 512;
+  char buffer[bufsize];
+  input.read(buffer, bufsize - 1);
+  if (!input)
+      return input;
+
+  str.assign(buffer, input.gptr() - buffer);
+  return input;
+}
+
+
+class C {
+public:
+  int read() {
+    std::istringstream iss(getenv("ADD")); // 🚨 UNCONTROLLED_RESOURCE_CONSUMPTION getenv("ADD") is not checked for NULL before use in a loop
+    std::string number;
+    getline(iss, number);
+    int count = 0;
+    if (!number.empty()) {
+      count = atoi(number.c_str()); // 🌡️🤷‍♀️🌡️🤷‍♀️🌡️
+    }
+    return count;
+  }
+
+  void write(unsigned int nloops) {
+    unsigned int i = 0;
+    while (i < nloops) {
+      printf("hello world %u\n", i);
+      i <<= 1; // 🤷‍♂️
+    }
+  }
+
+  void main() {
+    auto data = read() + 1; // 🌡️🤷‍♀️🌡️🤷‍♀️🌡️
+    write(data); // 🌡️🤷‍♀️🌡️🤷‍♀️🌡️
+  }
+};
+
+int main() {
+  C c;
+  c.main();
+  return EXIT_SUCCESS;
+}

@@ -1,0 +1,28 @@
+#include <iostream>
+#include <iomanip>
+
+
+int read()
+{
+    std::string env = std::getenv("ADD");
+    if (env.empty())
+    {
+        throw std::runtime_error("Environment variable 'ADD' not found.");
+    }
+    int num = std::stoi(env);
+    std::cout << "Value of 'ADD' environment variable: "<< env << '\n'; 
+    return num;
+}
+int main () {
+    int i = 0; 
+    int numberOfLoops = read();
+    try
+    { 
+        while (i<numberOfLoops) {
+            std::cout  << "hello world " << i++ << std::endl; 
+        }
+    } catch (const std::exception &e) { 
+        std::cerr << e.what() << ':' << e.code() << std::endl;
+    }   
+    return 0;  
+}

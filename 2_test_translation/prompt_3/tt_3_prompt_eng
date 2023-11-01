@@ -1,5 +1,5 @@
-Translate the given C# code that demonstrates vulnerability of unvalidated loop boundary to C++: 
-
+Translate the given C# code that demonstrates mistake of unvalidated loop boundary to C++. Preserve semantics and mistakes present in the code.
+```C#
 using System;
 using System.IO;
 using System.Net;
@@ -34,3 +34,4 @@ class C
         Write(data); // ℹ️〔numberOfLoops is tainted〕
     }
 }
+```

@@ -1,0 +1,37 @@
+Переведи этот код на C#, который демонстрирует ошибку непроверенной границы цикла, на язык C++. Сохрани семантику и баги в коде.
+```C#
+using System;
+using System.IO;
+using System.Net;
+using System.Web;
+
+class C
+{
+    public int Read()
+    {
+        string stringNumber = Environment.GetEnvironmentVariable(""ADD"");
+        int count = 0;
+        if (stringNumber != null) 
+        {
+            count = int.Parse(stringNumber.Trim());
+        }
+        return count;
+    }
+        
+    public void Write(int numberOfLoops) 
+    {     
+        int i = 0;
+        while (i < numberOfLoops) 
+        {
+            Console.WriteLine(""hello world {0}"",  i);
+            i *= 2;
+        }
+    }
+
+    public void Main()
+    {
+        int data = Read() + 1;
+        Write(data);
+    }
+}
+```

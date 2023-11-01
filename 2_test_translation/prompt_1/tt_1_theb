@@ -1,0 +1,11 @@
+Here's the translation of the given C# code to Python, preserving the semantics and mistakes:
+
+python
+class Foo:
+    def foo(self, n):
+        i = 0
+        sum = 0
+        while i < n:  # Wrong loop direction: loop incrementor decreases the loop iterator variable i, but condition i < n expects the value of i to increase
+            sum += 1
+            i -= 1
+Please note that the mistake present in the original C# code, where the loop incrementor decreases the loop iterator variable i, but the condition i < n expects the value of i to increase, is preserved in the translated Python code.

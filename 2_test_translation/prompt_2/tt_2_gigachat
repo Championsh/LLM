@@ -1,0 +1,35 @@
+Вот пример того, как можно перевести код на C++, сохраняя семантику и ошибки:
+
+
+#include &lt;iostream&gt;
+
+namespace Csharp_checker
+{
+    class A
+    {
+        int square(int x)
+        {
+            return x * x;
+        }
+
+        int example(int a, int b, int c, int x)
+        {
+            int result = 0;
+
+            if (b != 0)
+            {
+                result = square(b) + square(x);
+            }
+
+            if (c != 0)
+            {
+                result = square(b) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+            }
+
+            return result;
+        }
+    }
+}
+
+
+В этом коде мы используем оператор if для проверки значений b и c. Мы также используем оператор CSCC-WARN, чтобы предупредить о потенциальной проблеме с копированием и вставкой.

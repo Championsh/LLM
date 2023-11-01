@@ -1,0 +1,30 @@
+// TODO: Check for errors. The translation is not guaranteed to produce valid C++.
+
+#include <iostream>
+
+class A
+{
+public:
+    inline int square(const int& x) const noexcept
+    {
+        return x * x;
+    };
+    
+    inline int example(const int& a, const int& b, const int& c, const int& x) const noexcept
+    {
+        auto result = 0;
+        
+        if (b != 0) // CSCC-TRACE{{Start of original code block}}
+        {
+            
+            result = square(b) + square(x);
+        }
+        
+        if (c != 0) // CSCC-TRACE{{Start of pasted copy}}
+        {
+            result = square(c) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+        }
+        
+        return result;
+    }
+};

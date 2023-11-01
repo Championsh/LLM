@@ -1,5 +1,5 @@
-Translate the given C# code that demonstrates infinite loop bug to Python: 
-
+Translate the given C# code that demonstrates infinite loop bug to Python. Preserve semantics and mistakes present in the code. 
+```C#
 public class Foo 
 {
     void foo(int n) 
@@ -12,3 +12,4 @@ public class Foo
         }
     }
 }
+```
