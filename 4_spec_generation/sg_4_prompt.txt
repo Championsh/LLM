@@ -1,0 +1,95 @@
+Generate a specification for the certain C# class: 
+
+using System.Collections.Generic;
+
+namespace System.Linq
+{
+    public static class Enumerable
+    {
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource First<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (((CSharpCodeChecker_Kostil.HasItemObject<TSource>)source)._count <= 0)
+                throw new InvalidOperationException(nameof(source));
+            return ((CSharpCodeChecker_Kostil.HasItemObject<TSource>)source).Item;
+        }
+
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource FirstOrDefault<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            var src = (CSharpCodeChecker_Kostil.HasItemObject<TSource>)source;
+            return src._count > 0 ? src.Item : default;
+        }
+
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource Single<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            var src = (CSharpCodeChecker_Kostil.HasItemObject<TSource>)source;
+            if (src._count <= 0 || src._count > 1)
+                throw new InvalidOperationException(nameof(source));
+            return src.Item;
+        }
+
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource SingleOrDefault<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            var src = (CSharpCodeChecker_Kostil.HasItemObject<TSource>)source;
+            if (src._count > 1)
+                throw new InvalidOperationException(nameof(source));
+            return src._count == 1 ? src.Item : default;
+        }
+
+        [Models.ExternalFunctionModels.EnableModel]
+        public static bool Any<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            return ((CSharpCodeChecker_Kostil.HasItemObject<TSource>) source)._count > 0;
+        }
+
+        public static bool Any<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+            return ((CSharpCodeChecker_Kostil.HasItemObject<TSource>) source)._count > 0;
+        }
+
+        [Models.ExternalFunctionModels.EnableModel]
+        public static int Count<TSource>(this IEnumerable<TSource> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            return ((CSharpCodeChecker_Kostil.HasItemObject<TSource>) source)._count;
+        }
+    }
+}
+
+according to the already existing specification for function __ctype_b_loc:
+
+/**
+* __ctype_b_loc -- accessor function for __ctype_b array for ctype functions
+* The __ctype_b_loc() function shall return a pointer into an array of
+* characters in the current locale that contains characteristics for each
+* character in the current character set.
+* The array shall contain a total of 384 characters, and can be indexed with
+* any signed or unsigned char (i.e. with an index value between -128 and 255).
+* If the application is multithreaded, the array shall be local to the current
+* thread.
+* This interface is not in the source standard; only in the binary standard.
+*/
+const unsigned short **__ctype_b_loc(void) {
+    const unsigned short **res;
+    sf_overwrite(&res);
+    sf_not_null(res);
+    return res;
+}

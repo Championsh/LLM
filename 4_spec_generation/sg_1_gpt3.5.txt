@@ -1,0 +1,17 @@
+Specification for the lib function BSTR SysAllocString(const OLECHAR *psz):
+
+- Function name: SysAllocString
+- Input: const OLECHAR *psz (pointer to a string)
+- Output: BSTR (pointer to a string)
+- Behavior:
+  - Allocates memory for a BSTR string and copies the content of psz into it
+  - Returns the pointer to the allocated BSTR string
+- Error handling:
+  - If memory allocation fails, returns a possible null pointer
+- Memory management:
+  - Uses sf_overwrite to clear any existing memory at the pointer location
+  - Uses sf_uncontrolled_ptr to indicate that the pointer may not be under direct control of the program
+  - Uses sf_set_alloc_possible_null to handle possible null pointer return
+  - Uses sf_new to indicate that memory allocation is taking place in the BSTR_ALLOC_CATEGORY
+- Additional notes:
+  - The function does not handle exception handling and does not call std::terminate_handler.

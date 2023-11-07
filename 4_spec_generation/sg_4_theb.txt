@@ -1,0 +1,80 @@
+namespace System.Linq
+{
+    public static class Enumerable
+    {
+        /// <summary>
+        /// Returns the first element of a sequence.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to return the first element from.</param>
+        /// <returns>The first element in the sequence.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence is null.</exception>
+        /// <exception cref="System.InvalidOperationException">Thrown when the source sequence is empty.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource First<TSource>(this IEnumerable<TSource> source);
+
+        /// <summary>
+        /// Returns the first element of a sequence, or a default value if the sequence contains no elements.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to return the first element from.</param>
+        /// <returns>The first element in the sequence, or the default value for the element type if the sequence is empty.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence is null.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource FirstOrDefault<TSource>(this IEnumerable<TSource> source);
+
+        /// <summary>
+        /// Returns the only element of a sequence, and throws an exception if there is not exactly one element in the sequence.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to return the single element from.</param>
+        /// <returns>The single element in the sequence.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence is null.</exception>
+        /// <exception cref="System.InvalidOperationException">Thrown when the source sequence is empty or contains more than one element.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource Single<TSource>(this IEnumerable<TSource> source);
+
+        /// <summary>
+        /// Returns the only element of a sequence, or a default value if the sequence is empty; this method throws an exception if there is more than one element in the sequence.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to return the single element from.</param>
+        /// <returns>The single element in the sequence, or the default value for the element type if the sequence is empty.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence is null.</exception>
+        /// <exception cref="System.InvalidOperationException">Thrown when the source sequence contains more than one element.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static TSource SingleOrDefault<TSource>(this IEnumerable<TSource> source);
+
+        /// <summary>
+        /// Determines whether a sequence contains any elements.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to check for elements.</param>
+        /// <returns>True if the sequence contains any elements; otherwise, false.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence is null.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static bool Any<TSource>(this IEnumerable<TSource> source);
+
+        /// <summary>
+        /// Determines whether any element of a sequence satisfies a condition.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to check for elements.</param>
+        /// <param name="predicate">A function to test each element for a condition.</param>
+        /// <returns>True if any element in the sequence satisfies the condition; otherwise, false.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence or the predicate is null.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static bool Any<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate);
+
+        /// <summary>
+        /// Returns the number of elements in a sequence.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the elements in the sequence.</typeparam>
+        /// <param name="source">The sequence to count the elements of.</param>
+        /// <returns>The number of elements in the sequence.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when the source sequence is null.</exception>
+        [Models.ExternalFunctionModels.EnableModel]
+        public static int Count<TSource>(this IEnumerable<TSource> source);
+    }
+}
+

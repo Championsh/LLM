@@ -1,0 +1,53 @@
+Specification for the C# class Enumerable:
+
+- Class name: Enumerable
+- Namespace: System.Linq
+- Methods:
+  - First<TSource>
+    - Input: IEnumerable<TSource> source
+    - Output: TSource
+    - Behavior:
+      - Throws ArgumentNullException if source is null
+      - Throws InvalidOperationException if the count of items in source is less than or equal to 0
+      - Returns the first item in the source
+  - FirstOrDefault<TSource>
+    - Input: IEnumerable<TSource> source
+    - Output: TSource
+    - Behavior:
+      - Throws ArgumentNullException if source is null
+      - Returns the first item in the source if count is greater than 0, otherwise returns default value for TSource
+  - Single<TSource>
+    - Input: IEnumerable<TSource> source
+    - Output: TSource
+    - Behavior:
+      - Throws ArgumentNullException if source is null
+      - Throws InvalidOperationException if the count of items in source is less than or equal to 0 or greater than 1
+      - Returns the single item in the source
+  - SingleOrDefault<TSource>
+    - Input: IEnumerable<TSource> source
+    - Output: TSource
+    - Behavior:
+      - Throws ArgumentNullException if source is null
+      - Throws InvalidOperationException if the count of items in source is greater than 1
+      - Returns the single item in the source if count is 1, otherwise returns default value for TSource
+  - Any<TSource>
+    - Input: IEnumerable<TSource> source
+    - Output: bool
+    - Behavior:
+      - Throws ArgumentNullException if source is null
+      - Returns true if the count of items in source is greater than 0, otherwise returns false
+  - Any<TSource> (with predicate)
+    - Input: IEnumerable<TSource> source, Func<TSource, bool> predicate
+    - Output: bool
+    - Behavior:
+      - Throws ArgumentNullException if source or predicate is null
+      - Returns true if the count of items in source is greater than 0, otherwise returns false
+  - Count<TSource>
+    - Input: IEnumerable<TSource> source
+    - Output: int
+    - Behavior:
+      - Throws ArgumentNullException if source is null
+      - Returns the count of items in the source
+- Additional notes:
+  - The class contains methods for querying and manipulating collections of objects using LINQ syntax.
+  - The class does not specify multithreading behavior or locale dependency in the function specification.

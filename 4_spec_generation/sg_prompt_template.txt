@@ -1,0 +1,5 @@
+Generate a specification for the lib function 
+
+
+
+according to the already existing specification for function

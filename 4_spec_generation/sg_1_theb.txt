@@ -1,0 +1,17 @@
+/**
+ * @brief Allocates a new BSTR string and initializes it with the specified OLECHAR string.
+ *
+ * @param psz Pointer to the OLECHAR string.
+ * @return BSTR A newly allocated BSTR string initialized with the specified OLECHAR string.
+ */
+BSTR SysAllocString(const OLECHAR* psz)  {
+    BSTR ptr;
+    sf_overwrite(&ptr);
+    sf_overwrite(ptr);
+    sf_uncontrolled_ptr(ptr);
+    sf_set_alloc_possible_null(ptr);
+    sf_new(ptr, BSTR_ALLOC_CATEGORY);
+
+    sf_copy_string(ptr, psz);
+    return ptr; 
+}

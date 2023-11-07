@@ -1,0 +1,18 @@
+Specification for the lib function SysAllocString:
+
+- Function name: SysAllocString
+- Input: const OLECHAR *psz (pointer to a wide-character string)
+- Output: BSTR (pointer to a wide-character string)
+- Behavior:
+  - Allocates memory for a BSTR and copies the contents of the input wide-character string into it
+  - Uses sf_overwrite to clear any existing memory at the pointer location
+  - Uses sf_uncontrolled_ptr to handle possible null pointer return
+  - Uses sf_set_alloc_possible_null to indicate that the function may return a null pointer in case of memory allocation failure
+- Error handling:
+  - If the pointer to the allocated BSTR is null, returns a possible null pointer
+- Memory management:
+  - Uses sf_overwrite to clear any existing memory at the pointer location
+  - Uses sf_new to allocate memory for the BSTR
+  - Uses sf_copy_string to copy the contents of the input wide-character string into the allocated BSTR
+- Additional notes:
+  - No specific mention of multithreading behavior or locale dependency in the function specification
