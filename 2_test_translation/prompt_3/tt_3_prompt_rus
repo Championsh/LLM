@@ -24,7 +24,7 @@ class C
         while (i < numberOfLoops) 
         {
             Console.WriteLine(""hello world {0}"",  i);
-            i *= 2;
+            i += 2;
         }
     }
 

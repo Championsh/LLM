@@ -29,7 +29,7 @@ public:
 		while (i < numberOfLoops) // ℹ️〔numberOfLoops is passed into sink in expression i < numberOfLoops〕
 		{
 			cout << "hello world " << i << endl;
-			i *= 2;
+			i += 2;
 		}
 	}
 

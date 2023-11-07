@@ -13,7 +13,7 @@ return count; // eturn is tainted}
 void write(int numberOfLoops) {
 int i = 0;
 while (iOfLoops) { // umberOfLoops is passed into sink in expression i < numberOfLoops cout << "hello world " << i << endl;
-i *= 2;
+i += 2;
 }
 }
 int main() {

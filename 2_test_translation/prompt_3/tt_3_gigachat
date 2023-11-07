@@ -24,7 +24,7 @@ public:
         while (i < numberOfLoops)
         {
             std::cout << "Hello World " << i << std::endl;
-            i *= 2;
+            i += 2;
         }
     }
 
