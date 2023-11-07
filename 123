@@ -1,0 +1,9 @@
+Generate a test with following warning: DEREF_OF_NULL Value argument, which can be null, is dereferenced in member access expression argument.Kind
+which was detected at Binder_Expressions.cs:3696.
+Make sure that your test follows the execution path:
+Step 1: Condition analyzedArguments.HasErrors taking true branch at Binder_Expressions.cs:3617:21
+Step 2: Condition node.Initializer != null taking false branch at Binder_Expressions.cs:3642:21
+Step 3: Condition analyzedArguments.Arguments.Count >= 1 taking false branch at Binder_Expressions.cs:3648:44
+Step 4: Condition hasErrors taking false branch at Binder_Expressions.cs:3650:21
+Step 5: Condition argument is UnboundLambda taking false branch at Binder_Expressions.cs:3657:26
+Step 6: Condition analyzedArguments.HasErrors taking false branch at Binder_Expressions.cs:3690:26
