@@ -1,0 +1,11 @@
+Function Name: SysAllocString
+
+Parameters: const OLECHAR* psz - Input parameter containing string data to be copied and allocated memory for.
+
+Return Value: BSTR - Pointer to newly allocated memory containing the input string data.
+
+Description: This function allocates memory for the input string data and copies it into a new buffer, returning a pointer to the newly allocated memory. The memory allocation is performed using the BSTR_ALLOC_CATEGORY and BSTR_ALLOC_FLAG_DEFAULT flags, which specify that the string should be allocated on the default heap with normal memory management behavior.
+
+The sf_overwrite() function is used to overwrite the memory with random values before use to avoid information leakage. The sf_uncontrolled_ptr() function ensures that the memory is cleared before returning it to the caller. The sf_set_alloc_possible_null() function sets the flag that allows the allocator to return NULL pointers in certain error conditions.
+
+Note: The implementation of this function may vary depending on the programming language or platform being used, but the basic functionality and parameters should remain consistent with the given specification.

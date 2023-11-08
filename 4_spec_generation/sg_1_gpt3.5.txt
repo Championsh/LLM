@@ -15,3 +15,5 @@ Specification for the lib function BSTR SysAllocString(const OLECHAR *psz):
   - Uses sf_new to indicate that memory allocation is taking place in the BSTR_ALLOC_CATEGORY
 - Additional notes:
   - The function does not handle exception handling and does not call std::terminate_handler.
+  
+  

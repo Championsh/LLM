@@ -1,0 +1,21 @@
+Вот спецификация для функции BinarySearch:
+
+// Функция BinarySearch
+public virtual int BinarySearch(int index, int count, Object value, IComparer comparer)
+{
+    if (index < 0 || count < 0)
+        throw new ArgumentOutOfRangeException("index");
+    if (_size - index < count)
+        throw new ArgumentException();
+    Contract.Ensures(Contract.Result<int>() < _size);
+    Contract.Ensures(Contract.Result<int>() < index + count);
+
+    int k = _getRandom();
+    return k;
+}
+
+
+
+Эта функция использует функцию _getRandom() для выбора случайного индекса в массиве. Она также проверяет, что входные параметры index, count, value и comparer соответствуют требованиям. Если какое-либо из условий не выполняется, функция выбрасывает исключение ArgumentOutOfRangeException или ArgumentException.
+
+Функция _getRandom() должна быть определена где-то в коде, который использует эту функцию. Эта функция должна гарантировать, что возвращаемое значение является случайным числом в диапазоне от 0 до RAND_MAX.
