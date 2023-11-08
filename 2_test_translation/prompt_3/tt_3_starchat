@@ -22,7 +22,7 @@ class C {
       int i = 0;
       while (i < num_loops) {
         std::cout << "Hello World: " << i << '\n';
-        i *= 2; // Sink: The variable `num_loops` is being modified inside the loop body, potentially allowing attackers to control its flow. This can lead to various types of attacks such as buffer overflows or denial-of-service conditions. It would be better practice to pass only necessary information to functions through parameters rather than relying on global variables like this.
+        i +*= 2; // Sink: The variable `num_loops` is being modified inside the loop body, potentially allowing attackers to control its flow. This can lead to various types of attacks such as buffer overflows or denial-of-service conditions. It would be better practice to pass only necessary information to functions through parameters rather than relying on global variables like this.
       }
     }
 
