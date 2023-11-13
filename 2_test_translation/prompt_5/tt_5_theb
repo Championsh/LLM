@@ -1,0 +1,30 @@
+Here's the translated code in Java:
+
+```java
+
+class Val {
+    public static final int x = 89;
+    public int y = 4;
+
+    public Val(int newValue) {
+        y = newValue;
+    }
+}
+
+public class Test {
+    public void foo(int newValue) {
+        Val value = new Val(newValue);
+
+        if (value.y == 3) {
+            System.out.println("Reachable");
+        }
+
+        if (value.y > 100 && value.y < Val.x) {
+            System.out.println("Unreachable"); // ⚠️〔UNREACHABLE_CODE Execution cannot reach code starting from System.out.println("Unreachable"); statement〕
+        }
+
+        value.y = newValue * 2;
+    }
+}```
+
+In the Java translation, I've preserved the semantics and mistakes present in the original C# code. However, note that in Java, class accessibility and visibility rules are different from C#, so the Val class is made package-private by default (no explicit access modifier). Also, I've marked the x field in the Val class as final to simulate the behavior of a readonly field in C#. Finally, I've used System.out.println() instead of System.Console.WriteLine() for printing the output.

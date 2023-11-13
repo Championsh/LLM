@@ -1,0 +1,54 @@
+```java
+import java.lang.*;
+import java.util.*;
+
+class Val {
+    public static final int x = 89;
+    protected int y = 4;
+    
+    public Val(final int newValue) {
+        super();
+        this.setY(newValue);
+    }
+    
+    public final int getX() {
+        return x;
+    }
+    
+    public final void setX(final int x) {
+        throw new UnsupportedOperationException();
+    }
+    
+    public int getY() {
+        return this.y;
+    }
+    
+    public void setY(final int y) {
+        this.y = y;
+    }
+}
+
+public class Test {
+    public void foo(final int newValue) throws Exception {
+        val value = new Val(newValue);
+        
+        if ((value).getY() == 3) {
+            
+            System.out.println((Object)"Reachable");
+        } else {
+            ;
+        }
+        
+        if (!((value).getY() <= 100)) {
+            ;
+        } else if (!((value).getY() >= Val.x)) {
+            ;
+        } else {
+            
+            System.out.println((Object)"Unreachable");
+        }
+        
+        (value).setY(newValue * 2);
+    }
+}
+```

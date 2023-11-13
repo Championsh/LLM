@@ -1,0 +1,46 @@
+Вот перевод на C++:
+
+#include <iostream>
+
+class Point
+{
+    double x;
+    double y;
+  public:
+    Point(double x, double y) : x(x), y(y) {}
+    void scale()
+    {
+        x *= 2.0;
+        y *= 2.0;
+    }
+    double getX() const { return x; }
+    double getY() const { return y; }
+};
+
+class Vector
+{
+    double x;
+    double y;
+  public:
+    Vector(double x, double y) : x(x), y(y) {}
+};
+
+class C
+{
+  private:
+    Vector v;
+
+  public:
+    C() : v(0.0, 0.0) {}
+
+    bool g()
+    {
+      Point pt;
+      try
+      {
+        pt = Point(v.x, v.y);
+        pt.scale();
+      }
+      catch (const std::exception &e)
+      {
+

@@ -1,0 +1,46 @@
+```java
+import java.util.Scanner;
+
+public class Val {
+    private static int x = 89; // ⚠️〔FORGOTTEN_READONLY Field Val.x should be readonly〕 // ⚠️〔SINGLE_KNOWN_VALUE Field Val.x has only one possible value (89)〿
+    private int y = 4;
+
+    public Val(int new_value) {
+        y = new_value;
+    }
+
+    public boolean isReachable() {
+        return y == 3;
+    }
+
+    public boolean isUnreachable() {
+        return y > 100 && y < x;
+    }
+
+    public void setY(int new_value) {
+        y = new_value * 2;
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Val value = new Val(10);
+
+        if (value.isReachable()) {
+            System.out.println("Reachable");
+        } else {
+            System.out.println("Unreachable");
+        }
+
+        if (value.isUnreachable()) {
+            System.out.println("Unreachable");
+        }
+
+        value.setY(10);
+    }
+}
+```
+
+
+В этом коде класс Val объявлен как внутренний, чтобы предотвратить доступ к его полям извне. Метод isReachable() проверяет, является ли значение y равным 3, что означает, что объект Val достижим. Метод isUnreachable() проверяет, находится ли значение y между 100 и x, что означает, что объект Val недосягаем. Метод setY() устанавливает значение y равным новому значению, умноженному на 2.

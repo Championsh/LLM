@@ -1,0 +1,23 @@
+Here's the Java version of the code, with the same semantics and mistakes:
+```Java
+import java.util.*;
+private class Val { // ield Val.x is not accessible from external code because class Val is private or internal// ield Val.x is not accessible from external code because class Val is private or internal 
+    public static int x = 89; // ORGOTTEN_READONLY Field Val.x should be readonly// INGLE_KNOWN_VALUE Field Val.x has only one possible value (89)// nitialization of Val.x field// nitialization of Val.x field 
+    public int y = 4; 
+    public Val(int new_value) { 
+        y = new_value; 
+    }
+}
+
+public class Test { 
+    public void foo(int new_value) { 
+        Val value = new Val(new_value); 
+        if (value.y == 3) 
+            System.out.println("Reachable"); 
+        if (value.y > 100 && value.y < Val.x) 
+            System.out.println("Unreachable"); // NREACHABLE_CODE Execution cannot reach code starting from System.Console.WriteLine("Unreachable"); statement 
+        value.y = new_value * 2; 
+    }
+}
+```
+Note that the code has been translated to Java, but the mistakes and warnings present in the original C# code have been preserved. The code still contains the same unreachable code warning, forgotten readonly field, single known value, and initialization of fields.
