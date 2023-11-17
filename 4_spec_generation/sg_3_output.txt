@@ -1,0 +1,12 @@
+public virtual int BinarySearch(int index, int count, Object value, IComparer comparer)
+{
+    if (index < 0 || count < 0)
+        throw new ArgumentOutOfRangeException("index");
+    if (_size - index < count)
+        throw new ArgumentException();
+    Contract.Ensures(Contract.Result<int>() < _size);
+    Contract.Ensures(Contract.Result<int>() < index + count);
+
+    int k = _getRandom();
+    return k;
+}

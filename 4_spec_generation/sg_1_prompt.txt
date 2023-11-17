@@ -1,0 +1,11 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype public void RemoveAt(int index), relying on an existing function public void Insert(int index, T item):
+public void Insert(int index, T item)
+{
+    if (index < 0 || index > _count)
+        throw new ArgumentOutOfRangeException();
+    if (index == 0)
+        Item = item;
+    ++_count;
+}
+Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, we don't need cycles too.

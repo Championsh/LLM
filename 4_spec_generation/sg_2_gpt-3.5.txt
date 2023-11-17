@@ -1,0 +1,25 @@
+public override int Read(char[] buffer, int index, int count)
+{
+    // Check if the index and count are within the bounds of the buffer array
+    if (index < 0 || index >= buffer.Length || count < 0 || index + count > buffer.Length)
+    {
+        throw new ArgumentOutOfRangeException("index or count is out of range");
+    }
+
+    // Check if the current position is at the end of the string
+    if (_position >= _length)
+    {
+        return 0; // Return 0 to indicate that no characters were read
+    }
+
+    // Calculate the number of characters to read based on the length of the string and the current position
+    int charsToRead = Math.Min(count, _length - _position);
+
+    // Copy the characters from the string to the buffer array starting at the specified index
+    _s.CopyTo(_position, buffer, index, charsToRead);
+
+    // Update the current position
+    _position += charsToRead;
+
+    return charsToRead; // Return the number of characters read
+}

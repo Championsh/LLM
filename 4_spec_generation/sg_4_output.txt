@@ -1,0 +1,18 @@
+int SysReAllocString(BSTR *pbstr, const OLECHAR *psz) {
+    //sf_not_null(pbstr); - incorrect use of it
+
+    BSTR ptr;
+    sf_overwrite(&ptr);
+    sf_overwrite(ptr);
+    sf_uncontrolled_ptr(ptr);
+    sf_set_alloc_possible_null(ptr);
+    sf_new(ptr, BSTR_ALLOC_CATEGORY);
+    sf_copy_string(ptr, psz);
+    
+    sf_escape(pbstr);
+    int res;
+	sf_overwrite(&res);
+    //sf_not_acquire_if_eq(ptr, res, 0);
+    sf_not_acquire_if_less(ptr, res, 1);
+    return res; // Returns True if the string is successfully reallocated, or False if insufficient memory exists.
+}

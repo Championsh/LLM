@@ -1,0 +1,20 @@
+
+
+public void RemoveAt(int index)
+{
+    if (index < 0 || index >= Count)
+        throw new ArgumentOutOfRangeException();
+
+    // Shift elements to fill the gap left by the removed element
+    // at the specified index
+    for (int i = index; i < Count - 1; i++)
+    {
+        Items[i] = Items[i + 1];
+    }
+
+    // Decrement the count variable and resize the items array
+    // if it has become too large
+    Count--;
+    if (Count < Items.Length / 2)
+        Array.Resize(ref Items, Items.Length / 2);
+}

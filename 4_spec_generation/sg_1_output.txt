@@ -1,0 +1,7 @@
+public void RemoveAt(int index)
+{
+    if (index < 0 || index >= Count)
+        throw new ArgumentOutOfRangeException();
+
+    _count--;
+}

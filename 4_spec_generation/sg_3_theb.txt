@@ -1,0 +1,34 @@
+public virtual int BinarySearch(int index, int count, Object value, IComparer comparer)
+{
+    if (comparer == null)
+        throw new ArgumentNullException(nameof(comparer));
+    
+    if (index < 0 || count < 0 || index + count > _size)
+        throw new ArgumentOutOfRangeException();
+    
+    int lo = index;
+    int hi = index + count - 1;
+
+    while (lo <= hi)
+    {
+        int mid = lo + ((hi - lo) >> 1);
+        int comparison = comparer.Compare(value, _getRandomElement(mid));
+
+        if (comparison == 0)
+            return mid;
+        else if (comparison < 0)
+            hi = mid - 1;
+        else
+            lo = mid + 1;
+    }
+
+    return ~lo;
+}
+
+private Object _getRandomElement(int index)
+{
+    if (_getBool())
+        return _getDefaultValue();
+    else
+        return emptyArray[index];
+}

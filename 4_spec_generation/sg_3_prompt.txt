@@ -1,0 +1,28 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype public virtual int BinarySearch(int index, int count, Object value, IComparer comparer), relying on an existing function public virtual int BinarySearch(Object value, IComparer comparer):
+public virtual int BinarySearch(Object value, IComparer comparer)
+{
+    Contract.Ensures(Contract.Result<int>() < _size);
+    int k = _getRandom();
+    return k;
+}
+Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, we don't need cycles too.
+Also consider using only following auxiliary class fields and functions:
+
+private int _size;
+private int _version;
+private const int _defaultCapacity = 4;
+private static readonly Object[] emptyArray = Array.Empty<Object>();
+private int _getRandom()
+{
+    return (new Random()).Next();
+}
+private bool _getBool()
+{
+    return _getRandom() % 2 == 0;
+}
+public Object _getDefaultValue()
+{
+    return new Object();
+}
+

@@ -1,0 +1,10 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype public override int Read(char[] buffer, int index, int count), relying on an existing function public StringReader(string s):
+public StringReader(string s)
+{
+    if (s == null)
+        throw new ArgumentNullException("s");
+    _s = s;
+    _length = s == null ? 0 : s.Length;
+};
+Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, we don't need cycles too.
