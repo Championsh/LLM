@@ -1,0 +1,27 @@
+```java
+class Val
+{
+    public static final int x = 89;
+    public int y;
+
+    public Val(int new_value)
+    {
+        y = new_value;
+    }
+}
+
+public class Test
+{
+    public void foo(int new_value)
+    {
+        Val value = new Val(new_value);
+
+        if (value.y == 3)
+            System.out.println("Reachable");
+
+        if (value.y > 100 && value.y < Val.x)
+            System.out.println("Unreachable"); // ⚠️ UNREACHABLE_CODE Execution cannot reach code starting from System.out.println("Unreachable"); statement⚠️
+
+        value.y = new_value * 2;
+    }
+}```

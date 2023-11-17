@@ -1,0 +1,24 @@
+```java
+class Val { // ℹ️〔Field Val.x is not accessible from external code because class Val is private or internal〕 // ℹ️〔Field Val.x is not accessible from external code because class Val is private or internal〕
+  public static final int x = 89; // ⚠️〔FORGOTTEN_READONLY Field Val.x should be readonly〕 // ⚠️〔SINGLE_KNOWN_VALUE Field Val.x has only one possible value (89)〕 // ℹ️〔Initialization of Val.x field〕 // ℹ️〔Initialization of Val.x field〕
+  public int y = 4;
+  
+  public Val(int new_value) { // ℹ️〔Method 'Val.Val(int)' may be 'private'〕 // ℹ️〔Local variable 'new_value' is never read〕 // ℹ️〔Parameter 'new_value' of 'Val.Val(int)' has a null default value〕
+    y = new_value;
+  }
+}
+
+public class Test { // ℹ️〔Class 'Test' is never used〕
+  public void foo(int new_value) { // ℹ️〔Parameter 'new_value' of 'Test.foo(int)' has a null default value〕
+    Val value = new Val(new_value); // ℹ️〔Variable 'value' is assigned null or an instance of anonymous class 'Val$1'〕
+    
+    if (value.y == 3)
+      System.out.println("Reachable");
+
+    if (value.y > 100 && value.y < Val.x) { // ⚠️〔UNREACHABLE_CODE Execution cannot reach code starting from System.out.println("Unreachable"); statement〕
+      System.out.println("Unreachable");
+    }
+
+    value.y = new_value * 2; // ℹ️〔Assigned value is never used〕
+  }
+}```
