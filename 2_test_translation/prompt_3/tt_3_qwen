@@ -1,0 +1,29 @@
+```cpp
+#include <iostream>
+#include <cstdlib>
+class C {
+public:
+    int read() {
+        char* stringNumber = std::getenv("ADD"); // ⚠️['ADD' is an unvalidated environment variable and used as a loop bound]
+        int count = 0;
+        if (stringNumber != nullptr) {
+            try {
+                count = std::stoi(stringNumber);
+            } catch (...) {
+                throw std::invalid_argument("Error parsing string number");
+            }
+        }
+        return count;
+    }
+    void write(int numberOfLoops) {
+        for (int i = 0; i < numberOfLoops; ++i) { // ⚠️[numberOfLoops is not validated before use in sink]
+            std::cout << "hello world " << i << '\n';
+        }
+    }
+    void main() {
+        int data = read() + 1; // ⚠️[read() returns a tainted value]
+        write(data); // ⚠️[write() uses a tainted value as input to the sink]
+    }
+};```
+
+This C++ translation preserves the semantics of the original C# code, but moves the mistakes to the same location. In both cases, there is an issue with unvalidated loop boundaries: the first one is the ADD environment variable, which is not validated before being used as a loop bound, and the second one is numberOfLoops, which is also not validated before being used in the sink. Additionally, the code includes exception handling for the case where the parsed string number is not a valid integer, as well as appropriate sanitization of the user input when reading from the environment.

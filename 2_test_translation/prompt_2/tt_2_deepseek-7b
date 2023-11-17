@@ -1,0 +1,35 @@
+Here is the C++ version of the given C# code:
+
+```cpp
+#include <iostream>
+
+class A {
+    int square(int x) {
+        return x*x;
+    }
+
+    int example(int a, int b, int c, int x) {
+        int result = 0;
+
+        if (b != 0) // CSCC-TRACE{{Start of original code block}}
+        {
+            result = square(b) + square(x);
+        }
+
+        if (c != 0) // CSCC-TRACE{{Start of pasted copy}}
+        {
+            result = square(b) + square(x); // CSCC-WARN{{BAD_COPY_PASTE In the expression square(b) variable b possibly need to be replaced with c after copy paste}}
+        }
+
+        return result;
+    }
+};
+
+int main() {
+    A a;
+    int result = a.example(1, 2, 3, 4);
+    std::cout << result << std::endl;
+    return 0;
+}```
+
+Please note that the C++ code is a direct translation of the C# code. The C++ code does not have the same semantics as the C# code because the C++ language does not support the concept of "variable shadowing" in the way that the C# language does. In C++, if you declare a variable with the same name as a parameter in a function, the function parameter takes precedence. This is not the case in C#. Therefore, in the C++ code, the variable b in the square(b) expressions will always refer to the b parameter of the example function, not the b variable declared in the example function.

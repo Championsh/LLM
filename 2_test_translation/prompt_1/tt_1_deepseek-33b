@@ -1,0 +1,15 @@
+The C# code provided is a buggy infinite loop. The loop variable i is decremented in each iteration, but the loop condition i < n expects i to increase. This will cause the loop to never end, resulting in an infinite loop.
+
+Here is the equivalent Python code:
+
+```python
+class Foo:
+    def foo(self, n):
+        i = 0
+        sum = 0
+        for i in range(n, -1, -1):  # Python's range function can take a step argument to decrement the iterator
+            sum += 1
+```
+In Python, the range function can take a step argument, which allows you to specify the increment or decrement of the iterator. In this case, we're using -1 as the step argument to decrement i in each iteration.
+
+However, the C# code is buggy because it's an infinite loop. The loop variable i is decremented in each iteration, but the loop condition i < n expects i to increase. This will cause the loop to never end, resulting in an infinite loop.

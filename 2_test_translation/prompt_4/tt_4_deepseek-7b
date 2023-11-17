@@ -1,0 +1,67 @@
+Here is the C++ equivalent of the given C# code:
+
+```cpp
+#include <iostream>
+
+class Point {
+public:
+    int x;
+    int y;
+
+    Point(int x, int y) : x(y), y(x) {}
+};
+
+class Vector {
+public:
+    int x;
+    int y;
+};
+
+class C {
+public:
+    Vector* v;
+};
+
+Point ConvertToPoint(Vector vector) {
+    return Point(vector.x, vector.y);
+}
+
+bool g(C* c) {
+    Vector* v = c ? c->v : nullptr;
+    Point* pt = nullptr;
+    if (v) {
+        try {
+            *pt = ConvertToPoint(*v);
+        }
+        catch (std::exception& e) {
+            std::cout << "Failed to convert vector to point; v.x = " << v->x << ", v.y = " << v->y << std::endl;
+            return false;
+        }
+    }
+
+    if (pt) {
+        pt->x *= 2;
+        pt->y *= 2;
+    }
+
+    if (v) {
+        v->x = 5;
+        v->y = 6;
+    }
+
+    return true;
+}
+
+int main() {
+    C* c = new C();
+    c->v = new Vector();
+    g(c);
+    delete c->v;
+    delete c;
+    return 0;
+}```
+Please note that in C++, we need to manage memory manually, unlike C# where the garbage collector takes care of it. Also, C++ does not support null propagation (?.) like C#, so we need to check if the pointer is null before dereferencing it.
+
+In the g function, we first check if c is not null, then we check if c->v is not null. If c->v is not null, we try to convert it to a Point. If it fails, we catch the exception and return false. If the conversion is successful, we double the x and y of the Point, and change the x and y of the Vector.
+
+In the main function, we create a C object and a Vector object, call g with the C object, delete the Vector and C objects, and return 0.

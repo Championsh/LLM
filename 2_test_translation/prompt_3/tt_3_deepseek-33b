@@ -1,0 +1,38 @@
+Here is the equivalent C++ code:
+
+```cpp
+#include <iostream>
+#include <cstdlib>
+#include <string>
+
+class C
+{
+public:
+    int Read()
+    {
+        const char* stringNumber = std::getenv("ADD"); // ⚠️〔UNCONTROLLED_RESOURCE_CONSUMPTION Input std::getenv("ADD") is not validated and used in loop condition expression i < numberOfLoops〕 // ℹ️〔std::getenv("ADD") is the origin of the taint〕 // ℹ️〔stringNumber is tainted〕
+        int count = 0;
+        if (stringNumber != nullptr) 
+        {
+            count = std::stoi(stringNumber); // ℹ️〔std::stoi(stringNumber) is tainted〕// ℹ️〔count is tainted〕
+        }
+        return count; // ℹ️〔return is tainted〕
+    }
+        
+    void Write(int numberOfLoops) 
+    {     
+        int i = 0;
+        while (i < numberOfLoops) // ℹ️〔numberOfLoops is passed into sink in expression i < numberOfLoops〕
+        {
+            std::cout << "hello world " << i << std::endl;
+            i += 2;
+        }
+    }
+
+    void Main()
+    {
+        int data = Read() + 1; // ℹ️〔Read() is tainted〕// ℹ️〔Read() + 1 is tainted〕// ℹ️〔data is tainted〕
+        Write(data); // ℹ️〔numberOfLoops is tainted〕
+    }
+};```
+Please note that the C++ version of the code does not have the same semantics as the original C# code. In particular, the std::getenv function does not trim the string, and the std::stoi function does not handle invalid input. These differences are due to the fact that C++ does not have a direct equivalent to the int.Parse method in C#.

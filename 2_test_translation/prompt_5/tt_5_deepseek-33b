@@ -1,0 +1,26 @@
+Here is the equivalent Java code:
+
+```java
+public class Val {
+    public static final int x = 89; // ⚠️〔FORGOTTEN_READONLY Field Val.x should be final〕 // ⚠️〔SINGLE_KNOWN_VALUE Field Val.x has only one possible value (89)〕 // ℹ️〔Initialization of Val.x field〕 // ℹ️〔Initialization of Val.x field〕
+    public int y = 4;
+
+    public Val(int new_value) {
+        y = new_value;
+    }
+}
+
+public class Test {
+    public void foo(int new_value) {
+        Val value = new Val(new_value);
+
+        if (value.y == 3)
+            System.out.println("Reachable");
+
+        if (value.y > 100 && value.y < Val.x)
+            System.out.println("Unreachable"); // ⚠️〔UNREACHABLE_CODE Execution cannot reach code starting from System.out.println("Unreachable"); statement〕
+
+        value.y = new_value * 2;
+    }
+}```
+Please note that in Java, the System.Console.WriteLine is replaced with System.out.println. Also, the internal keyword in C# is replaced with the default access modifier in Java, which is package-private.
