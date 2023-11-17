@@ -1,0 +1,1 @@
+Imagine you're a programmer and you have a task to generate a simple program to demonstrate a following warning: MISSING_THROW Exception object new System.Exception(""Message"") is created, but is not thrown
