@@ -1,0 +1,9 @@
+```python
+class Foo:
+    def foo(self, n):
+        i = 0
+        sum = 0
+        while i < n:  # Correct loop direction: loop incrementor increases the loop iterator variable i, and condition i < n expects the value of i increase
+            sum += 1
+            i += 1
+```

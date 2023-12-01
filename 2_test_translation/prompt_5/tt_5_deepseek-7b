@@ -1,0 +1,24 @@
+```java
+public class Val {
+    public static final int x = 89;
+    public int y = 4;
+
+    public Val(int new_value) {
+        y = new_value;
+    }
+}
+
+public class Test {
+    public void foo(int new_value) {
+        Val value = new Val(new_value);
+
+        if (value.y == 3)
+            System.out.println("Reachable");
+
+        if (value.y > 100 && value.y < Val.x)
+            System.out.println("Unreachable");
+
+        value.y = new_value * 2;
+    }
+}
+```

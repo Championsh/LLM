@@ -1,5 +1,5 @@
 Here's the translated code in C++:
-
+```cpp
 #include <iostream>
 
 class Vector {
@@ -63,5 +63,5 @@ int main()
 
     return 0;
 }
-
+```
 In the C++ translation, I've preserved the null dereference behavior and kept the original mistakes present in the C# code. However, note that in C++, you need to manually manage memory with dynamic allocation using new and deallocation using delete. Also, exception handling in C++ is done with try-catch blocks and the std::exception class is used to catch exceptions.

@@ -1,0 +1,33 @@
+Here's the equivalent Java code:
+
+```java
+import java.util.*;
+class Val // ℹ️〔Field Val.x is not accessible from external code because class Val is private or internal〕 // ℹ️〔Field Val.x is not accessible from external code because class Val is private or internal〕
+{
+    public static final int x = 89; // ⚠️〔FORGOTTEN_READONLY Field Val.x should be readonly〕 // ⚠️〔SINGLE_KNOWN_VALUE Field Val.x has only one possible value (89)〕 // ℹ️〔Initialization of Val.x field〕 // ℹ️〔Initialization of Val.x field〕
+    public int y = 4;
+    
+    public Val(int new_value)
+    {
+        y = new_value;
+    }
+}
+public class Test
+{
+    public void foo(int new_value)
+    {
+        Val value = new Val(new_value);
+        
+        if (value.y == 3)
+            System.out.println("Reachable");
+        if (value.y > 100 && value.y < Val.x)
+            System.out.println("Unreachable"); // ⚠️〔UNREACHABLE_CODE Execution cannot reach code starting from System.out.println("Unreachable"); statement〕
+        value.y = new_value * 2;
+    }
+}
+```
+
+Note that I made the following changes:
+* Changed int to final int for Val.x to make it readonly.
+* Added the final keyword before int for Val.x to make it readonly.
+* Changed using System; to import java.util; since we're using System.out.println().

@@ -1,0 +1,13 @@
+Here's the equivalent Python code:
+
+```py
+class Foo:
+    def foo(self, n):
+        i = 0
+        sum = 0
+        while i < n: # Corrected loop direction: loop decrementor decreases the loop iterator variable i, which is expected in this case.
+            sum += 1
+            i -= 1
+```
+
+Note that Python does not require explicit type declarations like C#, so I removed them from the code. Also, in Python, you can use += operator to increment a variable by 1 and -= operator to decrease it by 1. Finally, instead of using for loop with decrementing loop counter, I used a while loop with decrementing loop counter to achieve the same behavior as the original C# code.
