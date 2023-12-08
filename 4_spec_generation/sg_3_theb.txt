@@ -1,34 +1,14 @@
-public virtual int BinarySearch(int index, int count, Object value, IComparer comparer)
-{
-    if (comparer == null)
-        throw new ArgumentNullException(nameof(comparer));
-    
-    if (index < 0 || count < 0 || index + count > _size)
-        throw new ArgumentOutOfRangeException();
-    
-    int lo = index;
-    int hi = index + count - 1;
+Here's a lightweight code snippet that relies on the existing getsockname function to implement the getpeername function:
 
-    while (lo <= hi)
-    {
-        int mid = lo + ((hi - lo) >> 1);
-        int comparison = comparer.Compare(value, _getRandomElement(mid));
+c
 
-        if (comparison == 0)
-            return mid;
-        else if (comparison < 0)
-            hi = mid - 1;
-        else
-            lo = mid + 1;
-    }
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+  sf_bitinit(addr);
+  sf_must_not_be_release(sockfd);
+  sf_set_must_be_positive(sockfd);
+  sf_lib_arg_type(sockfd, "SocketCategory");
 
-    return ~lo;
+  return getsockname(sockfd, addr, addrlen);
 }
 
-private Object _getRandomElement(int index)
-{
-    if (_getBool())
-        return _getDefaultValue();
-    else
-        return emptyArray[index];
-}
+This code simply calls the getsockname function with the provided arguments and returns its result. It uses the same input parameters sockfd, addr, and addrlen. By relying on the existing getsockname implementation, we leverage its functionality without introducing additional logic or control structures. 

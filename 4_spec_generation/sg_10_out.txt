@@ -1,0 +1,15 @@
+void *AllocateReservedPool (uintptr_t AllocationSize)
+{
+  sf_set_trusted_sink_int(AllocationSize);
+
+  void *Res;
+
+  sf_overwrite(&Res);
+  sf_overwrite(Res);
+  sf_new (Res, POOL_MEMORY_CATEGORY);
+  sf_set_possible_null(Res);
+  sf_not_acquire_if_eq(Res, Res, 0);
+  sf_buf_size_limit(Res, AllocationSize);
+
+  return Res;
+}

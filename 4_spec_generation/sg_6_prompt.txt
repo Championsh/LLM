@@ -1,0 +1,8 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype int isgraph(int c), relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+2. For any value check functions, e.g. isalpha, islower etc., use sf_set_trusted_sink_char(<parameter>), return_PURE(<parameter>), where <parameter> is function's int parameter;
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+
+Also consider that we need this function only to mark the program and we the real function behavior is not needed.

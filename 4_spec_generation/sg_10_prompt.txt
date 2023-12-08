@@ -1,0 +1,8 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype void *AllocateReservedPool (uintptr_t AllocationSize), relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+3. For any page or pool allocation functions, e.g. AllocatePages, AllocateReservedPool, AllocateAlignedPages etc., use sf_set_trusted_sink_int(<parameter>), void *Res, sf_overwrite(&Res), sf_overwrite(Res), sf_new(Res, <keyword>_MEMORY_CATEGORY), sf_set_possible_null(Res), sf_not_acquire_if_eq(Res, Res, 0), <set_buffer>, return Res, where <parameter> is the first function's uintptr_t parameter and <keyword> is a part of function's name,  e.g. for AllocateAlignedPages function the <keyword> is ALIGNED_PAGES, for AllocateReservedPool function the <keyword> is POOL, <set_buffer> is sf_buf_size_limit(Res, <size>), where <size> is an allocation size, e.g. for functions where <keyword> contains PAGES <size>=(Pages * EFI_PAGE_SIZE), and for functions where <keyword> contains POOL <size>=<parameter> from its first definition in this rule;
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+
+Also consider that we need this function only to mark the program and we the real function behavior is not needed.

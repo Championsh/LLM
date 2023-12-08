@@ -1,0 +1,4 @@
+int isgraph(int c) {
+    sf_set_trusted_sink_char(c);
+    return_PURE(c);
+}

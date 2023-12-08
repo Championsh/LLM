@@ -1,0 +1,13 @@
+Sure! Here's a lightweight implementation of the SysReAllocString function based on the existing SysAllocString function:
+
+c
+
+int SysReAllocString(BSTR *pbstr, const OLECHAR *psz) {
+    BSTR ptr = *pbstr;
+    sf_copy_string(ptr, psz);
+    return 0;
+}
+
+This implementation simply copies the content of the psz string to the existing pbstr BSTR pointer. The return value of 0 indicates that the function has completed successfully.
+
+Please note that this is a simplified implementation and does not include error handling or memory allocation logic present in a real-world code analysis tool.

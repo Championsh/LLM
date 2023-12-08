@@ -1,0 +1,7 @@
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    sf_bitinit(addr);
+    sf_must_not_be_release(sockfd);
+    sf_set_must_be_positive(sockfd);
+    sf_lib_arg_type(sockfd, "SocketCategory");
+
+    return getsockname(sockfd, addr, addrlen);

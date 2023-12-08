@@ -1,5 +1,5 @@
 Imagine you are a programmer creating static code analysis tool.
-Generate function with prototype int SysReAllocString(BSTR *pbstr, const OLECHAR *psz), relying on an existing function BSTR SysAllocString(const OLECHAR *psz):
+Generate function with prototype int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen), relying on an existing function BSTR SysAllocString(const OLECHAR *psz):
 BSTR SysAllocString(const OLECHAR *psz) {
     BSTR ptr;
     sf_overwrite(&ptr);
@@ -11,4 +11,5 @@ BSTR SysAllocString(const OLECHAR *psz) {
     sf_copy_string(ptr, psz);
     return ptr;
 };
-Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, we don't need cycles too.
+Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, loops, cycles.
+Make sure to use auxiliary functions from existing function.

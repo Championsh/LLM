@@ -1,0 +1,19 @@
+Here is a possible implementation of the getpeername function with the given prototype:
+Copy code
+
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    sf_bitinit(addr);
+    sf_must_not_be_release(sockfd);
+    sf_set_must_be_positive(sockfd);
+    sf_lib_arg_type(sockfd, "SocketCategory");
+
+    int res;
+    sf_overwrite(&res);
+    sf_set_possible_negative(res);
+
+    return res;
+}
+
+This function is similar to the getsockname function, but it takes an additional socklen_t *addrlen argument. The getpeername function is used to retrieve the address of the peer connected to the socket specified by sockfd. The address is returned in the struct sockaddr *addr argument, and the length of the address is returned in the socklen_t *addrlen argument.
+
+Note that this implementation does not actually perform the operation of retrieving the peer address. It simply sets up the arguments and returns a result, which is not used in this implementation. To actually retrieve the peer address, you would need to use the getsockname function or a similar function provided by the operating system.

@@ -1,0 +1,19 @@
+#include "windows.h"
+#include "oleauto.h"
+BSTR SysReAllocString(BSTR *pbstr, const OLECHAR *psz) {
+    BSTR oldStr = *pbstr;
+    // allocate new memory
+    BSTR newStr = SysAllocString(psz);
+    // copy contents of old string to new one
+    if (oldStr != NULL) {
+        CopyMemory(newStr, oldStr, strlen(oldStr) + 1);
+    }
+    // free old memory
+    SysFreeString(oldStr);
+    // set pointer to new memory
+    *pbstr = newStr;
+    return newStr;
+}
+
+
+This function takes in a pointer to a BSTR variable and a null-terminated wide character string. It first allocates new memory for the BSTR using the SysAllocString function provided. It then copies the contents of the old BSTR (if it exists) to the new BSTR using the CopyMemory function. Finally, it frees the old memory using the SysFreeString function and sets the pointer to the new BSTR memory. The function returns the new BSTR memory.

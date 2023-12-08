@@ -1,0 +1,40 @@
+Here is a possible implementation of the RemoveAt function using the existing Insert function:
+Copy code
+
+public void RemoveAt(int index)
+{
+    if (index < 0 || index >= _count)
+        throw new ArgumentOutOfRangeException();
+
+    if (index == 0)
+    {
+        // Remove the first item
+        _count--;
+    }
+    else
+    {
+        // Remove the item at the given index
+        T item = GetItem(index);
+        Remove(item);
+    }
+}
+
+This implementation uses the Insert function to remove the first item in the list, and the Remove function to remove the item at the given index. It also uses the GetItem function to retrieve the item at the given index before removing it.
+
+Note that this implementation assumes that the Remove function is defined as follows:
+Copy code
+
+public void Remove(T item)
+{
+    // Remove the given item from the list
+}
+
+And the GetItem function is defined as follows:
+Copy code
+
+public T GetItem(int index)
+{
+    // Return the item at the given index
+}
+
+I hope this helps! Let me know if you have any questions.

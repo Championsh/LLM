@@ -1,0 +1,12 @@
+public void RemoveAt(int index)
+{
+    if (index < 0 || index >= _count)
+        throw new ArgumentOutOfRangeException();
+
+    for (int i = index; i < _count - 1; i++)
+    {
+        Insert(i, _array[i + 1]);
+    }
+
+    _count--;
+}

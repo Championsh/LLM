@@ -1,0 +1,13 @@
+int SysReAllocString(BSTR *pbstr, const OLECHAR *psz) {
+    BSTR oldPtr = *pbstr;
+    BSTR newPtr = SysAllocString(psz);
+
+    if (newPtr != NULL) {
+        sf_overwrite(   oldPtr);
+        sf_overwrite(oldPtr);
+        sf_uncontrolled_ptr(oldPtr);
+        sf_set_free_possible_null(oldPtr);
+        *pbstr = newPtr;
+        return 0;
+    }
+    return -1;

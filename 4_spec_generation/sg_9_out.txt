@@ -1,0 +1,4 @@
+void FreePages (void *Buffer, uintptr_t Pages)
+{
+  sf_delete (Buffer, PAGES_MEMORY_CATEGORY);
+}

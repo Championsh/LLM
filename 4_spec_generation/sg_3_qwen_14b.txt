@@ -1,0 +1,11 @@
+Here is the implementation of the getpeername function:
+
+
+#include <string.h>
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+  return getsockname(sockfd, addr, addrlen);
+}
+
+
+This function simply calls the getsockname function and returns its result. It does not perform any additional checks or assignments.

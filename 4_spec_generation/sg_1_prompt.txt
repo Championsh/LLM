@@ -8,4 +8,5 @@ public void Insert(int index, T item)
         Item = item;
     ++_count;
 }
-Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, we don't need cycles too.
+Consider to generate a lightweight code, i.e. we need only general function behaviour without assignment, loops, cycles.
+Make sure to use auxiliary functions from existing function.

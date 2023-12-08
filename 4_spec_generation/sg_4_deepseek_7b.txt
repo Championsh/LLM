@@ -1,0 +1,19 @@
+#include <stdlib.h>
+#include <string.h>
+
+int SysReAllocString(BSTR *pbstr, const OLECHAR *psz) {
+    BSTR newBSTR = SysAllocString(psz);
+    if (newBSTR == NULL) {
+        return 0; // Failed to allocate memory
+    }
+
+    // Free the old BSTR
+    if (*pbstr != NULL) {
+        free(*pbstr);
+    }
+
+    // Update the pointer
+    *pbstr = newBSTR;
+
+    return 1; // Success
+}

@@ -1,0 +1,8 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype void FreePages(void *Buffer, uintptr_t Pages), relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+4. For any page or pool free functions, e.g. FreeAlignedPages, FreePool etc., use sf_delete(<buffer>, <keyword>_MEMORY_CATEGORY);, where <buffer> is function's pointer parameter and <keyword> is a part of function's name, e.g. for FreeAlignedPages function the <keyword> is ALIGNED_PAGES, for FreePool function the <keyword> is POOL;
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+
+Also consider that we need this function only to mark the program and we the real function behavior is not needed.

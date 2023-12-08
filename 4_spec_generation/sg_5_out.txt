@@ -1,0 +1,4 @@
+int cbc_crypt(char *key, char *data, unsigned datalen, unsigned mode, char *ivec) {
+    sf_password_use(key);
+    sf_password_use(ivec);
+}

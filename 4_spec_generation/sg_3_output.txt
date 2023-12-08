@@ -1,12 +1,12 @@
-public virtual int BinarySearch(int index, int count, Object value, IComparer comparer)
-{
-    if (index < 0 || count < 0)
-        throw new ArgumentOutOfRangeException("index");
-    if (_size - index < count)
-        throw new ArgumentException();
-    Contract.Ensures(Contract.Result<int>() < _size);
-    Contract.Ensures(Contract.Result<int>() < index + count);
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t
+       *addrlen)  {
+	sf_must_not_be_release(sockfd);
+    sf_set_must_be_positive(sockfd);
+    sf_lib_arg_type(sockfd, "SocketCategory");
 
-    int k = _getRandom();
-    return k;
+	int res;
+    sf_overwrite(&res);
+	sf_set_possible_negative(res);
+		
+    return res;
 }
