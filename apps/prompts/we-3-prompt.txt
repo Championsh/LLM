@@ -1,0 +1,1 @@
+Explain the following C# warning: BUFFER_OVERFLOW Writing 1 element of type Tizen.Location.Coordinate into buffer listPointer + i * Marshal.SizeOf(coordinates[0]) can exceed its size

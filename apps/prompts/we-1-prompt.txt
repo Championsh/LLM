@@ -1,0 +1,1 @@
+Explain the following c# warning: API.CSHARP.CULTURE Method string.Compare(string, string, bool) is culture specific. Its usage can cause unexpected behaviour. It is recommended to add CultureInfo argument into invocation or use CompareOrdinal()

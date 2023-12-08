@@ -7,7 +7,7 @@ import os
 from flask import Flask, render_template, request
 import chainlit as cl
 
-# TODO: Test is works
+# TODO: Test if works
 
 huggingfacehub_api_token = os.environ['HUGGINGFACEHUB_API_TOKEN']
 
