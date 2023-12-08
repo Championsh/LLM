@@ -49,9 +49,15 @@ def run(dir_path=None, sys_prompt_flag=False, model_flag=False):
         return
 
     while True:
-        prompt = input("Enter Prompt\n")
-        if prompt == '--':
-            return
+        prompt = ''
+        cur = input("Enter Prompt\n")
+        while True:
+            if cur == '--':
+                return
+            if cur == '++':
+                break
+            prompt += '\n' + cur
+            cur = input()
         generate_response(prompt, hf_email, hf_pass, sys_prompt, model)
 
 
@@ -77,7 +83,7 @@ if __name__ == '__main__':
                   'Для этого запишите путь к папке в командной строке.\n\n'
                   'Каждый output отделен строкой из 10 "-":\n'
                   '----------\n\n'
-                  'Либо вводить Промпты напрямую.\nЧтобы завершить напишите --\n'
+                  'Либо вводить Промпты напрямую (++ в конце каждого).\nЧтобы завершить напишите --\n'
                   'Чтобы выбрать из доступных моделей, добавьте аргумент m.\n'
                   'Доступные модели:\n'
                   '1 - Llama-2-70b,\n'
