@@ -1,21 +1,3 @@
-LLM CA Tasks: Promts -> Outputs.
-LLM Models to test on:
-Llama 2,
-Marcoroni-70B-v1,
-FashionGPT-70B-V1.1,
-Uni-TianYan,
-ORCA_LLaMA_70B_QLoRA,
-Falcon-40B,
-Falcon-180B,
-Starchat,
-Llama2-13B,
-Llama2-70B,
-Gigachat,
-YandexGPT,
-ChatGPT baseline,
-TheB.Ai,
-AutoGen (GPT based)
-
 # ML and LLM for Code Analysis
 
 This repository is devoted to using **Large Language Models** for solving Code Analysis tasks.
@@ -24,14 +6,23 @@ In this repository, you can find examples of:
 - C++ functionality such as **file i/o**, **stream i/o**, **vectors**, **stacks**.
 - Python functionality such as **itertools.product**, **copy.deepcopy**, **collections.Counter**, **file i/o**.
 
-## Involved Algorithms
-- Graphs
-    - Breadth First Searching
-    - Depth First Searching
-    - Prim's Algorithm
-    - Dijkstra's Algorithm
-- Lists
-    - Binary Search
+## Tested LLM Models
+- Llama 2,
+- Marcoroni-70B-v1,
+- FashionGPT-70B-V1.1,
+- Uni-TianYan,
+- ORCA_LLaMA_70B_QLoRA,
+- Falcon-40B,
+- Falcon-180B,
+- Starchat,
+- Llama2-13B,
+- Llama2-70B,
+- Gigachat,
+- YandexGPT,
+- ChatGPT baseline,
+- TheB.Ai,
+- AutoGen (GPT based)
+
 ## Project Tree
 ```
 ├── 1_warning_explanation
@@ -73,4 +64,3 @@ In this repository, you can find examples of:
 └── test_generation_NotATask
     └── ...
 ```
-
