@@ -1,0 +1,7 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype {func_prototype}, relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+{sca_rules}
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+Also consider that we need these functions only to mark the program and we the real functions behavior is not needed.
+Don't add implementation for any static code analysis functions, as they are defined in "specfunc.h" header.

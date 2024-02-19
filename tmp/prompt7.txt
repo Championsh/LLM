@@ -1,0 +1,8 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype void des_setparity(char *key), relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+1. For any cryptography functions, e.g. crypt, setkey, password etc., use sf_password_use(<parameter>) for each any char pointer parameter of function except data parameter
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+Also consider that we need these functions only to mark the program and we the real functions behavior is not needed.
+Don't add implementation for any static code analysis functions, as they are defined in "specfunc.h" header.
