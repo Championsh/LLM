@@ -1,0 +1,66 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype void * AllocatePages ( uintptr_t Pages )
+
+void * AllocateRuntimePages ( uintptr_t Pages )
+
+void * AllocateReservedPages ( uintptr_t Pages )
+
+void FreePages ( void    *Buffer,  uintptr_t Pages )
+
+void * AllocateAlignedPages ( uintptr_t Pages,  uintptr_t Alignment )
+
+void * AllocatePool ( uintptr_t AllocationSize )
+
+void * AllocateRuntimePool ( uintptr_t AllocationSize )
+
+void * AllocateReservedPool ( uintptr_t AllocationSize )
+
+void * AllocateZeroPool ( uintptr_t AllocationSize )
+
+void * AllocateRuntimeZeroPool ( uintptr_t AllocationSize )
+
+void * AllocateReservedZeroPool ( uintptr_t AllocationSize )
+
+void * AllocateCopyPool ( uintptr_t    AllocationSize,  const void   *Buffer )
+
+void * AllocateRuntimeCopyPool ( uintptr_t    AllocationSize,  const void   *Buffer )
+
+void * AllocateReservedCopyPool ( uintptr_t    AllocationSize,  const void   *Buffer )
+
+void * ReallocatePool ( uintptr_t OldSize,  uintptr_t NewSize,  void    *OldBuffer )
+
+void * ReallocateRuntimePool ( uintptr_t OldSize,  uintptr_t NewSize,  void    *OldBuffer )
+
+void * ReallocateReservedPool ( uintptr_t OldSize,  uintptr_t NewSize,  void    *OldBuffer )
+
+void FreePool ( void  *Buffer ), relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+For any memory allocation function that allocates one or more pages or a buffer of a specific type:
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the number of pages or allocation size.
+    Create a pointer variable Res to hold the allocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., PAGES_MEMORY_CATEGORY, ALIGNED_MEMORY_CATEGORY, POOL_MEMORY_CATEGORY, etc.).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the number of pages or allocation size and the page size (if applicable).
+    If the allocation function copies a buffer to the allocated memory, use sf_bitcopy to mark the memory as copied from the input buffer.
+    Return the pointer variable Res as the allocated memory.
+
+For any memory reallocation function:
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the new allocation size.
+    Create a pointer variable Res to hold the reallocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the new allocation size.
+    Use sf_bitcopy to mark the memory as copied from the old buffer.
+    Use sf_delete to mark the old buffer as freed with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Return the pointer variable Res as the reallocated memory.
+
+For any memory free function:
+    Use sf_delete to mark the input buffer as freed with a specific memory category (e.g., PAGES_MEMORY_CATEGORY, ALIGNED_MEMORY_CATEGORY, POOL_MEMORY_CATEGORY, etc.).
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+Also consider that we need these functions only to mark the program and we the real functions behavior is not needed.
+Don't add implementation for any static code analysis functions, as they are defined in "specfunc.h" header.

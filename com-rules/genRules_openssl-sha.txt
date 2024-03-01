@@ -1,4 +1,4 @@
-Generate a common rule for static analysis tool based on following specifications: #include "specfunc.h"
+Generate common rules for static analysis tool functions usages based on the following specifications: #include "specfunc.h"
 
 typedef struct sha256_state_st SHA256_CTX;
 typedef struct sha512_state_st SHA512_CTX;
