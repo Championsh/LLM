@@ -73,7 +73,7 @@ def get_rules(rules_pwd, rule_numbers):
     f.close()
 
     if rule_numbers is None:
-        return rules
+        return ''.join(rules)
 
     res = ''
     for rule in rules:
