@@ -1,1 +1,1 @@
-Generate a common rule for static analysis tool based on following specifications: {spec}
+Generate common rules for static analysis tool functions usages based on the following specifications: {spec}

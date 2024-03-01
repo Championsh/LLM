@@ -60,10 +60,27 @@ def get_protos(protos_pwd):
             res += [proto]
         return res
 
-    protos = comment_remover(protos)
+    protos = comment_remover(protos).split('\n')
+    tmp = ''
+    fl = False
     for line in protos:
-        if line.startswith('typedef') or line.startswith('#include') or not line:
+        line = line.rstrip()
+        if (line.startswith('typedef') or line.startswith('#include')
+                or line.startswith('#define') or not line):
             continue
+        if line == '{':
+            res += [tmp.replace('  ', ' ').replace('( ', '(').replace(' )',')')]
+            tmp = ''
+            fl = True
+            continue
+        if fl:
+            if '}' in line:
+                fl = False
+            continue
+        tmp += str(line) + ' '
+    for line in res:
+        print(line)
+        print()
     return
 
 
