@@ -1,0 +1,18 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with prototype int SHA512_Update(SHA512_CTX *sha, const void *data, size_t len), relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
+For any cryptographic hash function (e.g., SHA256, SHA384, SHA512):
+    Use sf_overwrite to mark the hash context as overwritten in the initialization, update, and finalization functions.
+    Use sf_new to mark the hash context as newly allocated with a specific memory category in the initialization function.
+    Use sf_set_possible_null to mark the hash context as possibly null in the initialization function.
+    Use sf_not_acquire_if_eq to mark the hash context as not acquired if it is equal to null in the initialization function.
+    Use sf_delete to mark the hash context as freed with a specific memory category in a cleanup function (if applicable).
+    If the hash function takes a password, key, or secret as an input parameter, use sf_password_use to mark the input parameter that specifies the password, key, or secret.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the size of the data to be hashed and any other relevant parameters.
+    If the hash function copies a buffer to the allocated memory, use sf_bitcopy to mark the memory as copied from the input buffer.
+    In the finalization function, use sf_overwrite to mark the output digest as overwritten.
+    Return the output digest as the result of the hash function.
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+Also consider that we need these functions only to mark the program and we the real functions behavior is not needed.
+Don't add implementation for any static code analysis functions, as they are defined in "specfunc.h" header.
