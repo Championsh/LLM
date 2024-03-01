@@ -1,0 +1,56 @@
+For any memory allocation function that allocates one or more pages of a specific type (e.g., AllocatePages, AllocateRuntimePages, AllocateReservedPages, etc.):
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the number of pages to allocate.
+    Create a pointer variable Res to hold the allocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., PAGES_MEMORY_CATEGORY, ALIGNED_MEMORY_CATEGORY, POOL_MEMORY_CATEGORY, etc.).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the number of pages to allocate and the page size.
+    Return the pointer variable Res as the allocated memory.
+
+For any memory allocation function that allocates a buffer of a specific type (e.g., AllocatePool, AllocateRuntimePool, AllocateReservedPool, etc.):
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the allocation size.
+    Create a pointer variable Res to hold the allocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the allocation size.
+    Return the pointer variable Res as the allocated memory.
+
+For any memory allocation function that allocates and zeros a buffer of a specific type (e.g., AllocateZeroPool, AllocateRuntimeZeroPool, AllocateReservedZeroPool, etc.):
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the allocation size.
+    Create a pointer variable Res to hold the allocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the allocation size.
+    Use sf_memset to mark the memory as zeroed out.
+    Return the pointer variable Res as the allocated memory.
+
+For any memory allocation function that copies a buffer to an allocated buffer of a specific type (e.g., AllocateCopyPool, AllocateRuntimeCopyPool, AllocateReservedCopyPool, etc.):
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the allocation size.
+    Create a pointer variable Res to hold the allocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the allocation size.
+    Use sf_bitcopy to mark the memory as copied from the input buffer.
+    Return the pointer variable Res as the allocated memory.
+
+For any memory reallocation function (e.g., ReallocatePool, ReallocateRuntimePool, ReallocateReservedPool, etc.):
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the new allocation size.
+    Create a pointer variable Res to hold the reallocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the new allocation size.
+    Use sf_bitcopy to mark the memory as copied from the old buffer.
+    Use sf_delete to mark the old buffer as freed with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Return the pointer variable Res as the reallocated memory.
+
+For any memory free function (e.g., FreePages, FreeAlignedPages, FreePool, etc.):
+    Use sf_delete to mark the input buffer as freed with a specific memory category (e.g., PAGES_MEMORY_CATEGORY, ALIGNED_MEMORY_CATEGORY, POOL_MEMORY_CATEGORY, etc.).
