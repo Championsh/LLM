@@ -1,5 +1,29 @@
 #include "specfunc.h"
 
+#include <stdint.h>
+#include <stdbool.h>
+
+#define EFI_PAGE_SIZE             0x1000
+#define PAGES_MEMORY_CATEGORY     0x10001
+#define ALIGNED_MEMORY_CATEGORY   0x10002
+#define POOL_MEMORY_CATEGORY      0x10003
+
+bool
+DebugAssertEnabled (
+  void
+  )
+{
+  return true;
+}
+
+void
+CpuDeadLoop (
+  void
+  )
+{
+  sf_terminate_path();
+}
+
 void * AllocatePages(uintptr_t Pages) {
     void *Res;
 
