@@ -1,3 +1,13 @@
+#include "specfunc.h"
+
+typedef struct sha256_state_st SHA256_CTX;
+typedef struct sha512_state_st SHA512_CTX;
+typedef unsigned char uint8_t;
+
+#define SHA256_DIGEST_LENGTH 32
+#define SHA384_DIGEST_LENGTH 48
+#define SHA512_DIGEST_LENGTH 64
+
 int my_SHA256_Init(SHA256_CTX *sha) {
     sf_cryptography_use(sha);
     return 0; // Dummy return value
