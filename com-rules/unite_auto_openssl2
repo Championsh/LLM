@@ -1,0 +1,22 @@
+Unite Static Analysis Rules for specification generation where possible: 
+    Use sf_bitinit to mark the output buffer as initialized for any cryptographic function that generates a key or secret, such as DH_compute_key, compute_key, EVP_BytesToKey, etc.
+    Use sf_password_set to mark the output buffer as containing a password or secret for any cryptographic function that generates a key or secret.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameters that specify the size of the output buffer and any other relevant parameters for any cryptographic function that generates a key or secret.
+    Use sf_bitcopy to mark the output buffer as copied from the input buffer if the function copies a buffer to the output buffer for any cryptographic function that generates a key or secret.
+    Use sf_password_use to mark any input buffer that contains a password or secret for functions such as CMS_add0_recipient_key, EVP_PKEY_new_mac_key, EVP_PKEY_new_raw_private_key, EVP_PKEY_new_raw_public_key, CMS_RecipientInfo_set0_key, CTLOG_new_from_base64, EVP_CipherInit, EVP_CipherInit_ex, EVP_DecryptInit, EVP_DecryptInit_ex, EVP_EncryptInit, EVP_EncryptInit_ex, EVP_PKEY_CTX_set1_hkdf_key, EVP_PKEY_CTX_set_mac_key, BIO_set_cipher, EVP_PKEY_new_CMAC_key, EVP_OpenInit, EVP_PKEY_get_raw_private_key, EVP_SealInit, BF_cbc_encrypt, BF_cfb64_encrypt, BF_ofb64_encrypt, set_priv_key, DES_crypt, DES_fcrypt, EVP_PKEY_CTX_set1_hkdf_salt, PKCS5_PBKDF2_HMAC, PKCS5_PBKDF2_HMAC_SHA1.
+    Use sf_overwrite to mark any input/output parameter that gets overwritten, such as the len parameter in EVP_PKEY_get_raw_private_key and get_priv_key.
+    Use sf_bitinit to mark any output buffer that gets initialized, such as the out parameter in BF_cbc_encrypt, BF_cfb64_encrypt, BF_ofb64_encrypt, and DES_fcrypt.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the ivec parameter in BF_cbc_encrypt, BF_cfb64_encrypt, and BF_ofb64_encrypt.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameters that specify the size of the output buffer and any other relevant parameters for any function that generates an output buffer, such as EVP_BytesToKey, EVP_CIPHER_CTX_rand_key, PKCS5_PBKDF2_HMAC, and PKCS5_PBKDF2_HMAC_SHA1.
+    Use sf_bitcopy to mark the output buffer as copied from the input buffer if the function copies a buffer to the output buffer, such as in EVP_BytesToKey where the key and iv output buffers are copied from the data input buffer.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the pass and salt parameters in PKCS5_PBKDF2_HMAC and PKCS5_PBKDF2_HMAC_SHA1.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the pkey_base64 parameter in CTLOG_new_from_base64.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the oldpass and newpass parameters in PKCS12_newpass.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the pass parameter in PKCS12_parse.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the pass parameter in PKCS12_create.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the priv parameter in EVP_PKEY_new_CMAC_key.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the priv parameter in EVP_OpenInit.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the pub parameter in EVP_SealInit.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the priv parameter in set_priv_key.
+    Use sf_password_use to mark any input buffer that contains a password or secret, such as the pub parameter in set_pub_key.
+

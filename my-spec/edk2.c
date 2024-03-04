@@ -35,6 +35,8 @@ void * AllocatePages(uintptr_t Pages) {
     sf_not_acquire_if_eq(Res, Res, 0);
     sf_buf_size_limit(Res, Pages * EFI_PAGE_SIZE);
 
+    sf_buf_size_limit(Res, Pages * EFI_PAGE_SIZE);
+
     return Res;
 }
 
@@ -230,6 +232,8 @@ void * ReallocatePool(uintptr_t OldSize, uintptr_t NewSize, void *OldBuffer) {
 }
 
 void * ReallocateRuntimePool(uintptr_t OldSize, uintptr_t NewSize, void *OldBuffer) {
+    void *Res;
+
     sf_set_trusted_sink_int(NewSize);
     sf_overwrite(&Res);
     sf_overwrite(Res);
@@ -244,6 +248,8 @@ void * ReallocateRuntimePool(uintptr_t OldSize, uintptr_t NewSize, void *OldBuff
 }
 
 void * ReallocateReservedPool(uintptr_t OldSize, uintptr_t NewSize, void *OldBuffer) {
+    void *Res;
+
     sf_set_trusted_sink_int(NewSize);
     sf_overwrite(&Res);
     sf_overwrite(Res);

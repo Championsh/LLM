@@ -1,5 +1,6 @@
 import os
 import re
+import regex
 import argparse
 
 
@@ -11,7 +12,8 @@ save_prompt_path = 'prompts/'
 save_comments_path = 'comments/'
 uniteRule_template_path = 'com-rules/unite_rules_template.txt'
 genRule_template_path = 'com-rules/generate_rules_template.txt'
-saveRule_path = 'com-rules/'
+save_rule_path = 'com-rules/'
+save_specs_path = 'my-spec-auto/{}'
 
 
 def gen_prompt_id():
@@ -44,44 +46,45 @@ def comment_remover(text):
     return re.sub(pattern, replacer, text)
 
 
+def squeeze_specs(specs_pwd: str):
+    pwd = []
+    if os.path.isdir(specs_pwd):
+        specs_template = specs_pwd + \
+                         ('' if specs_pwd.endswith('/') else '/') + '{}'
+        files = (os.fsdecode(file) for file in os.listdir(os.fsencode(specs_pwd)))
+        files = (file for file in files if not os.path.isdir(os.path.join(specs_pwd, file)))
+        pwd = [specs_template.format(file) for file in files]
+    else:
+        pwd = [specs_pwd]
+    for filename in pwd:
+        f = open(filename, "r")
+        text = f.read()
+        f.close()
+        specs = comment_remover(text)
+
+        pattern = r"{(?:[^{}]|(?R))*}"
+        res = regex.sub(pattern, ";", specs)
+
+        text_file = open(save_specs_path.format(filename.rsplit('/')[-1]), "w")
+        text_file.write(res.replace('( ', '(').replace(') ', ')'))
+
+        text_file.close()
+
+
 def get_protos(protos_pwd):
     f = open(protos_pwd, "r")
     protos = f.read()
     f.close()
 
     res = []
-    if "#include" not in protos:
-        protos = protos.split(';\n')
-        for proto in protos:
-            if not proto.rstrip():
-                continue
-            if proto.startswith('//'):
-                continue
-            res += [proto]
-        return res
-
-    protos = comment_remover(protos).split('\n')
-    tmp = ''
-    fl = False
-    for line in protos:
-        line = line.rstrip()
-        if (line.startswith('typedef') or line.startswith('#include')
-                or line.startswith('#define') or not line):
+    protos = protos.split(';\n')
+    for proto in protos:
+        if not proto.rstrip():
             continue
-        if line == '{':
-            res += [tmp.replace('  ', ' ').replace('( ', '(').replace(' )',')')]
-            tmp = ''
-            fl = True
+        if proto.startswith('//'):
             continue
-        if fl:
-            if '}' in line:
-                fl = False
-            continue
-        tmp += str(line) + ' '
-    for line in res:
-        print(line)
-        print()
-    return
+        res += [proto]
+    return res
 
 
 def get_rules(rules_pwd, rule_numbers):
@@ -150,17 +153,17 @@ def unite_rules(rules_pwd):
     f.close()
     path, _, name = rules_pwd.rpartition('/')
     name = name.replace('.c', '.txt')
-    text_file = open(saveRule_path + 'unite_' + name, "w")
+    text_file = open(save_rule_path + 'unite_' + name, "w")
     res = template.format(auto_gen_rules=rules)
     n = text_file.write(res)
     if n == len(res):
-        print(f"Success! Prompt for rules unite written to {saveRule_path + 'unite_' + name}.")
+        print(f"Success! Prompt for rules unite written to {save_rule_path + 'unite_' + name}.")
     else:
         print("Failure! Prompt for rules unite not written to text file.")
     text_file.close()
 
 
-def gen_rules(spec_pwd):
+def gen_rules_prompt(spec_pwd):
     f = open(genRule_template_path, "r")
     template = f.read()
     f.close()
@@ -169,11 +172,11 @@ def gen_rules(spec_pwd):
     f.close()
     path, _, name = spec_pwd.rpartition('/')
     name = name.replace('.c', '.txt')
-    text_file = open(saveRule_path + '/' + 'genRules_' + name, "w")
+    text_file = open(save_rule_path + '/' + 'genRules_' + name, "w")
     res = template.format(spec=specs)
     n = text_file.write(res)
     if n == len(res):
-        print(f"Success! Prompt for rules generation written to {saveRule_path + '/' + 'genRules_' + name}.")
+        print(f"Success! Prompt for rules generation written to {save_rule_path + '/' + 'genRules_' + name}.")
     else:
         print("Failure! Prompt for rules generation not written to text file.")
     text_file.close()
@@ -192,6 +195,8 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--rule-numbers')
     parser.add_argument('-gr', '--gen-rules')
     parser.add_argument('-ur', '--unite-rules')
+    parser.add_argument('-ss', '--squeeze-specs')
+
     # parser.add_argument('-sp', '--save-path', default="/home/champion/Projects/LLM/tmp/prompt{num}.txt")
     args = parser.parse_args()
 
@@ -199,9 +204,10 @@ if __name__ == '__main__':
     rules_path = args.rules_path
     prototypes_path = args.prototypes_path
     rule_numbers = list(map(int, list(args.rule_numbers))) if args.rule_numbers else None
-    spec_pwd = args.gen_rules
-    rules_pwd = args.unite_rules
+    gen_rules_pwd = args.gen_rules
+    unite_rules_pwd = args.unite_rules
     # save_path = args.save_path
+    squeeze_specs_pwd = args.squeeze_specs
 
     if args.parse:
         parse()
@@ -209,9 +215,11 @@ if __name__ == '__main__':
     if args.form:
         form(template_path, rules_path, protos_path=prototypes_path, rule_numbers=rule_numbers)
 
-    if spec_pwd:
-        gen_rules(spec_pwd)
+    if gen_rules_pwd:
+        gen_rules_prompt(gen_rules_pwd)
 
-    if rules_pwd:
-        unite_rules(rules_pwd)
+    if unite_rules_pwd:
+        unite_rules(unite_rules_pwd)
 
+    if squeeze_specs_pwd:
+        squeeze_specs(squeeze_specs_pwd)
