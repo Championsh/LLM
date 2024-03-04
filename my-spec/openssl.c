@@ -15,6 +15,7 @@ typedef struct BIGNUM BIGNUM;
 typedef struct DH DH;
 typedef struct EVP_CIPHER EVP_CIPHER;
 typedef struct EVP_CIPHER_CTX EVP_CIPHER_CTX;
+typedef struct EVP_MD_CTX EVP_MD_CTX;
 typedef struct EVP_MD EVP_MD;
 typedef struct PKCS12 PKCS12;
 typedef struct BF_KEY BF_KEY;
@@ -26,16 +27,7 @@ int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *ctx) {
     sf_set_possible_null(ctx);
 
     // Mark the context as overwritten
-    sf_overwrite(ctx, sizeof(EVP_CIPHER_CTX));
-
-    // Set the buffer size limit based on the size of the context
-    sf_buf_size_limit(ctx, sizeof(EVP_CIPHER_CTX));
-
-    // Since this function resets the context, it doesn't copy a buffer to the context
-    // Therefore, sf_bitcopy is not used
-
-    // The function doesn't return a pointer variable or context as the allocated memory or initialized context
-    // Therefore, no return statement is needed
+    sf_overwrite(ctx);
 
     return 0;
 }
