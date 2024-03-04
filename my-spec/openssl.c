@@ -25,12 +25,6 @@ int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *ctx) {
     // Mark the context as possibly null
     sf_set_possible_null(ctx);
 
-    // If ctx is not null, mark it as not acquired
-    if (ctx == NULL) {
-        sf_not_acquire_if_eq(ctx);
-        return 0;
-    }
-
     // Mark the context as overwritten
     sf_overwrite(ctx, sizeof(EVP_CIPHER_CTX));
 
