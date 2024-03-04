@@ -1,4 +1,5 @@
-Generate a common rule for static analysis tool based on following specifications: #include "specfunc.h"
+Relying on the already created specifications for some functions from a needed library, generate common rules for static analysis tool functions usages, that perform all the necessary actions, the analysis functions not from a file shouldn't be included into the rules.
+#include "specfunc.h"
 
 #define STACK_OF(TYPE) TYPE
 

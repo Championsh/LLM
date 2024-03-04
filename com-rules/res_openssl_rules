@@ -1,19 +1,11 @@
-For any cryptographic function that takes a password, key, or secret as an input parameter, or initializes a context:
-    Use sf_password_use to mark any input parameters that specify a password, key, or secret.
-    If the function returns a pointer to a newly allocated memory block, create a pointer variable to hold the allocated memory.
-    Use sf_overwrite to mark both the pointer variable and the memory it points to as overwritten (if applicable).
-    Use sf_new to mark the memory as newly allocated with a specific memory category (if applicable).
-    Use sf_set_possible_null to mark the pointer variable or context as possibly null.
-    Use sf_not_acquire_if_eq to mark the pointer variable or context as not acquired if it is equal to null.
-    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the size of the password, key, secret, or context and any other relevant parameters (if applicable).
-    If the function copies a buffer to the allocated memory or context, use sf_bitcopy to mark the memory or context as copied from the input buffer.
-    Return the pointer variable or context as the allocated memory or initialized context (if applicable).
+Password Usage: Functions that take a password or key as an argument should be checked to ensure that the password/key is not hardcoded or stored in plaintext. The sf_password_use function is used to mark these arguments.
+Functions include but are not limited to: CMS_add0_recipient_key, EVP_PKEY_new_mac_key, EVP_PKEY_new_raw_private_key, EVP_PKEY_new_raw_public_key, CMS_RecipientInfo_set0_key, CTLOG_new_from_base64, EVP_BytesToKey, EVP_CipherInit, EVP_CipherInit_ex, EVP_DecryptInit, EVP_DecryptInit_ex, EVP_EncryptInit, EVP_EncryptInit_ex, EVP_PKEY_CTX_set1_hkdf_key, EVP_PKEY_CTX_set_mac_key, EVP_PKEY_derive, BIO_set_cipher, EVP_PKEY_new_CMAC_key, EVP_OpenInit, EVP_PKEY_get_raw_private_key, EVP_SealInit, BF_cbc_encrypt, BF_cfb64_encrypt, BF_ofb64_encrypt, get_priv_key, set_priv_key, DES_crypt, DES_fcrypt, EVP_PKEY_CTX_set1_hkdf_salt, PKCS5_PBKDF2_HMAC, PKCS5_PBKDF2_HMAC_SHA1, PKCS12_newpass, PKCS12_parse, PKCS12_create, EVP_PKEY_get_raw_public_key, get_pub_key, set_pub_key.
 
-For any cryptographic function that generates a key or secret:
-    Use sf_bitinit to mark the output buffer as initialized.
-    Use sf_password_set to mark the output buffer as containing a password or secret.
-    Use sf_buf_size_limit to set the buffer size limit based on the input parameters that specify the size of the output buffer and any other relevant parameters.
-    If the function copies a buffer to the output buffer, use sf_bitcopy to mark the output buffer as copied from the input buffer.
+Bit Initialization: Functions that initialize bits should be checked to ensure that they are properly initialized and used. The sf_bitinit function is used to mark these arguments.
+Functions include but are not limited to: DH_compute_key, compute_key, EVP_BytesToKey, EVP_CIPHER_CTX_rand_key, EVP_PKEY_derive, BF_cbc_encrypt, BF_cfb64_encrypt, BF_ofb64_encrypt, get_priv_key, PKCS5_PBKDF2_HMAC, PKCS5_PBKDF2_HMAC_SHA1, EVP_PKEY_get_raw_public_key, get_pub_key.
 
-For any cryptographic function that frees a context or memory block:
-    Use sf_delete to mark the input buffer as freed with a specific memory category.
+Password Setting: Functions that set a password should be checked to ensure that the password is properly set and used. The sf_password_set function is used to mark these arguments.
+Functions include but are not limited to: DH_compute_key, compute_key, EVP_BytesToKey, EVP_CIPHER_CTX_rand_key, EVP_PKEY_derive, get_priv_key, EVP_PKEY_get_raw_public_key, get_pub_key.
+
+Overwrite: Functions that overwrite data should be checked to ensure that the data is properly overwritten and not used after being overwritten. The sf_overwrite function is used to mark these arguments.
+Functions include but are not limited to: EVP_PKEY_derive, EVP_PKEY_get_raw_private_key, EVP_SealInit, get_priv_key, PKCS12_parse, EVP_PKEY_get_raw_public_key, get_pub_key.
