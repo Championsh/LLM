@@ -3,8 +3,10 @@
 
 #define STACK_OF(TYPE)TYPE
 #define LHASH_OF(TYPE)TYPE
-# define TSAN_QUALIFIER volatile
+#define TSAN_QUALIFIER volatile
 
+typedef _Atomic int CRYPTO_REF_COUNT;
+typedef struct ssl_st SSL;
 typedef struct ssl_method_st SSL_METHOD;
 typedef struct ssl_cipher_st SSL_CIPHER;
 typedef struct ssl_session_st SSL_SESSION;
