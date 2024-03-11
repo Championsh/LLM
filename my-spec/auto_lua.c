@@ -475,10 +475,6 @@ const char *lua_tostring(lua_State *L, int index) {
     // For this example, let's assume EFI_PAGE_SIZE is defined and used
     sf_buf_size_limit(Res, index * EFI_PAGE_SIZE);
 
-    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer
-    // For this example, let's assume there's a buffer named Buffer
-    sf_bitcopy(Res, Buffer);
-
     // Return the pointer variable Res as the allocated memory
     return Res;
 }
