@@ -1,7 +1,11 @@
 #include "specfunc.h"
+#include <cstdint>
 
 #define STACK_OF(TYPE)TYPE
 
+typedef struct X509_name_st X509_NAME;
+typedef struct ssl_ctx_st SSL_CTX;
+typedef struct ossl_lib_ctx_st OSSL_LIB_CTX;
 typedef struct ui_string_st UI_STRING;
 typedef struct ui_st UI;
 typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
