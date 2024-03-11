@@ -1,0 +1,16 @@
+    All functions should be checked for their return values. If a function returns an error code, it should be handled appropriately. This can be done using sf_set_errno_if and sf_no_errno_if functions, e.g. sf_set_errno_if(res, sf_cond_range("==", -1)), sf_no_errno_if(res, sf_cond_range("==", 0)).
+
+    All functions that take file names or paths as arguments should be checked for TOCTTOU (Time of check to time of use) race conditions using sf_tocttou_check or sf_tocttou_access functions. The file names or paths should also be marked as trusted sink pointers using sf_set_trusted_sink_ptr, e.g. sf_tocttou_check(path), sf_tocttou_access(path).
+
+    All functions that take file descriptors as arguments should be checked for their validity. The file descriptors should be positive and should not be released. This can be done using sf_must_not_be_release, sf_set_must_be_positive, and sf_lib_arg_type functions, e.g. sf_must_not_be_release(fd), sf_set_must_be_positive(fd), sf_lib_arg_type(fd, "StdioHandlerCategory").
+
+    All functions that allocate memory or return pointers should overwrite the memory or pointer using sf_overwrite function. The memory or pointer should also be marked as possible null using sf_set_possible_null function. E.g. sf_overwrite(&x), sf_set_possible_null(res).
+
+    All functions that deal with user input or untrusted data should mark the data as tainted using sf_set_tainted function, e.g. sf_set_tainted(buf).
+
+    All functions that deal with sensitive data should mark the data as password using sf_password_set function, e.g. sf_password_set(buf).
+
+    All functions that deal with time should be marked as long time using sf_long_time function, e.g. sf_long_time().
+
+    All functions that deal with file offsets or sizes should limit the buffer size using sf_buf_size_limit function.
+    All functions that deal with file offsets or sizes should also limit the buffer size for read operations using sf_buf_size_limit_read function. E.g. sf_buf_size_limit(buf, nbytes), sf_buf_size_limit_read(buf, nbytes).

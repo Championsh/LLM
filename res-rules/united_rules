@@ -1,0 +1,84 @@
+For any memory allocation function that allocates one or more pages or a buffer of a specific type:
+    Use sf_set_trusted_sink_int to mark the input parameter that specifies the number of pages or allocation size.
+    Create a pointer variable Res to hold the allocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten, e.g. sf_overwrite(&Res), sf_overwrite(Res).
+    Use sf_new(Res, <category>_MEMORY_CATEGORY) to mark the memory as newly allocated with a specific memory category (e.g., PAGES_MEMORY_CATEGORY, ALIGNED_MEMORY_CATEGORY, POOL_MEMORY_CATEGORY, etc.).
+    Use sf_set_possible_null(Res) to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq(Res, Res, 0) to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit(Res, Pages * EFI_PAGE_SIZE) to set the buffer size limit based on the input parameter that specifies the number of pages or allocation size and the page size (if applicable).
+    If the allocation function copies a buffer to the allocated memory, use sf_bitcopy(Res, Buffer) to mark the memory as copied from the input buffer.
+    Return the pointer variable Res as the allocated memory.
+
+For any memory reallocation function:
+    Use sf_set_trusted_sink_int(parameter) to mark the input parameter that specifies the new allocation size.
+    Create a pointer variable Res to hold the reallocated memory.
+    Use sf_overwrite to mark both the pointer variable Res and the memory it points to as overwritten.
+    Use sf_new to mark the memory as newly allocated with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Use sf_set_possible_null to mark the pointer variable Res as possibly null.
+    Use sf_not_acquire_if_eq to mark the pointer variable Res as not acquired if it is equal to null.
+    Use sf_buf_size_limit to set the buffer size limit based on the input parameter that specifies the new allocation size.
+    Use sf_bitcopy to mark the memory as copied from the old buffer.
+    Use sf_delete to mark the old buffer as freed with a specific memory category (e.g., POOL_MEMORY_CATEGORY).
+    Return the pointer variable Res as the reallocated memory.
+
+For any memory free function:
+    Use sf_delete to mark the input buffer as freed with a specific memory category (e.g., PAGES_MEMORY_CATEGORY, ALIGNED_MEMORY_CATEGORY, POOL_MEMORY_CATEGORY, etc.).
+
+Password Usage: Functions that take a password or key as an argument should be checked to ensure that the password/key is not hardcoded or stored in plaintext. The sf_password_use function is used to mark these arguments.
+Functions include but are not limited to: CMS_add0_recipient_key, EVP_PKEY_new_mac_key, EVP_PKEY_new_raw_private_key, EVP_PKEY_new_raw_public_key, CMS_RecipientInfo_set0_key, CTLOG_new_from_base64, EVP_BytesToKey, EVP_CipherInit, EVP_CipherInit_ex, EVP_DecryptInit, EVP_DecryptInit_ex, EVP_EncryptInit, EVP_EncryptInit_ex, EVP_PKEY_CTX_set1_hkdf_key, EVP_PKEY_CTX_set_mac_key, EVP_PKEY_derive, BIO_set_cipher, EVP_PKEY_new_CMAC_key, EVP_OpenInit, EVP_PKEY_get_raw_private_key, EVP_SealInit, BF_cbc_encrypt, BF_cfb64_encrypt, BF_ofb64_encrypt, get_priv_key, set_priv_key, DES_crypt, DES_fcrypt, EVP_PKEY_CTX_set1_hkdf_salt, PKCS5_PBKDF2_HMAC, PKCS5_PBKDF2_HMAC_SHA1, PKCS12_newpass, PKCS12_parse, PKCS12_create, EVP_PKEY_get_raw_public_key, get_pub_key, set_pub_key.
+
+Bit Initialization: Functions that initialize bits should be checked to ensure that they are properly initialized and used. The sf_bitinit function is used to mark these arguments.
+Functions include but are not limited to: DH_compute_key, compute_key, EVP_BytesToKey, EVP_CIPHER_CTX_rand_key, EVP_PKEY_derive, BF_cbc_encrypt, BF_cfb64_encrypt, BF_ofb64_encrypt, get_priv_key, PKCS5_PBKDF2_HMAC, PKCS5_PBKDF2_HMAC_SHA1, EVP_PKEY_get_raw_public_key, get_pub_key.
+
+Password Setting: Functions that set a password should be checked to ensure that the password is properly set and used. The sf_password_set function is used to mark these arguments.
+Functions include but are not limited to: DH_compute_key, compute_key, EVP_BytesToKey, EVP_CIPHER_CTX_rand_key, EVP_PKEY_derive, get_priv_key, EVP_PKEY_get_raw_public_key, get_pub_key.
+
+Overwrite: Functions that overwrite data should be checked to ensure that the data is properly overwritten and not used after being overwritten. The sf_overwrite function is used to mark these arguments.
+Functions include but are not limited to: EVP_PKEY_derive, EVP_PKEY_get_raw_private_key, EVP_SealInit, get_priv_key, PKCS12_parse, EVP_PKEY_get_raw_public_key, get_pub_key.
+
+    sf_set_trusted_sink_ptr: This function is used to mark a pointer as a trusted sink. It should be used when a pointer is passed to a function that is known to handle it safely: sf_set_trusted_sink_ptr(s);
+
+    sf_append_string: This function is used to append one string to another. It should be used when concatenating strings to avoid potential buffer overflows: sf_append_string((char *)s, (const char *)append);
+
+    sf_null_terminated: This function is used to ensure that a string is null-terminated. It should be used when working with strings to avoid potential buffer overflows: sf_null_terminated((char *)s);
+
+
+    sf_buf_overlap: This function is used to check for potential buffer overlaps. It should be used when working with buffers to avoid potential buffer overflows: sf_buf_overlap(s, append);
+
+    sf_set_trusted_sink_int: This function is used to mark an integer as a trusted sink. It should be used when an integer is passed to a function that is known to handle it safely: sf_set_trusted_sink_int(destlen);
+
+    sf_buf_copy: This function is used to copy one buffer to another. It should be used when working with buffers to avoid potential buffer overflows.
+    e.g. sf_buf_copy(s, append);
+
+    sf_buf_size_limit: This function is used to set a limit on the size of a buffer. It should be used when working with buffers to avoid potential buffer overflows.
+    e.g. sf_buf_size_limit(append, count);
+
+    sf_buf_size_limit_read: This function is used to set a limit on the number of bytes that can be read from a buffer. It should be used when working with buffers to avoid potential buffer overflows.
+    e.g. sf_buf_size_limit_read(append, count);
+
+    sf_buf_stop_at_null: This function is used to ensure that a buffer stops at a null character. It should be used when working with buffers to avoid potential buffer overflows.
+    e.g. sf_buf_stop_at_null(append);
+
+    sf_strlen: This function is used to get the length of a string. It should be used when working with strings to avoid potential buffer overflows.
+    e.g. sf_strlen(res, (const char *)s);
+
+    sf_strdup_res: This function is used to duplicate a string. It should be used when working with strings to avoid potential buffer overflows.
+    sf_strdup_res(res);
+
+    All functions should be checked for their return values. If a function returns an error code, it should be handled appropriately. This can be done using sf_set_errno_if and sf_no_errno_if functions, e.g. sf_set_errno_if(res, sf_cond_range("==", -1)), sf_no_errno_if(res, sf_cond_range("==", 0)).
+
+    All functions that take file names or paths as arguments should be checked for TOCTTOU (Time of check to time of use) race conditions using sf_tocttou_check or sf_tocttou_access functions. The file names or paths should also be marked as trusted sink pointers using sf_set_trusted_sink_ptr, e.g. sf_tocttou_check(path), sf_tocttou_access(path).
+
+    All functions that take file descriptors as arguments should be checked for their validity. The file descriptors should be positive and should not be released. This can be done using sf_must_not_be_release, sf_set_must_be_positive, and sf_lib_arg_type functions, e.g. sf_must_not_be_release(fd), sf_set_must_be_positive(fd), sf_lib_arg_type(fd, "StdioHandlerCategory").
+
+    All functions that allocate memory or return pointers should overwrite the memory or pointer using sf_overwrite function. The memory or pointer should also be marked as possible null using sf_set_possible_null function. E.g. sf_overwrite(&x), sf_set_possible_null(res).
+
+    All functions that deal with user input or untrusted data should mark the data as tainted using sf_set_tainted function, e.g. sf_set_tainted(buf).
+
+    All functions that deal with sensitive data should mark the data as password using sf_password_set function, e.g. sf_password_set(buf).
+
+    All functions that deal with time should be marked as long time using sf_long_time function, e.g. sf_long_time().
+
+    All functions that deal with file offsets or sizes should limit the buffer size using sf_buf_size_limit function.
+    All functions that deal with file offsets or sizes should also limit the buffer size for read operations using sf_buf_size_limit_read function. E.g. sf_buf_size_limit(buf, nbytes), sf_buf_size_limit_read(buf, nbytes).
+
