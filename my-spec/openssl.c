@@ -2,6 +2,7 @@
 
 #define STACK_OF(TYPE)TYPE
 
+typedef struct ui_string_st UI_STRING;
 typedef struct ui_st UI;
 typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
 typedef struct ui_method_st UI_METHOD;
@@ -25,61 +26,61 @@ typedef struct BF_KEY BF_KEY;
 typedef struct BIO BIO;
 typedef struct X509 X509;
 
-struct ui_st {
-    const UI_METHOD *meth;
-    STACK_OF(UI_STRING) *strings; /* We might want to prompt for more than
-                                   * one thing at a time, and with different
-                                   * echoing status.  */
-    void *user_data;
-    CRYPTO_EX_DATA ex_data;
-# define UI_FLAG_REDOABLE        0x0001
-# define UI_FLAG_DUPL_DATA       0x0002 /* user_data was duplicated */
-# define UI_FLAG_PRINT_ERRORS    0x0100
-    int flags;
-
-    CRYPTO_RWLOCK *lock;
-};
-
-struct ui_method_st {
-    char *name;
-    /*
-     * All the functions return 1 or non-NULL for success and 0 or NULL for
-     * failure
-     */
-    /*
-     * Open whatever channel for this, be it the console, an X window or
-     * whatever. This function should use the ex_data structure to save
-     * intermediate data.
-     */
-    int (*ui_open_session) (UI *ui);
-    int (*ui_write_string) (UI *ui, UI_STRING *uis);
-    /*
-     * Flush the output.  If a GUI dialog box is used, this function can be
-     * used to actually display it.
-     */
-    int (*ui_flush) (UI *ui);
-    int (*ui_read_string) (UI *ui, UI_STRING *uis);
-    int (*ui_close_session) (UI *ui);
-    /*
-     * Duplicate the ui_data that often comes alongside a ui_method.  This
-     * allows some backends to save away UI information for later use.
-     */
-    void *(*ui_duplicate_data) (UI *ui, void *ui_data);
-    void (*ui_destroy_data) (UI *ui, void *ui_data);
-    /*
-     * Construct a prompt in a user-defined manner.  object_desc is a textual
-     * short description of the object, for example "pass phrase", and
-     * object_name is the name of the object (might be a card name or a file
-     * name. The returned string shall always be allocated on the heap with
-     * OPENSSL_malloc(), and need to be free'd with OPENSSL_free().
-     */
-    char *(*ui_construct_prompt) (UI *ui, const char *object_desc,
-                                  const char *object_name);
-    /*
-     * UI_METHOD specific application data.
-     */
-    CRYPTO_EX_DATA ex_data;
-};
+//struct ui_st {
+//    const UI_METHOD *meth;
+//    STACK_OF(UI_STRING) *strings; /* We might want to prompt for more than
+//                                   * one thing at a time, and with different
+//                                   * echoing status.  */
+//    void *user_data;
+//    CRYPTO_EX_DATA ex_data;
+//# define UI_FLAG_REDOABLE        0x0001
+//# define UI_FLAG_DUPL_DATA       0x0002 /* user_data was duplicated */
+//# define UI_FLAG_PRINT_ERRORS    0x0100
+//    int flags;
+//
+//    CRYPTO_RWLOCK *lock;
+//};
+//
+//struct ui_method_st {
+//    char *name;
+//    /*
+//     * All the functions return 1 or non-NULL for success and 0 or NULL for
+//     * failure
+//     */
+//    /*
+//     * Open whatever channel for this, be it the console, an X window or
+//     * whatever. This function should use the ex_data structure to save
+//     * intermediate data.
+//     */
+//    int (*ui_open_session) (UI *ui);
+//    int (*ui_write_string) (UI *ui, UI_STRING *uis);
+//    /*
+//     * Flush the output.  If a GUI dialog box is used, this function can be
+//     * used to actually display it.
+//     */
+//    int (*ui_flush) (UI *ui);
+//    int (*ui_read_string) (UI *ui, UI_STRING *uis);
+//    int (*ui_close_session) (UI *ui);
+//    /*
+//     * Duplicate the ui_data that often comes alongside a ui_method.  This
+//     * allows some backends to save away UI information for later use.
+//     */
+//    void *(*ui_duplicate_data) (UI *ui, void *ui_data);
+//    void (*ui_destroy_data) (UI *ui, void *ui_data);
+//    /*
+//     * Construct a prompt in a user-defined manner.  object_desc is a textual
+//     * short description of the object, for example "pass phrase", and
+//     * object_name is the name of the object (might be a card name or a file
+//     * name. The returned string shall always be allocated on the heap with
+//     * OPENSSL_malloc(), and need to be free'd with OPENSSL_free().
+//     */
+//    char *(*ui_construct_prompt) (UI *ui, const char *object_desc,
+//                                  const char *object_name);
+//    /*
+//     * UI_METHOD specific application data.
+//     */
+//    CRYPTO_EX_DATA ex_data;
+//};
 
 int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *ctx) {
     // Mark the context as possibly null
