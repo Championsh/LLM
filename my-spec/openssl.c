@@ -2,6 +2,49 @@
 
 #define STACK_OF(TYPE)TYPE
 
+struct ui_method_st {
+    char *name;
+    /*
+     * All the functions return 1 or non-NULL for success and 0 or NULL for
+     * failure
+     */
+    /*
+     * Open whatever channel for this, be it the console, an X window or
+     * whatever. This function should use the ex_data structure to save
+     * intermediate data.
+     */
+    int (*ui_open_session) (UI *ui);
+    int (*ui_write_string) (UI *ui, UI_STRING *uis);
+    /*
+     * Flush the output.  If a GUI dialog box is used, this function can be
+     * used to actually display it.
+     */
+    int (*ui_flush) (UI *ui);
+    int (*ui_read_string) (UI *ui, UI_STRING *uis);
+    int (*ui_close_session) (UI *ui);
+    /*
+     * Duplicate the ui_data that often comes alongside a ui_method.  This
+     * allows some backends to save away UI information for later use.
+     */
+    void *(*ui_duplicate_data) (UI *ui, void *ui_data);
+    void (*ui_destroy_data) (UI *ui, void *ui_data);
+    /*
+     * Construct a prompt in a user-defined manner.  object_desc is a textual
+     * short description of the object, for example "pass phrase", and
+     * object_name is the name of the object (might be a card name or a file
+     * name. The returned string shall always be allocated on the heap with
+     * OPENSSL_malloc(), and need to be free'd with OPENSSL_free().
+     */
+    char *(*ui_construct_prompt) (UI *ui, const char *object_desc,
+                                  const char *object_name);
+    /*
+     * UI_METHOD specific application data.
+     */
+    CRYPTO_EX_DATA ex_data;
+};
+
+typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
+typedef struct ui_method_st UI_METHOD;
 typedef struct CMS_RecipientInfo CMS_RecipientInfo;
 typedef struct CMS_ContentInfo CMS_ContentInfo;
 typedef struct ASN1_GENERALIZEDTIME ASN1_GENERALIZEDTIME;
