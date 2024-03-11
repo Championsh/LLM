@@ -2,6 +2,28 @@
 
 #define STACK_OF(TYPE)TYPE
 
+typedef struct ui_st UI;
+typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
+typedef struct ui_method_st UI_METHOD;
+typedef struct CMS_RecipientInfo CMS_RecipientInfo;
+typedef struct CMS_ContentInfo CMS_ContentInfo;
+typedef struct ASN1_GENERALIZEDTIME ASN1_GENERALIZEDTIME;
+typedef struct ASN1_OBJECT ASN1_OBJECT;
+typedef struct ASN1_TYPE ASN1_TYPE;
+typedef struct EVP_PKEY EVP_PKEY;
+typedef struct EVP_PKEY_CTX EVP_PKEY_CTX;
+typedef struct ENGINE ENGINE;
+typedef struct CTLOG CTLOG;
+typedef struct BIGNUM BIGNUM;
+typedef struct DH DH;
+typedef struct EVP_CIPHER EVP_CIPHER;
+typedef struct EVP_CIPHER_CTX EVP_CIPHER_CTX;
+typedef struct EVP_MD_CTX EVP_MD_CTX;
+typedef struct EVP_MD EVP_MD;
+typedef struct PKCS12 PKCS12;
+typedef struct BF_KEY BF_KEY;
+typedef struct BIO BIO;
+typedef struct X509 X509;
 
 struct ui_st {
     const UI_METHOD *meth;
@@ -18,7 +40,6 @@ struct ui_st {
     CRYPTO_RWLOCK *lock;
 };
 
-typedef struct ui_st UI;
 struct ui_method_st {
     char *name;
     /*
@@ -59,28 +80,6 @@ struct ui_method_st {
      */
     CRYPTO_EX_DATA ex_data;
 };
-
-typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
-typedef struct ui_method_st UI_METHOD;
-typedef struct CMS_RecipientInfo CMS_RecipientInfo;
-typedef struct CMS_ContentInfo CMS_ContentInfo;
-typedef struct ASN1_GENERALIZEDTIME ASN1_GENERALIZEDTIME;
-typedef struct ASN1_OBJECT ASN1_OBJECT;
-typedef struct ASN1_TYPE ASN1_TYPE;
-typedef struct EVP_PKEY EVP_PKEY;
-typedef struct EVP_PKEY_CTX EVP_PKEY_CTX;
-typedef struct ENGINE ENGINE;
-typedef struct CTLOG CTLOG;
-typedef struct BIGNUM BIGNUM;
-typedef struct DH DH;
-typedef struct EVP_CIPHER EVP_CIPHER;
-typedef struct EVP_CIPHER_CTX EVP_CIPHER_CTX;
-typedef struct EVP_MD_CTX EVP_MD_CTX;
-typedef struct EVP_MD EVP_MD;
-typedef struct PKCS12 PKCS12;
-typedef struct BF_KEY BF_KEY;
-typedef struct BIO BIO;
-typedef struct X509 X509;
 
 int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *ctx) {
     // Mark the context as possibly null
