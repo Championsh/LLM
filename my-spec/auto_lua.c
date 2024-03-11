@@ -249,11 +249,6 @@ int lua_next(lua_State *L, int index) {
     // Static analysis rules not applicable
 }
 
-// Number function
-lua_Number lua_Number(lua_State *L, int index) {
-    // Static analysis rules not applicable
-}
-
 // Object length function
 int lua_objlen(lua_State *L, int index) {
     // Static analysis rules not applicable
