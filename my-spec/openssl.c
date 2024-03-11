@@ -4,15 +4,20 @@
 #define STACK_OF(TYPE)TYPE
 #define LHASH_OF(TYPE)TYPE
 #define TSAN_QUALIFIER volatile
+#define SSL_MAX_SID_CTX_LENGTH   32
 
 typedef _Atomic int CRYPTO_REF_COUNT;
+typedef struct crypto_ex_data_st CRYPTO_EX_DATA;
 typedef struct ssl_st SSL;
+typedef struct ssl_comp_st SSL_COMP;
 typedef struct ssl_method_st SSL_METHOD;
 typedef struct ssl_cipher_st SSL_CIPHER;
 typedef struct ssl_session_st SSL_SESSION;
 typedef struct x509_store_ctx_st X509_STORE_CTX;
 typedef int (*SSL_verify_cb)(int preverify_ok, X509_STORE_CTX *x509_ctx);
 typedef struct X509_name_st X509_NAME;
+typedef struct X509_verify_param_st X509_VERIFY_PARAM;
+typedef struct ctlog_store_st CTLOG_STORE;
 typedef struct ssl_ctx_st SSL_CTX;
 typedef struct ossl_lib_ctx_st OSSL_LIB_CTX;
 typedef struct ui_string_st UI_STRING;
@@ -38,6 +43,7 @@ typedef struct PKCS12 PKCS12;
 typedef struct BF_KEY BF_KEY;
 typedef struct BIO BIO;
 typedef struct X509 X509;
+typedef int (*GEN_SESSION_CB) (SSL *ssl, unsigned char *id, unsigned int *id_len);
 
 struct ssl_ctx_st {
     const SSL_METHOD *method;
