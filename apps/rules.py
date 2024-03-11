@@ -13,7 +13,7 @@ save_comments_path = 'comments/'
 uniteRule_template_path = 'com-rules/unite_rules_template.txt'
 genRule_template_path = 'com-rules/generate_rules_template.txt'
 save_rule_path = 'com-rules/'
-save_specs_path = 'my-spec-auto/{}'
+save_specs_path = 'protos-auto/{}'
 
 
 def gen_prompt_id():
@@ -115,18 +115,17 @@ def form(path, rules_path=None, protos_path=None, rule_numbers=None):
     prototypes = [x.replace('  ', '').replace(';', '') for x in prototypes]
     rules = get_rules(rules_path, rule_numbers)
 
-    for prototype in prototypes:
-        res = prompt.format(func_prototype=prototype, sca_rules=rules)
+    res = prompt.format(func_prototype=', '.join(prototypes), sca_rules=rules)
 
-        text_file = open(next(prompt_id), "w")
-        n = text_file.write(res)
+    text_file = open(next(prompt_id), "w")
+    n = text_file.write(res)
 
-        if n == len(res):
-            print("Success! String written to text file.")
-        else:
-            print("Failure! String not written to text file.")
+    if n == len(res):
+        print("Success! String written to text file.")
+    else:
+        print("Failure! String not written to text file.")
 
-        text_file.close()
+    text_file.close()
 
 
 def parse():
@@ -171,7 +170,7 @@ def gen_rules_prompt(spec_pwd):
     specs = f.read()
     f.close()
     path, _, name = spec_pwd.rpartition('/')
-    name = name.replace('.c', '.txt')
+    name = name.rsplit('.', 1)[0] + '.txt'
     text_file = open(save_rule_path + '/' + 'genRules_' + name, "w")
     res = template.format(spec=specs)
     n = text_file.write(res)
@@ -190,7 +189,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--parse', action="store_true")
     parser.add_argument('-f', '--form', action="store_true")
     parser.add_argument('-tp', '--template-path', default="/home/champion/Projects/LLM/template.txt")
-    parser.add_argument('-rp', '--rules-path', default="/home/champion/Projects/LLM/sg_rules")
+    parser.add_argument('-rp', '--rules-path', default="/home/champion/Projects/LLM/res-rules/united_rules")
     parser.add_argument('-pp', '--prototypes-path')
     parser.add_argument('-r', '--rule-numbers')
     parser.add_argument('-gr', '--gen-rules')
