@@ -419,11 +419,6 @@ void lua_settop(lua_State *L, int index) {
     // Static analysis rules not applicable
 }
 
-// State function
-lua_State *lua_State(lua_State *L, int index) {
-    // Static analysis rules not applicable
-}
-
 // Status function
 int lua_status(lua_State *L) {
     // Static analysis rules not applicable
