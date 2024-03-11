@@ -15,6 +15,7 @@ typedef ptrdiff_t lua_Integer;
 typedef const char * (*lua_Reader) (lua_State *L,
                                     void *data,
                                     size_t *size);
+typedef double lua_Number;
 #define EFI_PAGE_SIZE             0x1000
 
 
