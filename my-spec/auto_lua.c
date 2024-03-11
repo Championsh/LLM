@@ -1,5 +1,5 @@
 #include "specfunc.h"
-#include "string-templates.h"
+#include <stdarg.h>
 
 typedef struct lua_State lua_State;
 typedef int (*lua_Writer) (lua_State *L,
@@ -11,10 +11,16 @@ typedef void * (*lua_Alloc) (void *ud,
                              size_t osize,
                              size_t nsize);
 typedef int (*lua_CFunction) (lua_State *L);
+typedef ptrdiff_t lua_Integer;
+typedef const char * (*lua_Reader) (lua_State *L,
+                                    void *data,
+                                    size_t *size);
+#define EFI_PAGE_SIZE             0x1000
+
 
 
 // Memory allocation function
-void* lua_Alloc(void* ud, void* ptr, size_t osize, size_t nsize) {
+void* l_alloc(void* ud, void* ptr, size_t osize, size_t nsize) {
     sf_set_trusted_sink_int(nsize);
     void* Res;
     sf_overwrite(&Res);
@@ -36,12 +42,6 @@ int lua_call(lua_State *L, int nargs, int nresults) {
     sf_set_trusted_sink_int(nargs);
     sf_set_trusted_sink_int(nresults);
     return 0;
-}
-
-lua_CFunction lua_CFunction(lua_State *L, int ud) {
-    sf_set_trusted_sink_ptr(L);
-    sf_set_trusted_sink_int(ud);
-    return NULL;
 }
 
 int lua_checkstack(lua_State *L, int n) {
@@ -142,11 +142,6 @@ int lua_gettop(lua_State *L) {
 
 // Insert function
 void lua_insert(lua_State *L, int index) {
-    // Static analysis rules not applicable
-}
-
-// Integer function
-lua_Integer lua_Integer(lua_State *L, int index) {
     // Static analysis rules not applicable
 }
 
@@ -368,11 +363,6 @@ void lua_rawseti(lua_State *L, int index, int n) {
     // Static analysis rules not applicable
 }
 
-// Reader function
-lua_Reader lua_Reader(lua_State *L, void *dt, size_t *size) {
-    // Static analysis rules not applicable
-}
-
 // Register function
 void lua_register(lua_State *L, const char *name, lua_CFunction f) {
     // Static analysis rules not applicable
@@ -389,9 +379,9 @@ void lua_replace(lua_State *L, int index) {
 }
 
 // Resume function
-int lua_resume(lua_State *L, int narg, lua_KContext ctx, lua_KContext *nctx) {
-    // Static analysis rules not applicable
-}
+int lua_resume (lua_State *L, int narg) {
+
+};
 
 // Set alloc function
 void lua_setallocf(lua_State *L, lua_Alloc f, void *ud) {
@@ -523,10 +513,6 @@ const char *lua_typename(lua_State *L, int index) {
     // Static analysis rules not applicable
 }
 
-// Writer function
-int lua_Writer(lua_State *L, const void* p, size_t sz, void* ud) {
-    // Static analysis rules not applicable
-}
 
 // Move values between threads function
 void lua_xmove(lua_State *from, lua_State *to, int n) {
