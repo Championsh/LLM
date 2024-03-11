@@ -81,3 +81,7 @@ const ASN1_ITEM* ASN1_ITEM_rptr(const ASN1_ITEM *it) {
     sf_set_possible_null(res);
     return res;
 }
+
+ENGINE *ENGINE_by_id(const char *id);
+
+
