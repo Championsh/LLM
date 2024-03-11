@@ -1,5 +1,6 @@
 #include "specfunc.h"
 #include <stdint.h>
+#include <openssl.h>
 
 #define STACK_OF(TYPE)TYPE
 #define LHASH_OF(TYPE)TYPE
