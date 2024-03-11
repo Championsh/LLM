@@ -1,10 +1,25 @@
+#include "specfunc.h"
+#include "string-templates.h"
+
+typedef struct lua_State lua_State;
+typedef int (*lua_Writer) (lua_State *L,
+                           const void* p,
+                           size_t sz,
+                           void* ud);
+typedef void * (*lua_Alloc) (void *ud,
+                             void *ptr,
+                             size_t osize,
+                             size_t nsize);
+typedef int (*lua_CFunction) (lua_State *L);
+
+
 // Memory allocation function
 void* lua_Alloc(void* ud, void* ptr, size_t osize, size_t nsize) {
     sf_set_trusted_sink_int(nsize);
     void* Res;
     sf_overwrite(&Res);
     sf_overwrite(Res);
-    sf_new(Res, ALLOCATED_MEMORY_CATEGORY);
+    sf_new(Res, MALLOC_CATEGORY);
     sf_set_possible_null(Res);
     sf_not_acquire_if_eq(Res, Res, 0);
     sf_buf_size_limit(Res, nsize);
@@ -226,7 +241,7 @@ void *lua_newuserdata(lua_State *L, size_t sz) {
     void* Res;
     sf_overwrite(&Res);
     sf_overwrite(Res);
-    sf_new(Res, USERDATA_MEMORY_CATEGORY);
+    sf_new(Res, MALLOC_CATEGORY);
     sf_set_possible_null(Res);
     sf_not_acquire_if_eq(Res, Res, 0);
     sf_buf_size_limit(Res, sz);
@@ -467,7 +482,7 @@ const char *lua_tostring(lua_State *L, int index) {
 
     // Mark the memory as newly allocated with a specific memory category
     // For this example, let's use STRING_MEMORY_CATEGORY
-    sf_new(Res, STRING_MEMORY_CATEGORY);
+    sf_new(Res, MALLOC_CATEGORY);
 
     // Mark the pointer variable Res as possibly null
     sf_set_possible_null(Res);
