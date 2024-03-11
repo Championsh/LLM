@@ -3,9 +3,11 @@
 
 #define STACK_OF(TYPE)TYPE
 #define LHASH_OF(TYPE)TYPE
+# define TSAN_QUALIFIER volatile
 
 typedef struct ssl_method_st SSL_METHOD;
 typedef struct ssl_cipher_st SSL_CIPHER;
+typedef struct ssl_session_st SSL_SESSION;
 typedef struct x509_store_ctx_st X509_STORE_CTX;
 typedef int (*SSL_verify_cb)(int preverify_ok, X509_STORE_CTX *x509_ctx);
 typedef struct X509_name_st X509_NAME;
