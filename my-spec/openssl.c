@@ -2,6 +2,23 @@
 
 #define STACK_OF(TYPE)TYPE
 
+
+struct ui_st {
+    const UI_METHOD *meth;
+    STACK_OF(UI_STRING) *strings; /* We might want to prompt for more than
+                                   * one thing at a time, and with different
+                                   * echoing status.  */
+    void *user_data;
+    CRYPTO_EX_DATA ex_data;
+# define UI_FLAG_REDOABLE        0x0001
+# define UI_FLAG_DUPL_DATA       0x0002 /* user_data was duplicated */
+# define UI_FLAG_PRINT_ERRORS    0x0100
+    int flags;
+
+    CRYPTO_RWLOCK *lock;
+};
+
+typedef struct ui_st UI;
 struct ui_method_st {
     char *name;
     /*
