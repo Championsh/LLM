@@ -82,3 +82,44 @@ Functions include but are not limited to: EVP_PKEY_derive, EVP_PKEY_get_raw_priv
     All functions that deal with file offsets or sizes should limit the buffer size using sf_buf_size_limit function.
     All functions that deal with file offsets or sizes should also limit the buffer size for read operations using sf_buf_size_limit_read function. E.g. sf_buf_size_limit(buf, nbytes), sf_buf_size_limit_read(buf, nbytes).
 
+sf_terminate_path: This function is used to terminate the program path. It should be used in functions that do not return, such as _Exit, abort, and exit. e.g. sf_terminate_path();
+
+sf_overwrite: This function is used to mark a variable (and, sometimes, the memory it points to) as overwritten. It should be used when a variable is assigned a new value (sometimes, when the memory area is assigned), especially when the variable is used to store the result of a function, e.g. sf_overwrite(res)(sometimes sf_overwrite(&res));
+
+sf_pure: This function is used to mark a function as pure, i.e., its return value depends only on its arguments and it has no side effects. It should be used in functions like abs, labs, llabs, etc, e.g. sf_pure(res, x);
+
+sf_buf_stop_at_null: This function is used to mark a buffer as stopping at a null character. It should be used in functions that take a null-terminated string as an argument, such as atoi, atol, atoll, etc, e.g. sf_buf_stop_at_null(arg);
+
+sf_str_to_int, or sf_str_to_long: This function is used to mark a string-to-integer, or string-to-long, conversion. It should be used in functions like atoi, atol, atoll, etc, e.g. sf_str_to_int(arg, res);
+
+sf_set_trusted_sink_int, or sf_set_trusted_sink_ptr: This function is used to mark an integer, or a pointer, as a trusted sink. It should be used in functions that allocate memory, such as calloc, malloc, aligned_alloc, etc, e.g. sf_set_trusted_sink_int(num);
+
+sf_set_alloc_possible_null: This function is used to mark a pointer as possibly null after allocation. It should be used in functions that allocate memory, such as calloc, malloc, aligned_alloc, etc, e.g. sf_set_alloc_possible_null(ptr, num ,size);
+
+sf_new: This function is used to mark a pointer as newly allocated. It should be used in functions that allocate memory, such as calloc, malloc, aligned_alloc, etc, e.g. sf_new(ptr, MALLOC_CATEGORY);
+
+sf_delete: This function is used to mark a pointer as deleted. It should be used in functions that free memory, such as free, e.g. sf_delete(ptr, MALLOC_CATEGORY);
+
+sf_set_tainted: This function is used to mark a string as tainted. It should be used in functions that return environment variables, such as getenv, e.g. sf_set_tainted(str);
+
+sf_malloc_arg: This function is used to mark the argument of a memory allocation function. It should be used in functions like malloc, e.g. sf_malloc_arg(size);
+
+sf_fun_rand: This function is used to mark a function that generates a random number. It should be used in functions like rand, rand_r, random, etc, e.g. sf_fun_rand()
+
+sf_set_tainted_<type>: This function is used to mark an integer, long, double, etc. as tainted. It should be used in functions that generate random numbers, such as rand, rand_r, random, etc, e.g. sf_set_tainted_int(res)
+
+sf_rand_value: This function is used to mark a value as a random value. It should be used in functions that generate random numbers, such as rand, rand_r, random, etc, e.g. sf_rand_value(res);
+
+sf_tocttou_access: This function is used to mark a function that accesses a file. It should be used in functions that take a file path as an argument, such as realpath, e.g. sf_tocttou_access(path);
+
+sf_bitinit: This function is used to mark a buffer as initialized. It should be used in functions that initialize a buffer, such as realpath, e.g. sf_bitinit(resolved_path);
+
+sf_lib_arg_type is used to specify the type of a library argument. This is useful when the argument is a pointer and the type of the pointed-to object is not clear from the function signature. For example, in the malloc function, the return value is a void* pointer, but the actual type of the allocated memory depends on how the caller will use it. So, sf_lib_arg_type can be used to specify the type of the allocated memory, e.g. sf_lib_arg_type(ptr, "MallocCategory");
+
+sf_set_must_be_not_null is used to specify that a certain argument or variable must not be null. This is useful to prevent null pointer dereferences. For example, in the free function, the argument must not be null, because dereferencing a null pointer would lead to undefined behavior, e.g. sf_set_must_be_not_null(ptr, FREE_OF_NULL);
+
+sf_set_possible_null is used to specify that a certain argument or variable may be null. This is useful to indicate that a null value is a valid input or output for a function. For example, in the getenv function, the return value may be null if the requested environment variable is not set, e.g. sf_set_possible_null(value);
+
+sf_uncontrolled_ptr is a static analysis function used to mark a pointer that is not fully controlled by the program. This function is typically used when a pointer is obtained from an external source, such as a library function or user input, and the program does not have full control over its lifetime or contents. This can help the static analysis tool to better understand the potential risks associated with using the pointer and to provide more accurate results, e.g. sf_uncontrolled_ptr(buf)
+
+sf_set_possible_negative is a static analysis function used to mark a variable that can potentially have a negative value. This function is typically used when a variable is obtained from an external source, such as a library function or user input, and the program does not have full control over its value. This can help the static analysis tool to better understand the potential risks associated with using the variable and to provide more accurate results, e.g. sf_set_possible_negative(value);
