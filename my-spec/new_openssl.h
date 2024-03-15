@@ -8,6 +8,7 @@
 #define TLSEXT_KEYNAME_LENGTH 32
 #define SHA256_DIGEST_LENGTH 32
 
+typedef struct sct_st SCT;
 typedef _Atomic int CRYPTO_REF_COUNT;
 typedef struct crypto_ex_data_st CRYPTO_EX_DATA;
 typedef struct ssl_st SSL;
@@ -16,7 +17,6 @@ typedef struct ssl_method_st SSL_METHOD;
 typedef struct ssl_cipher_st SSL_CIPHER;
 typedef struct ssl_session_st SSL_SESSION;
 typedef struct x509_store_ctx_st X509_STORE_CTX;
-typedef int (*SSL_verify_cb)(int preverify_ok, X509_STORE_CTX *x509_ctx);
 typedef struct X509_name_st X509_NAME;
 typedef struct X509_verify_param_st X509_VERIFY_PARAM;
 typedef struct ctlog_store_st CTLOG_STORE;
@@ -24,7 +24,6 @@ typedef struct ssl_ctx_st SSL_CTX;
 typedef struct ossl_lib_ctx_st OSSL_LIB_CTX;
 typedef struct ui_string_st UI_STRING;
 typedef struct ui_st UI;
-typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
 typedef struct ui_method_st UI_METHOD;
 typedef struct CMS_RecipientInfo CMS_RecipientInfo;
 typedef struct CMS_ContentInfo CMS_ContentInfo;
@@ -44,26 +43,27 @@ typedef struct EVP_MD EVP_MD;
 typedef struct PKCS12 PKCS12;
 typedef struct BF_KEY BF_KEY;
 typedef struct BIO BIO;
+typedef struct srp_ctx_st SRP_CTX;
+typedef struct hmac_ctx_st HMAC_CTX;
+typedef struct srtp_protection_profile_st SRTP_PROTECTION_PROFILE;
+typedef struct crypto_rwlock_st CRYPTO_RWLOCK;
 typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
 typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
 typedef struct X509 X509;
+typedef struct ssl_ctx_ext_secure_st SSL_CTX_EXT_SECURE;
 typedef int (*SSL_client_hello_cb_fn)(SSL *s, int *al, void *arg);
 typedef int (*GEN_SESSION_CB) (SSL *ssl, unsigned char *id, unsigned int *id_len);
 typedef int (*ssl_ct_validation_cb)(const CT_POLICY_EVAL_CTX *ctx, const STACK_OF(SCT) *scts, void *arg);
-typedef struct sct_st SCT;
-typedef struct ssl_ctx_ext_secure_st SSL_CTX_EXT_SECURE;
-typedef struct hmac_ctx_st HMAC_CTX;
 typedef int (*SSL_CTX_npn_advertised_cb_func)(SSL *s, const unsigned char **data, unsigned int *len, void *arg);
 typedef int (*SSL_CTX_npn_select_cb_func)(SSL *s, const unsigned char **data, unsigned int *len, void *arg);
 typedef int (*SSL_psk_server_cb_func)(SSL *ssl, const char *identity, unsigned char *psk, size_t *psk_len);
 typedef int (*SSL_psk_find_session_cb_func)(SSL *ssl, const unsigned char *identity, unsigned int identity_len, SSL_SESSION **sess);
-typedef struct srp_ctx_st SRP_CTX;
-typedef struct srtp_protection_profile_st SRTP_PROTECTION_PROFILE;
-typedef struct crypto_rwlock_st CRYPTO_RWLOCK;
 typedef void (*SSL_CTX_keylog_cb_func)(const SSL *ssl, const char *line);
 typedef int (*SSL_CTX_generate_session_ticket_fn)(SSL *ssl, unsigned char *out, size_t *len, void *arg);
 typedef int (*SSL_CTX_decrypt_session_ticket_fn)(SSL *ssl, const unsigned char *in, size_t inlen, SSL_SESSION **sess, void *arg);
 typedef int (*SSL_allow_early_data_cb_fn)(SSL *ssl, size_t max_early_data, void *arg);
+typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
+typedef int (*SSL_verify_cb)(int preverify_ok, X509_STORE_CTX *x509_ctx);
 
 struct dane_ctx_st {
     // Add the necessary fields here
