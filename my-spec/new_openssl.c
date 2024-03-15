@@ -19,7 +19,7 @@ typedef struct ssl_session_st SSL_SESSION;
 typedef struct x509_store_ctx_st X509_STORE_CTX;
 typedef struct x509_store_st X509_STORE;
 typedef struct x509_lookup_st X509_LOOKUP;
-typedef struct x509_lookup_method_st X509_LOOKUP;
+typedef struct x509_lookup_method_st X509_LOOKUP_METHOD;
 typedef struct X509_name_st X509_NAME;
 typedef struct X509_verify_param_st X509_VERIFY_PARAM;
 typedef struct ctlog_store_st CTLOG_STORE;
