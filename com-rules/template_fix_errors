@@ -1,0 +1,1 @@
+Fix following errors adding all needed typedefs, structure definitions and #defines. Don't add #include statements.
