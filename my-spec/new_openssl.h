@@ -17,6 +17,7 @@ typedef struct ssl_method_st SSL_METHOD;
 typedef struct ssl_cipher_st SSL_CIPHER;
 typedef struct ssl_session_st SSL_SESSION;
 typedef struct x509_store_ctx_st X509_STORE_CTX;
+typedef struct x509_store_st X509_STORE;
 typedef struct X509_name_st X509_NAME;
 typedef struct X509_verify_param_st X509_VERIFY_PARAM;
 typedef struct ctlog_store_st CTLOG_STORE;
@@ -85,6 +86,23 @@ struct crypto_ex_data_st {
     OSSL_LIB_CTX *ctx;
     STACK_OF(void) *sk;
 };
+
+typedef struct srp_ctx_st {
+    /* param for all the callbacks */
+    void *SRP_cb_arg;
+    /* set client Hello login callback */
+    int (*TLS_ext_srp_username_callback) (SSL *, int *, void *);
+    /* set SRP N/g param callback for verification */
+    int (*SRP_verify_param_callback) (SSL *, void *);
+    /* set SRP client passwd callback */
+    char *(*SRP_give_srp_client_pwd_callback) (SSL *, void *);
+    char *login;
+    BIGNUM *N, *g, *s, *B, *A;
+    BIGNUM *a, *b, *v;
+    char *info;
+    int strength;
+    unsigned long srp_Mask;
+} SRP_CTX;
 
 struct ssl_ctx_st {
     const SSL_METHOD *method;
