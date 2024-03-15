@@ -597,12 +597,11 @@ void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, STACK_OF(X509_NAME) *list) {
     sf_set_trusted_sink_ptr(ctx);
     sf_set_trusted_sink_ptr(list);
 
-    sf_overwrite(ctx->client_CA);
-    sf_delete(ctx->client_CA, MALLOC_CATEGORY);
+    sf_overwrite(ctx);
+    sf_delete(ctx, MALLOC_CATEGORY);
 
-    ctx->client_CA = list;
-    sf_new(ctx->client_CA, MALLOC_CATEGORY);
-    sf_set_possible_null(ctx->client_CA);
+    sf_new(ctx, MALLOC_CATEGORY);
+    sf_set_possible_null(ctx);
 }
 
 
