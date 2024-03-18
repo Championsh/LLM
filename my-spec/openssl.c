@@ -1,11 +1,14 @@
 #include "specfunc.h"
 #include <stdint.h>
 
-#define STACK_OF(TYPE)TYPE
-#define LHASH_OF(TYPE)TYPE
+#define STACK_OF(TYPE) TYPE
+#define LHASH_OF(TYPE) TYPE
 #define TSAN_QUALIFIER volatile
 #define SSL_MAX_SID_CTX_LENGTH   32
+#define TLSEXT_KEYNAME_LENGTH 32
+#define SHA256_DIGEST_LENGTH 32
 
+typedef struct sct_st SCT;
 typedef _Atomic int CRYPTO_REF_COUNT;
 typedef struct crypto_ex_data_st CRYPTO_EX_DATA;
 typedef struct ssl_st SSL;
@@ -14,7 +17,9 @@ typedef struct ssl_method_st SSL_METHOD;
 typedef struct ssl_cipher_st SSL_CIPHER;
 typedef struct ssl_session_st SSL_SESSION;
 typedef struct x509_store_ctx_st X509_STORE_CTX;
-typedef int (*SSL_verify_cb)(int preverify_ok, X509_STORE_CTX *x509_ctx);
+typedef struct x509_store_st X509_STORE;
+typedef struct x509_lookup_st X509_LOOKUP;
+typedef struct x509_lookup_method_st X509_LOOKUP_METHOD;
 typedef struct X509_name_st X509_NAME;
 typedef struct X509_verify_param_st X509_VERIFY_PARAM;
 typedef struct ctlog_store_st CTLOG_STORE;
@@ -22,7 +27,6 @@ typedef struct ssl_ctx_st SSL_CTX;
 typedef struct ossl_lib_ctx_st OSSL_LIB_CTX;
 typedef struct ui_string_st UI_STRING;
 typedef struct ui_st UI;
-typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
 typedef struct ui_method_st UI_METHOD;
 typedef struct CMS_RecipientInfo CMS_RecipientInfo;
 typedef struct CMS_ContentInfo CMS_ContentInfo;
@@ -42,12 +46,31 @@ typedef struct EVP_MD EVP_MD;
 typedef struct PKCS12 PKCS12;
 typedef struct BF_KEY BF_KEY;
 typedef struct BIO BIO;
+typedef struct srp_ctx_st SRP_CTX;
+typedef struct hmac_ctx_st HMAC_CTX;
+typedef struct srtp_protection_profile_st SRTP_PROTECTION_PROFILE;
+typedef struct crypto_rwlock_st CRYPTO_RWLOCK;
 typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
 typedef struct ct_policy_eval_ctx_st CT_POLICY_EVAL_CTX;
 typedef struct X509 X509;
+typedef struct ssl_ctx_ext_secure_st SSL_CTX_EXT_SECURE;
 typedef int (*SSL_client_hello_cb_fn)(SSL *s, int *al, void *arg);
 typedef int (*GEN_SESSION_CB) (SSL *ssl, unsigned char *id, unsigned int *id_len);
 typedef int (*ssl_ct_validation_cb)(const CT_POLICY_EVAL_CTX *ctx, const STACK_OF(SCT) *scts, void *arg);
+typedef int (*SSL_CTX_npn_advertised_cb_func)(SSL *s, const unsigned char **data, unsigned int *len, void *arg);
+typedef int (*SSL_CTX_npn_select_cb_func)(SSL *s, const unsigned char **data, unsigned int *len, void *arg);
+typedef int (*SSL_psk_server_cb_func)(SSL *ssl, const char *identity, unsigned char *psk, size_t *psk_len);
+typedef int (*SSL_psk_find_session_cb_func)(SSL *ssl, const unsigned char *identity, unsigned int identity_len, SSL_SESSION **sess);
+typedef void (*SSL_CTX_keylog_cb_func)(const SSL *ssl, const char *line);
+typedef int (*SSL_CTX_generate_session_ticket_fn)(SSL *ssl, unsigned char *out, size_t *len, void *arg);
+typedef int (*SSL_CTX_decrypt_session_ticket_fn)(SSL *ssl, const unsigned char *in, size_t inlen, SSL_SESSION **sess, void *arg);
+typedef int (*SSL_allow_early_data_cb_fn)(SSL *ssl, size_t max_early_data, void *arg);
+typedef int pem_password_cb(char *buf, int size, int rwflag, void *u);
+typedef int (*SSL_verify_cb)(int preverify_ok, X509_STORE_CTX *x509_ctx);
+
+struct dane_ctx_st {
+    // Add the necessary fields here
+};
 
 typedef unsigned int (*SSL_psk_client_cb_func)(SSL *ssl,
                                             const char *hint,
@@ -65,6 +88,23 @@ struct crypto_ex_data_st {
     OSSL_LIB_CTX *ctx;
     STACK_OF(void) *sk;
 };
+
+typedef struct srp_ctx_st {
+    /* param for all the callbacks */
+    void *SRP_cb_arg;
+    /* set client Hello login callback */
+    int (*TLS_ext_srp_username_callback) (SSL *, int *, void *);
+    /* set SRP N/g param callback for verification */
+    int (*SRP_verify_param_callback) (SSL *, void *);
+    /* set SRP client passwd callback */
+    char *(*SRP_give_srp_client_pwd_callback) (SSL *, void *);
+    char *login;
+    BIGNUM *N, *g, *s, *B, *A;
+    BIGNUM *a, *b, *v;
+    char *info;
+    int strength;
+    unsigned long srp_Mask;
+} SRP_CTX;
 
 struct ssl_ctx_st {
     const SSL_METHOD *method;
@@ -397,6 +437,7 @@ struct ssl_ctx_st {
     int pha_enabled;
 };
 
+
 int EVP_CIPHER_CTX_reset(EVP_CIPHER_CTX *ctx) {
     // Mark the context as possibly null
     sf_set_possible_null(ctx);
@@ -558,34 +599,13 @@ void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, STACK_OF(X509_NAME) *list) {
     sf_set_trusted_sink_ptr(ctx);
     sf_set_trusted_sink_ptr(list);
 
-    sf_overwrite(ctx->client_CA);
-    sf_delete(ctx->client_CA, MALLOC_CATEGORY);
+    sf_overwrite(ctx);
+    sf_delete(ctx, MALLOC_CATEGORY);
 
-    ctx->client_CA = list;
-    sf_new(ctx->client_CA, MALLOC_CATEGORY);
-    sf_set_possible_null(ctx->client_CA);
+    sf_new(ctx, MALLOC_CATEGORY);
+    sf_set_possible_null(ctx);
 }
 
-void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb verify_callback) {
-    sf_set_trusted_sink_ptr(ctx);
-    sf_set_trusted_sink_int(mode);
-    sf_set_trusted_sink_ptr(verify_callback);
-
-    sf_overwrite(&ctx->verify_mode);
-    sf_overwrite(&ctx->verify_callback);
-
-    ctx->verify_mode = mode;
-    ctx->verify_callback = verify_callback;
-}
-
-void SSL_CTX_set_verify_depth(SSL_CTX *ctx, int depth) {
-    sf_set_trusted_sink_ptr(ctx);
-    sf_set_trusted_sink_int(depth);
-
-    sf_overwrite(&ctx->verify_depth);
-
-    ctx->verify_depth = depth;
-}
 
 X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *ctx) {
     sf_set_trusted_sink_ptr(ctx);
@@ -595,8 +615,6 @@ X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *ctx) {
     sf_new(store, MALLOC_CATEGORY);
     sf_set_possible_null(store);
     sf_not_acquire_if_eq(store, store, 0);
-
-    store = ctx->cert_store;
 
     return store;
 }
@@ -637,10 +655,58 @@ int X509_STORE_set_flags(X509_STORE *ctx, unsigned long flags) {
     sf_set_trusted_sink_ptr(ctx);
     sf_set_trusted_sink_int(flags);
 
-    sf_overwrite(&ctx->flags);
-
-    ctx->flags = flags;
-
-    return 1;
+    sf_overwrite(ctx);
 }
 
+int EVP_CIPHER_CTX_ctrl(EVP_CIPHER_CTX *ctx, int cmd, int p1, void *p2) {
+    sf_set_trusted_sink_int(cmd);
+    sf_set_trusted_sink_int(p1);
+    sf_set_trusted_sink_ptr(p2);
+    // Rest of the function implementation...
+}
+
+int EVP_DecryptFinal_ex(EVP_CIPHER_CTX *ctx, unsigned char *outm, int *outl) {
+    sf_set_trusted_sink_ptr(ctx);
+    sf_set_trusted_sink_ptr(outm);
+    sf_set_trusted_sink_ptr(outl);
+    // Rest of the function implementation...
+}
+
+void EVP_CIPHER_CTX_free(EVP_CIPHER_CTX *ctx) {
+    sf_set_must_be_not_null(ctx, FREE_OF_NULL);
+    sf_delete(ctx, MALLOC_CATEGORY);
+    sf_lib_arg_type(ctx, "MallocCategory");
+    // Rest of the function implementation...
+}
+
+void X509_STORE_CTX_free(X509_STORE_CTX *ctx) {
+    sf_set_must_be_not_null(ctx, FREE_OF_NULL);
+    sf_delete(ctx, MALLOC_CATEGORY);
+    sf_lib_arg_type(ctx, "MallocCategory");
+    // Rest of the function implementation...
+}
+
+X509_STORE_CTX *X509_STORE_CTX_new(void) {
+    X509_STORE_CTX *ctx = NULL;
+    sf_overwrite(&ctx);
+    sf_new(ctx, MALLOC_CATEGORY);
+    sf_set_possible_null(ctx);
+    sf_not_acquire_if_eq(ctx, ctx, 0);
+    // Rest of the function implementation...
+    return ctx;
+}
+
+int X509_STORE_CTX_init(X509_STORE_CTX *ctx, X509_STORE *trust_store, X509 *target, STACK_OF(X509) *untrusted) {
+    sf_set_trusted_sink_ptr(ctx);
+    sf_set_trusted_sink_ptr(trust_store);
+    sf_set_trusted_sink_ptr(target);
+    sf_set_trusted_sink_ptr(untrusted);
+    // Rest of the function implementation...
+}
+
+int X509_STORE_CTX_get1_issuer(X509 **issuer, X509_STORE_CTX *ctx, X509 *x) {
+    sf_set_trusted_sink_ptr(issuer);
+    sf_set_trusted_sink_ptr(ctx);
+    sf_set_trusted_sink_ptr(x);
+    // Rest of the function implementation...
+}
