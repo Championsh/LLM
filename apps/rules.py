@@ -56,6 +56,7 @@ def squeeze_specs(specs_pwd: str):
         pwd = [specs_template.format(file) for file in files]
     else:
         pwd = [specs_pwd]
+
     for filename in pwd:
         f = open(filename, "r")
         text = f.read()
@@ -128,19 +129,42 @@ def form(path, rules_path=None, protos_path=None, rule_numbers=None):
     text_file.close()
 
 
-def parse():
-    result = ''
-    code = input("Enter lines of code:\n")
-    while True:
-        if code == '--':
-            break
+def parse_scra(scra_pwd):
+    f = open(scra_pwd, "r")
+    scra = f.readlines()
+    f.close()
 
-        code = code.strip(';\n\t ')
-        if code:
-            result += code + ', '
-        code = input()
-    print()
-    print(result)
+    names = []
+    protos = []
+
+    for line in scra:
+        tmp = line.split(';')
+        if len(tmp) < 7:
+            continue
+        func_name, func_proto = tmp[4], tmp[5]
+        names += [func_name]
+        protos += [func_proto]
+
+    protos_lib_pwd = "lib-protos/res_openssl"
+    lib = open(protos_lib_pwd, "r")
+    lib_names = lib.readlines()
+    lib_names = list(map(lambda s: s.strip(), lib_names))
+    lib.close()
+
+    scra_protos_pwd = "lib-usages/%s"
+    path, _, name = scra_pwd.rpartition('/')
+
+    scra_proto_file = open(scra_protos_pwd % name, "w")
+
+    protos = [proto for proto, name in zip(protos, names) if name in lib_names]
+    print(protos)
+    protos = list(dict.fromkeys(protos))
+    print('---------')
+    print(names)
+
+    for proto in protos:
+        scra_proto_file.write(proto + ';\n')
+    scra_proto_file.close()
 
 
 def unite_rules(rules_pwd):
@@ -186,7 +210,7 @@ def gen_rules_prompt(spec_pwd):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Spec Gen')
-    parser.add_argument('-p', '--parse', action="store_true")
+    parser.add_argument('-p', '--parse-lib-scra')
     parser.add_argument('-f', '--form', action="store_true")
     parser.add_argument('-tp', '--template-path', default="/home/champion/Projects/LLM/template.txt")
     parser.add_argument('-rp', '--rules-path', default="/home/champion/Projects/LLM/res-rules/united_rules")
@@ -196,9 +220,10 @@ if __name__ == '__main__':
     parser.add_argument('-ur', '--unite-rules')
     parser.add_argument('-ss', '--squeeze-specs')
 
-    # parser.add_argument('-sp', '--save-path', default="/home/champion/Projects/LLM/tmp/prompt{num}.txt")
+    # parser.add_argument('-sp', '--save-path', default="/home/champion/Projects/LLM/lib-usages/prompt{num}.txt")
     args = parser.parse_args()
 
+    parse_scra_path = args.parse_scra
     template_path = args.template_path
     rules_path = args.rules_path
     prototypes_path = args.prototypes_path
@@ -208,8 +233,8 @@ if __name__ == '__main__':
     # save_path = args.save_path
     squeeze_specs_pwd = args.squeeze_specs
 
-    if args.parse:
-        parse()
+    if parse_scra_path:
+        parse_scra(parse_scra_path)
 
     if args.form:
         form(template_path, rules_path, protos_path=prototypes_path, rule_numbers=rule_numbers)
