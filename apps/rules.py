@@ -136,15 +136,17 @@ def parse_scra(scra_pwd):
 
     names = []
     protos = []
+    presence_types = []
 
     for line in scra:
         tmp = line.split(';')
         if len(tmp) < 7:
             continue
-        func_name, func_proto = tmp[4], tmp[5]
+        func_name, func_proto, presence_type = tmp[4], tmp[5], tmp[-1]
         names += [func_name]
         protos += [func_proto]
-
+        presence_types += [presence_type]
+    # CONTAINS
     protos_lib_pwd = "lib-protos/res_openssl"
     lib = open(protos_lib_pwd, "r")
     lib_names = lib.readlines()
@@ -156,7 +158,7 @@ def parse_scra(scra_pwd):
 
     scra_proto_file = open(scra_protos_pwd % name, "w")
 
-    protos = [proto for proto, name in zip(protos, names) if name in lib_names]
+    protos = [proto for proto, name, presence_type in zip(protos, names, presence_types) if name in lib_names and presence_type == "CONTAINS"]
     print(protos)
     protos = list(dict.fromkeys(protos))
     print('---------')
@@ -210,7 +212,7 @@ def gen_rules_prompt(spec_pwd):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Spec Gen')
-    parser.add_argument('-p', '--parse-lib-scra')
+    parser.add_argument('-p', '--parse-scra')
     parser.add_argument('-f', '--form', action="store_true")
     parser.add_argument('-tp', '--template-path', default="/home/champion/Projects/LLM/template.txt")
     parser.add_argument('-rp', '--rules-path', default="/home/champion/Projects/LLM/res-rules/united_rules")
