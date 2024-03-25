@@ -138,31 +138,38 @@ def parse_scra(scra_pwd):
     protos = []
     presence_types = []
 
+    name_filter = "include"
+    proto_filter = "inline"
+    presence_filter = "CONTAINS"
+
     for line in scra:
         tmp = line.split(';')
         if len(tmp) < 7:
             continue
-        func_name, func_proto, presence_type = tmp[4], tmp[5], tmp[-1]
-        names += [func_name]
+        func_lib_name, func_proto, func_presence_type = tmp[2], tmp[5], tmp[-1].strip()
+        names += [func_lib_name]
         protos += [func_proto]
-        presence_types += [presence_type]
-    # CONTAINS
-    protos_lib_pwd = "lib-protos/res_openssl"
-    lib = open(protos_lib_pwd, "r")
-    lib_names = lib.readlines()
-    lib_names = list(map(lambda s: s.strip(), lib_names))
-    lib.close()
+        presence_types += [func_presence_type]
+
+    # protos_lib_pwd = "lib-protos/res_openssl"
+    # lib = open(protos_lib_pwd, "r")
+    # lib_names = lib.readlines()
+    # lib_names = list(map(lambda s: s.strip(), lib_names))
+    # lib.close()
 
     scra_protos_pwd = "lib-usages/%s"
     path, _, name = scra_pwd.rpartition('/')
 
     scra_proto_file = open(scra_protos_pwd % name, "w")
 
-    protos = [proto for proto, name, presence_type in zip(protos, names, presence_types) if name in lib_names and presence_type == "CONTAINS"]
-    print(protos)
+    # print(list(dict.fromkeys(presence_types)))
+
+    protos = [proto.strip() for proto, name, presence_type in zip(protos, names, presence_types)
+              if name_filter in name and presence_type == presence_filter and proto_filter not in proto]
+    # print(protos)
     protos = list(dict.fromkeys(protos))
-    print('---------')
-    print(names)
+    # print('---------')
+    # print(names)
 
     for proto in protos:
         scra_proto_file.write(proto + ';\n')
