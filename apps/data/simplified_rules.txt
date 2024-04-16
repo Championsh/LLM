@@ -1,0 +1,87 @@
+In every Function create a variable Res of the same type as the function's return type and assign it Null or 0.
+Don't implement function behavior, we need to mark the code according the following rules:
+
+Memory Allocation and Reallocation Functions:
+    Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
+    Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
+    Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
+    Mark both Res and the memory it points to as overwritten using sf_overwrite.
+    Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY) for pages allocation.
+    Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
+    Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null, e.g. sf_set_alloc_possible_null(Res) or sf_set_alloc_possible_null(Res, size).
+    Mark the memory as rawly allocated with a specific memory category using sf_raw_new.
+    Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq.
+    Set the buffer size limit based on the allocation size using sf_buf_size_limit.
+    Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
+    Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
+    If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
+    For reallocation, mark the old buffer as freed with a specific memory category using sf_delete.
+    Return Res as the allocated/reallocated memory.
+
+Memory Free Function:
+    Check if the buffer is null using sf_set_must_be_not_null(buffer, FREE_OF_NULL) if the function doesn't accept nulls;
+    Mark the input buffer as freed using sf_delete, e.g. sf_delete(buffer, MALLOC_CATEGORY).
+    Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory");
+
+Password Usage:
+    Functions that take a password or key as an argument should be checked to ensure that the password/key is not hardcoded or stored in plaintext. Mark these arguments using sf_password_use.
+
+Memory Initialization:
+    Functions that initialize memory should be checked using sf_bitinit, e.g. sf_bitinit(buffer).
+
+Password Setting:
+    Functions that set a password should use sf_password_set, e.g. sf_password_set(buf).
+
+Overwrite:
+    Functions that overwrite data should use sf_overwrite to mark that the variable stores the correct data, e.g. sf_overwrite(buf).
+
+Trusted Sink Pointer:
+    Use sf_set_trusted_sink_ptr to mark a pointer as a trusted sink when it is passed to a function that is known to handle it safely.
+
+String and Buffer Operations:
+    Use sf_append_string to append one string to another, e.g. sf_append_string((char *)s, (const char *)append).
+    Use sf_null_terminated to to ensure that a string is null-terminated, e.g. sf_null_terminated((char *)s).
+    Use sf_buf_overlap to check for potential buffer overlaps, e.g. sf_buf_overlap(s, append).
+    Use sf_buf_copy to copy one buffer to another, e.g. sf_buf_copy(s, append).
+    Use sf_buf_size_limit to set a limit on the size of a buffer, e.g. sf_buf_size_limit(append, size).
+    Use sf_buf_size_limit_read to set a limit on the number of bytes that can be read from a buffer, e.g. sf_buf_size_limit_read(append, size).
+    Use sf_buf_stop_at_null to ensure that a buffer stops at a null character, e.g. sf_buf_stop_at_null(append).
+    Use sf_strlen to get the length of a string, e.g. to assign variable res a size of string s use sf_strlen(res, (const char *)s).
+    Use sf_strdup_res to duplicate a string, e.g. sf_strdup_res(res).
+
+Error Handling:
+    Check all functions for their return values and handle errors appropriately using sf_set_errno_if and sf_no_errno_if.
+
+TOCTTOU Race Conditions:
+    Check all functions that possibly have race conditions during use and take file names or paths as arguments for TOCTTOU race conditions using sf_tocttou_check or sf_tocttou_access, e.g. sf_tocttou_check(file) or sf_tocttou_check(path).
+
+File Descriptor Validity:
+    Check all functions that take file descriptors as arguments for their validity using sf_must_not_be_release, sf_set_must_be_positive, and sf_lib_arg_type.
+
+Tainted Data:
+    Mark all data that comes from user input or untrusted sources as tainted using sf_set_tainted.
+
+Sensitive Data:
+    Mark all sensitive data as password using sf_password_set.
+
+Time:
+    Mark all functions that deal with time as long time using sf_long_time.
+
+File Offsets or Sizes:
+    Limit the buffer size using sf_buf_size_limit and sf_buf_size_limit_read for all functions that deal with file offsets or sizes.
+
+Program Termination:
+    Use sf_terminate_path to terminate the program path in functions that do not return, such as _Exit, abort, and exit.
+
+Library Argument Type:
+    Use sf_lib_arg_type to specify the type of a library argument.
+
+Null Checks:
+    Use sf_set_must_be_not_null to specify that a certain argument or variable must not be null.
+    Use sf_set_possible_null to specify that the return value may be null.
+
+Uncontrolled Pointers:
+    Use sf_uncontrolled_ptr to mark a pointer that is not fully controlled by the program.
+
+Possible Negative Values:
+    Use sf_set_possible_negative to mark the return value can potentially have a negative value.

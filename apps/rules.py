@@ -8,12 +8,12 @@ def current_name_busy(name):
     return os.path.exists(name)
 
 
-save_prompt_path = 'prompts/'
-save_comments_path = 'comments/'
-uniteRule_template_path = 'com-rules/unite_rules_template.txt'
-genRule_template_path = 'com-rules/generate_rules_template.txt'
-save_rule_path = 'com-rules/'
-save_specs_path = 'protos-auto/{}'
+save_prompt_path = './prompts/'
+save_comments_path = './comments/'
+uniteRule_template_path = './com-rules/unite_rules_template.txt'
+genRule_template_path = './com-rules/generate_rules_template.txt'
+save_rule_path = './com-rules/'
+save_specs_path = './protos-auto/{}'
 
 
 def gen_prompt_id():
@@ -113,7 +113,7 @@ def form(path, rules_path=None, protos_path=None, rule_numbers=None):
     f.close()
 
     prototypes = get_protos(protos_path) if protos_path else [input("Enter the prototype of the function:\n")]
-    prototypes = [x.replace('  ', '').replace(';', '') for x in prototypes]
+    prototypes = [x.replace('  ', '').replace(';', '').strip() for x in prototypes]
     rules = get_rules(rules_path, rule_numbers)
 
     res = prompt.format(func_prototype=', '.join(prototypes), sca_rules=rules)
@@ -122,11 +122,19 @@ def form(path, rules_path=None, protos_path=None, rule_numbers=None):
     n = text_file.write(res)
 
     if n == len(res):
-        print("Success! String written to text file.")
+        print(f"Success! String written to text file {text_file.name}.")
     else:
         print("Failure! String not written to text file.")
 
     text_file.close()
+
+
+def show_progress(function, L):
+    def wrapper(elem):
+        i, x = elem
+        print('{}/{}'.format(i, len(L)))
+        return bool(function(x.strip()))
+    return wrapper
 
 
 def parse_scra(scra_pwd):
@@ -134,6 +142,7 @@ def parse_scra(scra_pwd):
     scra = f.readlines()
     f.close()
 
+    lib_names = []
     names = []
     protos = []
     presence_types = []
@@ -146,32 +155,33 @@ def parse_scra(scra_pwd):
         tmp = line.split(';')
         if len(tmp) < 7:
             continue
-        func_lib_name, func_proto, func_presence_type = tmp[2], tmp[5], tmp[-1].strip()
-        names += [func_lib_name]
+        func_lib_name, func_name, func_proto, func_presence_type = tmp[2], tmp[4], tmp[5], tmp[-1].strip()
+        lib_names += [func_lib_name]
+        names += [func_name]
         protos += [func_proto]
         presence_types += [func_presence_type]
+    
+    protos_lib_pwd = "./lib-protos/res_openssl"
+    lib = open(protos_lib_pwd, "r")
+    proto_names = lib.readlines()
+    lib.close()
+    proto_names = list(map(lambda s: s.strip(), proto_names))
 
-    # protos_lib_pwd = "lib-protos/res_openssl"
-    # lib = open(protos_lib_pwd, "r")
-    # lib_names = lib.readlines()
-    # lib_names = list(map(lambda s: s.strip(), lib_names))
-    # lib.close()
+    protos = [proto.strip() for proto, func_name, lib_name, presence_type in zip(protos, names, lib_names, presence_types)
+                if func_name in proto_names and name_filter in lib_name and presence_type == presence_filter and proto_filter not in proto]
+    
+    pattern = re.compile("(const |).+? .+?\(.+?")
+    res_protos = []
+    for proto in protos:
+        if pattern.match(proto.strip()):
+            res_protos += [proto]
+    protos = res_protos
 
     scra_protos_pwd = "lib-usages/%s"
     path, _, name = scra_pwd.rpartition('/')
 
     scra_proto_file = open(scra_protos_pwd % name, "w")
-
-    # print(list(dict.fromkeys(presence_types)))
-
-    protos = [proto.strip() for proto, name, presence_type in zip(protos, names, presence_types)
-              if name_filter in name and presence_type == presence_filter and proto_filter not in proto]
-    # print(protos)
-    protos = list(dict.fromkeys(protos))
-    # print('---------')
-    # print(names)
-
-    for proto in protos:
+    for proto in res_protos:
         scra_proto_file.write(proto + ';\n')
     scra_proto_file.close()
 
@@ -221,8 +231,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Spec Gen')
     parser.add_argument('-p', '--parse-scra')
     parser.add_argument('-f', '--form', action="store_true")
-    parser.add_argument('-tp', '--template-path', default="/home/champion/Projects/LLM/template.txt")
-    parser.add_argument('-rp', '--rules-path', default="/home/champion/Projects/LLM/res-rules/united_rules")
+    parser.add_argument('-tp', '--template-path', default="./template.txt")
+    parser.add_argument('-rp', '--rules-path', default="./res-rules/simplified_rules")
     parser.add_argument('-pp', '--prototypes-path')
     parser.add_argument('-r', '--rule-numbers')
     parser.add_argument('-gr', '--gen-rules')

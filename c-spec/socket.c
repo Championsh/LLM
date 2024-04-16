@@ -263,7 +263,7 @@ int setsockopt(int socket, int level, int option_name,
     sf_lib_arg_type(socket, "SocketCategory");
 
 	int res;
-  sf_use(option_value);
+    sf_use(option_value);
 	sf_overwrite(&res);
 	sf_set_possible_negative(res);
 	return res;

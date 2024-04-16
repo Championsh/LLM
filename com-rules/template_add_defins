@@ -1,1 +1,3 @@
-add to following file with .c extension all needed typedefs, structure definitions and #defines. Don't add #include statements.
+Add to following file with .c extension all needed typedefs, structure definitions and #defines. Don't add #include statements.
+
+{code}

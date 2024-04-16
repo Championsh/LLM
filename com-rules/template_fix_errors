@@ -1,1 +1,3 @@
-Fix following errors adding all needed typedefs, structure definitions and #defines. Don't add #include statements.
+Fix following errors, which occured due to use of undefined types, nor sf_* functions, adding all needed typedefs, structure definitions and #defines. Don't add #include statements.
+
+{errors}

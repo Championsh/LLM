@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "nginx": "c",
+        "tmp": "c",
+        "tmp_spec": "c",
+        "allspec": "c",
+        "allprotos": "c"
+    }
+}

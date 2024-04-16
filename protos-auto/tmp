@@ -1,0 +1,27 @@
+
+int BIO_read(BIO *b, void *data, int dlen) {
+    sf_set_trusted_sink_int(dlen);
+
+    void* Res = data;
+
+    sf_overwrite(&Res);
+    sf_overwrite(Res);
+
+    sf_new(Res, MALLOC_CATEGORY);
+
+    sf_set_possible_null(Res);
+
+    sf_not_acquire_if_eq(Res, Res, 0);
+
+    sf_buf_size_limit(Res, dlen);
+
+    sf_bitcopy(Res, data);
+
+    int res;
+    sf_set_errno_if(res, sf_cond_range("==", -1));
+    sf_no_errno_if(res, sf_cond_range("==", 0));
+
+    sf_overwrite(Res);
+
+    return res;
+}
