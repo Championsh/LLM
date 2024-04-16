@@ -1,9 +1,6 @@
-rf_path = "./libs/%s"
-wf_path = "./res_%s"
+rf_path = "./init-libs/protos/messy/%s"
+wf_path = "./init-libs/protos/res_%s"
 keywords = ["ENGINE", "X500", "SSL", "OPENSSL"]
-
-# if not any(keyword in "BIO_ssl_shutdown" for keyword in keywords):
-#     print("NO!")
 
 filename = str(input())
 with open(rf_path % filename, "r") as read_file:
