@@ -334,8 +334,6 @@ void ecb_crypt(char *key, char *data, unsigned datalen, unsigned mode) {
     sf_set_must_be_positive(mode); // Ensure mode is positive
     // Function implementation here
 }
-#include <string.h>
-
 
 void cbc_crypt(char *key, char *data, unsigned datalen, unsigned mode, char *ivec) {
  sf_password_use(key); //

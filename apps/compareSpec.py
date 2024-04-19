@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 from tree_sitter import Language, Parser
 
 
@@ -13,69 +14,6 @@ def transformCode(code):
 
     parser = Parser()
     parser.set_language(CPP_LANGUAGE)
-
-    # parsing a string of code
-    # tree = parser.parse(
-    #     bytes(
-    #         """
-    # void *
-    # AllocateAlignedReservedPages (
-    # uintptr_t  Pages,
-    # uintptr_t  Alignment
-    # )
-    # {
-    # sf_set_trusted_sink_int(Pages);
-
-    # void *Res;
-    # uintptr_t Remainder;
-
-    # sf_overwrite(&Res);
-    # sf_overwrite(Res);
-    # sf_new (Res, ALIGNED_MEMORY_CATEGORY);
-    # sf_set_possible_null(Res);
-    # sf_not_acquire_if_eq(Res, Res, 0);
-
-    # Remainder = (Pages * EFI_PAGE_SIZE) % Alignment;
-    # if (Remainder == 0) {
-    #     sf_buf_size_limit(Res, Pages * EFI_PAGE_SIZE);
-    # } else {
-    #     sf_buf_size_limit(Res, ((Pages * EFI_PAGE_SIZE) / Alignment + 1) * Alignment);
-    # }
-
-    # return Res;
-    # }
-            
-    # XIDeviceInfo* XIQueryDevice(Display *display,
-    #                             int deviceid,
-    #                             int *ndevices_return) {
-    #     XIDeviceInfo *res;
-    #     sf_overwrite(&res);
-    #     sf_overwrite(res);
-    #     //sf_uncontrolled_value(res);
-    #     //sf_set_possible_null(res);
-    #     sf_bitinit(ndevices_return);
-    #     sf_handle_acquire(res, X11_DEVICE);
-    #     return res;
-    # }
-
-    # struct Colormap *XListInstalledColormaps(Display *display, Window w, int *num_return) {
-    #     struct Colormap *res;
-    #     sf_overwrite(&res);
-    #     sf_overwrite(res);
-    #     //sf_uncontrolled_value(res);
-    #     //sf_set_possible_null(res);
-    #     sf_handle_acquire(res, X11_CATEGORY);
-    #     return res;
-    # }
-
-    # int XRemoveHost(Display* dpy, XHostAddress* host)
-    # {
-    # sf_use(host);
-    # }
-    # """,
-    #         "utf8",
-    #     )
-    # )
 
     tree = parser.parse(
         bytes(code, "utf8")
@@ -160,66 +98,146 @@ def transformCode(code):
     return functions
 
 
+def dictSort(var, amount=None):
+    amount = len(var) if amount is None else amount
+    return dict(sorted(var.items(), key=lambda x: x[1], reverse=True)[:amount])
+
+
 def compare(baseDict, curDict):
-    try:
-        functions_amount = len(baseDict)
+    # try:
+    extra_functions_amount = 5
+    compare_full = 0
+    compare_miss = 0
+    compare_extr = 0
+    top_miss = {}
+    top_extr = {}
+    no_spec = []
+    func_results = {}
 
-        res = 0
-        for func in baseDict:
-            # print(func)
-            if func not in curDict.keys():
-                continue
-            baseFunc = baseDict[func]
-            curFunc = curDict[func]
+    functions_amount = len(baseDict)
+    res = 0
+    for func in baseDict:
+        # print(func)
+        if func not in curDict.keys():
+            no_spec += [func]
+            continue
+        baseFunc = baseDict[func]
+        curFunc = curDict[func]
 
-            mapping = {'' : ''}
-            for var in baseFunc['param_types']:
+        mapping = {'' : ''}
+        for var in baseFunc['param_types']:
 
-                if var in curFunc['param_types'] and baseFunc['param_types'][var] == curFunc['param_types'][var]:
-                    mapping[var] = var
-                elif baseFunc['param_types'][var] in curFunc['param_types'].values() and \
-                        list(curFunc['param_types'].values()).count(baseFunc['param_types'][var]) > list(mapping.values()).count(baseFunc['param_types'][var]):
-                    var_choices = [param for param in curFunc['param_types'] \
-                                    if curFunc['param_types'][param] == baseFunc['param_types'][var] and\
-                                        param not in mapping.values()]
-                    if len(var_choices) == 0:
-                        mapping[var] = 'None'
-                    else:
-                        mapping[var] = var_choices[0]
+            if var in curFunc['param_types'] and baseFunc['param_types'][var] == curFunc['param_types'][var]:
+                mapping[var] = var
+            elif baseFunc['param_types'][var] in curFunc['param_types'].values() and \
+                    list(curFunc['param_types'].values()).count(baseFunc['param_types'][var]) > list(mapping.values()).count(baseFunc['param_types'][var]):
+                var_choices = [param for param in curFunc['param_types'] \
+                                if curFunc['param_types'][param] == baseFunc['param_types'][var] and\
+                                    param not in mapping.values()]
+                if len(var_choices) == 0:
+                    mapping[var] = 'None'
                 else:
-                    mapping[var] ='None'
-            # print("Mapping: ", mapping)
+                    mapping[var] = var_choices[0]
+            else:
+                mapping[var] ='None'
+        # print("Mapping: ", mapping)
 
-            var_amount = len(baseFunc.keys()) - 1
-            if var_amount == 0:
-                res += 1
+        var_amount = len(baseFunc.keys()) - 1
+        if var_amount == 0:
+            res += 1
+            continue
+
+        cur_var_res = 0
+        var_compare_full = 0
+        var_compare_miss = 0
+        var_compare_extr = 0
+        # print("baseFunc: ", baseFunc)
+        # print("curFunc: ", curFunc)
+        for var in baseFunc.keys():
+            if var == 'param_types':
                 continue
+            if mapping[var] == 'None':
+                for func in baseFunc[var]:
+                    if func not in top_miss.keys():
+                        top_miss[func] = 1
+                    else:
+                        top_miss[func] += 1
+                var_compare_miss += 1
+                continue
+                    
+            baseVarFunctions = baseFunc[var]
+            curVarFunctions = curFunc[mapping[var]]
 
-            cur_var_res = 0
-            # print("baseFunc: ", baseFunc)
-            # print("curFunc: ", curFunc)
-            for var in baseFunc.keys():
-                if var == 'param_types' or mapping[var] == 'None':
-                    continue
-                baseVarFunctions = baseFunc[var]
-                curVarFunctions = curFunc[mapping[var]]
-
-                var_functions_amount = len(baseVarFunctions)
-                if var_functions_amount == 0:
-                    cur_var_res += 1
-                    continue
-
-                cur_var_functions_res = 0
-                for baseVarFunction in baseVarFunctions:
-                    if baseVarFunction in curVarFunctions:
-                        cur_var_functions_res += 1
-                cur_var_res += cur_var_functions_res / var_functions_amount
+            var_functions_amount = len(baseVarFunctions)
+            if var_functions_amount == 0:
+                cur_var_res += 1
+                for func in curVarFunctions:
+                    if func not in top_extr.keys():
+                        top_extr[func] = 1
+                    else:
+                        top_extr[func] += 1
+                var_compare_extr += 1
+                continue
             
-            res += cur_var_res / var_amount
-        return "{:.1f}".format(100 * res / functions_amount)
-    except Exception as e:
-        print('Error occured: ', e)
-    return 0
+            cur_var_functions_res = 0
+            for baseVarFunction in baseVarFunctions:
+                if baseVarFunction in curVarFunctions:
+                    cur_var_functions_res += 1
+                else:
+                    if baseVarFunction not in top_miss.keys():
+                        top_miss[baseVarFunction] = 1
+                    else:
+                        top_miss[baseVarFunction] += 1
+            
+            tmp = cur_var_functions_res / var_functions_amount
+            cur_var_res += tmp
+            if tmp < 1:
+                var_compare_miss += 1
+            else:
+                var_compare_full += 1
+            
+            extr_fl = False
+            for curVarFunction in curVarFunctions:
+                if curVarFunction not in baseVarFunctions:
+                    extr_fl = True
+                    if curVarFunction not in top_extr.keys():
+                        top_extr[curVarFunction] = 1
+                    else:
+                        top_extr[curVarFunction] += 1
+            if extr_fl:
+                var_compare_extr += 1
+        
+        res += cur_var_res / var_amount
+        compare_full += var_compare_full / var_amount
+        compare_miss += var_compare_miss / var_amount
+        compare_extr += var_compare_extr / var_amount
+        
+        func_results[func] = cur_var_res / var_amount
+
+    return 100 * res / functions_amount,\
+        100 * compare_full / functions_amount,\
+        100 * compare_miss / functions_amount,\
+        100 * compare_extr / functions_amount,\
+        100 * len(no_spec) / functions_amount,\
+        dictSort(top_extr, extra_functions_amount),\
+        dictSort(top_miss, extra_functions_amount),\
+        no_spec[:extra_functions_amount],\
+        dict(filter(lambda x: x[1] < 0.5 , sorted(func_results.items(), key=lambda x: x[1])))
+
+    # return "Similarity: {:.1f}%\n".format(100 * res / functions_amount) + \
+    #         "\tFull Specifications: {:.1f}%\n".format(100 * compare_full / functions_amount) + \
+    #         "\tMissed Specifications: {:.1f}%\n".format(100 * compare_miss / functions_amount) + \
+    #         "\tExtra Specifications: {:.1f}%\n".format(100 * compare_extr / functions_amount) + \
+    #         "\tNo Specifications: {:.1f}%\n".format(100 * len(no_spec) / functions_amount) + \
+    #         "\tTop extr functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in dict(sorted(top_extr.items(), key=lambda x: x[1], reverse=True)[:extra_functions_amount]).items()) + \
+    #         "\n\tTop miss functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in dict(sorted(top_miss.items(), key=lambda x: x[1], reverse=True)[:extra_functions_amount]).items()))) + \
+    #         "\n\tNo spec functions: {:s}".format(', '.join(no_spec[:extra_functions_amount])) + \
+    #         "\n\tLess Hit: {:s}".format(', '.join(f'{key}' for key in dict(filter(lambda x: x[1] < 0.5 , sorted(func_results.items(), key=lambda x: x[1]))).keys()))
+            
+                
+    # except Exception as e:
+    #     print('Error occured: ', e)
+    # return 0
 
 
 def main():
@@ -241,7 +259,18 @@ def main():
             code = reader.read()
         curDict = transformCode(code)
 
-        print(filename, " similarity is ", compare(baseDict, curDict), "%")
+        compare_res, compare_full, compare_miss, compare_extr, noSpec, \
+            functions_extr, functions_miss, functions_noSpec, functions_lessHit = compare(baseDict, curDict)
+
+        print(f"{filename}:\n" + \
+              "Similarity: {:.1f}%\n".format(compare_res) + \
+              "\tFull Specifications: {:.1f}%\n".format(compare_full) + \
+              "\tMissed Specifications: {:.1f}%\n".format(compare_miss) + \
+              "\tExtra Specifications: {:.1f}%\n".format(compare_extr) + \
+              "\tNo Specifications: {:.1f}%\n".format(noSpec) + \
+              "\tTop extr functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in functions_extr.items())) + \
+              "\n\tTop miss functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in functions_miss.items())) + \
+              "\n\tNo spec functions: {:s}".format(', '.join(functions_noSpec)))
 
 
 if __name__ == '__main__':

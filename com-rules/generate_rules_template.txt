@@ -1,2 +1,4 @@
-Relying on the already created specifications for some functions from a certain library, generate common rules for static analysis functions, which perform all the necessary actions, usages, the analysis functions not from a file shouldn't be included into the rules. Also make sure to add 1-2 examples of usage for every static analysis special function.
-{spec}
+Relying on the following code specifications for some functions, generate common rule for static analysis function {function}. Sum up use cases and function's parameters for the needed function.
+
+# Code Specifications:
+    {specifications}

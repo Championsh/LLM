@@ -1,51 +1,40 @@
-RSA_PSS_PARAMS* RSA_PSS_PARAMS_new();
-NETSCAPE_SPKAC* d2i_NETSCAPE_SPKAC(NETSCAPE_SPKAC**, const unsigned char**, long);
-int SSL_CONF_CTX_set1_prefix(SSL_CONF_CTX*, const char*);
-OSSL_HTTP_REQ_CTX* OSSL_HTTP_open(const char*, const char*, const char*, const char*, int, BIO*, BIO*, OSSL_HTTP_bio_cb_t, void*, int, int);
-int i2d_PKCS8PrivateKeyInfo_bio(BIO*, const EVP_PKEY*);
-size_t BIO_ctrl_get_write_guarantee(BIO*);
-X509_REQ* X509_REQ_dup(const X509_REQ*);
-int SSL_set_trust(SSL*, int);
-PKCS7_ENVELOPE* d2i_PKCS7_ENVELOPE(PKCS7_ENVELOPE**, const unsigned char**, long);
-void SSL_set_client_CA_list(SSL*, stack_st_X509_NAME*);
-void RSA_get0_crt_params(const RSA*, const BIGNUM**, const BIGNUM**, const BIGNUM**);
-char* BIO_ADDR_path_string(const BIO_ADDR*);
-int BN_is_prime_fasttest(const BIGNUM*, int, void (int, int, void*)*, BN_CTX*, void*, int);
-const EVP_CIPHER* ENGINE_get_cipher(ENGINE*, int);
-int i2d_ASN1_INTEGER(const ASN1_INTEGER*, unsigned char**);
-int i2d_DIST_POINT(const DIST_POINT*, unsigned char**);
-int EVP_MD_meth_set_flags(EVP_MD*, unsigned long);
-int SSL_renegotiate(SSL*);
-void ENGINE_set_table_flags(unsigned int);
-X509_STORE_CTX_get_issuer_fn X509_STORE_get_get_issuer(const X509_STORE*);
-
-DIR *opendir(const char *file) {
-    sf_tocttou_access(file);
-	sf_set_trusted_sink_ptr(file);
-
-    DIR *res;
-    sf_overwrite(&res);
-    sf_overwrite(res);
-    sf_uncontrolled_value(res);
-    sf_set_possible_null(res);
-    sf_handle_acquire(res, DIR_CATEGORY);
-    return res;
-}
-
-FILE *fopen(const char *filename, const char *mode){
-    char d1 = *filename;
-    char d2 = *mode;
-    sf_tocttou_access(filename);
-    sf_set_trusted_sink_ptr(filename);
-
-    FILE *res;
-    sf_overwrite(&res);
-    sf_overwrite(res);
-    sf_uncontrolled_value((int)(intptr_t)res);
-    sf_set_possible_null(res);
-    sf_handle_acquire(res, FILE_CATEGORY);
-    sf_lib_arg_type(res, "FilePointerCategory");
-    sf_not_acquire_if_eq(res, (int)(intptr_t)res, 0);
-    sf_set_errno_if((int)(intptr_t)res, 0);
-    return res;
-}
+int i2b_PVK_bio_ex(BIO*, const EVP_PKEY*, int, pem_password_cb*, void*, OSSL_LIB_CTX*, const char*);
+X509_STORE_CTX_check_policy_fn X509_STORE_get_check_policy(const X509_STORE*);
+int EVP_PKEY_encrypt(EVP_PKEY_CTX*, unsigned char*, size_t*, const unsigned char*, size_t);
+int X509_NAME_add_entry(X509_NAME*, const X509_NAME_ENTRY*, int, int);
+int PKCS5_pbe_set0_algor_ex(X509_ALGOR*, int, int, const unsigned char*, int, OSSL_LIB_CTX*);
+int SSL_CTX_add_server_custom_ext(SSL_CTX*, unsigned int, custom_ext_add_cb, custom_ext_free_cb, void*, custom_ext_parse_cb, void*);
+const SSL_METHOD* TLS_method();
+const BIO_METHOD* BIO_s_mem();
+const char* SSL_state_string(const SSL*);
+BIO* BIO_pop(BIO*);
+ENGINE_DIGESTS_PTR ENGINE_get_digests(const ENGINE*);
+int PEM_write_DHxparams(FILE*, const DH*);
+int BIO_closesocket(int);
+void OSSL_HTTP_REQ_CTX_free(OSSL_HTTP_REQ_CTX*);
+long SSL_SESSION_get_time(const SSL_SESSION*);
+int PEM_write_bio_RSAPrivateKey(BIO*, const RSA*, const EVP_CIPHER*, const unsigned char*, int, pem_password_cb*, void*);
+int PEM_write_X509_REQ(FILE*, const X509_REQ*);
+void* ASN1_TYPE_unpack_sequence(const ASN1_ITEM*, const ASN1_TYPE*);
+int UI_add_error_string(UI*, const char*);
+const EVP_CIPHER* EVP_aria_192_ccm();
+PKCS8_PRIV_KEY_INFO* d2i_PKCS8_PRIV_KEY_INFO(PKCS8_PRIV_KEY_INFO**, const unsigned char**, long);
+int i2d_PKCS7_bio(BIO*, const PKCS7*);
+int X509_get_ext_by_NID(const X509*, int, int);
+const EVP_CIPHER* EVP_des_cbc();
+const EVP_CIPHER* EVP_aria_128_gcm();
+SRTP_PROTECTION_PROFILE* SSL_get_selected_srtp_profile(SSL*);
+char* X509_VERIFY_PARAM_get0_host(X509_VERIFY_PARAM*, int);
+const ASN1_OBJECT* NAMING_AUTHORITY_get0_authorityId(const NAMING_AUTHORITY*);
+OSSL_PARAM OSSL_PARAM_construct_utf8_string(const char*,  char*, size_t);
+int X509_VERIFY_PARAM_set_inh_flags(X509_VERIFY_PARAM*, uint32_t);
+const EVP_CIPHER* EVP_bf_ecb();
+int (DSA*)* DSA_meth_get_finish(const DSA_METHOD*);
+int ASN1_INTEGER_set_uint64(ASN1_INTEGER*, uint64_t);
+int i2d_PKCS7_ENVELOPE(const PKCS7_ENVELOPE*, unsigned char**);
+void EVP_RAND_free(EVP_RAND*);
+int EVP_PKEY_CTX_set0_dh_kdf_oid(EVP_PKEY_CTX*, ASN1_OBJECT*);
+int ENGINE_register_all_complete();
+const OSSL_PARAM* EVP_CIPHER_settable_ctx_params(const EVP_CIPHER*);
+int BN_BLINDING_convert_ex(BIGNUM*, BIGNUM*, BN_BLINDING*, BN_CTX*);
+CTLOG* CTLOG_new(EVP_PKEY*, const char*);

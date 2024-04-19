@@ -1,6 +1,3 @@
-In every Function create a variable Res of the same type as the function's return type and assign it Null or 0.
-Don't implement function behavior, we need to mark the code according the following rules:
-
 Memory Allocation and Reallocation Functions:
     Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
     Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
@@ -20,11 +17,15 @@ Memory Allocation and Reallocation Functions:
 
 Memory Free Function:
     Check if the buffer is null using sf_set_must_be_not_null(buffer, FREE_OF_NULL) if the function doesn't accept nulls;
-    Mark the input buffer as freed using sf_delete, e.g. sf_delete(buffer, MALLOC_CATEGORY).
+    Mark the input buffer as freed using sf_delete, e.g. sf_delete(buffer, MALLOC_CATEGORY);
     Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory");
 
+Overwrite:
+    For each overwritten parameter p of global variable v it must be labeled using sf_overwrite(p) or sf_overwrite(v)
+    Functions that overwrite data should use sf_overwrite to mark the variable as assigned the new correct data, e.g. sf_overwrite(buf).
+
 Password Usage:
-    Functions that take a password or key as an argument should be checked to ensure that the password/key is not hardcoded or stored in plaintext. Mark these arguments using sf_password_use.
+    Functions that take a password or key as an argument should use all the password and key arguments using sf_password_use, e.g. sf_password_use(key).
 
 Memory Initialization:
     Functions that initialize memory should be checked using sf_bitinit, e.g. sf_bitinit(buffer).
@@ -32,11 +33,8 @@ Memory Initialization:
 Password Setting:
     Functions that set a password should use sf_password_set, e.g. sf_password_set(buf).
 
-Overwrite:
-    Functions that overwrite data should use sf_overwrite to mark that the variable stores the correct data, e.g. sf_overwrite(buf).
-
 Trusted Sink Pointer:
-    Use sf_set_trusted_sink_ptr to mark a pointer as a trusted sink when it is passed to a function that is known to handle it safely.
+    Use sf_set_trusted_sink_ptr to mark a pointer as a trusted sink when it is passed to a function that is known to handle it safely, e.g. sf_set_trusted_sink_ptr(name).
 
 String and Buffer Operations:
     Use sf_append_string to append one string to another, e.g. sf_append_string((char *)s, (const char *)append).
@@ -55,8 +53,13 @@ Error Handling:
 TOCTTOU Race Conditions:
     Check all functions that possibly have race conditions during use and take file names or paths as arguments for TOCTTOU race conditions using sf_tocttou_check or sf_tocttou_access, e.g. sf_tocttou_check(file) or sf_tocttou_check(path).
 
-File Descriptor Validity:
-    Check all functions that take file descriptors as arguments for their validity using sf_must_not_be_release, sf_set_must_be_positive, and sf_lib_arg_type.
+Possible Negative Values:
+    Use sf_set_possible_negative to mark the return value can potentially have a negative value.
+
+Resource Validity:
+    Check that the resources (such as a socket, file descriptor, or pointer) will not be released, closed, or freed before the function execution completes with sf_must_not_be_release, e.g. sf_must_not_be_release(fd) or sf_must_not_be_release(ptr).
+    Check a variable or parameter representing size, count, identifier, or other value that should always be positive with sf_set_must_be_positive(), e.g. sf_set_must_be_positive(pid).
+    Use sf_lib_arg_type() to specify the category of an argument in a function call that operates on a resource, such as a file descriptor, socket descriptor, memory allocation, or file pointer. The categories used depend on the type of resource being operated on, such as "StdioHandlerCategory" for standard I/O file descriptors, "FileHandlerCategory" for file descriptors, "SocketCategory" for socket descriptors, "MallocCategory" for memory allocated by malloc() and related functions, "NewCategory" and "NewArrayCategory" for memory allocated by operator new() and operator new[](), and "FilePointerCategory" for file pointers. E.g. sf_lib_arg_type(stream, "FilePointerCategory").
 
 Tainted Data:
     Mark all data that comes from user input or untrusted sources as tainted using sf_set_tainted.
@@ -73,15 +76,9 @@ File Offsets or Sizes:
 Program Termination:
     Use sf_terminate_path to terminate the program path in functions that do not return, such as _Exit, abort, and exit.
 
-Library Argument Type:
-    Use sf_lib_arg_type to specify the type of a library argument.
-
 Null Checks:
     Use sf_set_must_be_not_null to specify that a certain argument or variable must not be null.
     Use sf_set_possible_null to specify that the return value may be null.
 
 Uncontrolled Pointers:
     Use sf_uncontrolled_ptr to mark a pointer that is not fully controlled by the program.
-
-Possible Negative Values:
-    Use sf_set_possible_negative to mark the return value can potentially have a negative value.

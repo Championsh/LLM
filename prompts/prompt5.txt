@@ -1,3 +1,6 @@
+Imagine you are a programmer creating static code analysis tool.
+Generate function with following exact prototypes , relying on the following static analysis rules which tell us what functions to use to mark the code as needed:
+
 Memory Allocation and Reallocation Functions:
     Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
     Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
@@ -16,11 +19,8 @@ Memory Allocation and Reallocation Functions:
     Return Res as the allocated/reallocated memory.
 
 Memory Free Function:
-    Check if the buffer is null using sf_set_must_be_not_null(buffer, FREE_OF_NULL) if the function doesn't accept nulls;
-    Mark the input buffer as freed using sf_delete, e.g. sf_delete(buffer, MALLOC_CATEGORY).
-    Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory");
-
-Overwrite:
+    Check if the buffer is null using sf_set_must_be_not_null(buffer, FREE_OF_NULL) if the function doesn't accept nullsMark the input buffer as freed using sf_delete, e.g. sf_delete(buffer, MALLOC_CATEGORY).
+    Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory")Overwrite:
     Functions that overwrite data should use sf_overwrite to mark the variable as assigned the new correct data, e.g. sf_overwrite(buf).
 
 Password Usage:
@@ -82,3 +82,7 @@ Null Checks:
 
 Uncontrolled Pointers:
     Use sf_uncontrolled_ptr to mark a pointer that is not fully controlled by the program.
+
+Consider that static code analysis functions perform all the necessary actions, you don't need to return or assign anything.
+Also consider that we need these functions only to mark the program and we the real functions behavior is not needed.
+Don't add implementation for any static code analysis functions, as all functions and structures are defined in "specfunc.h" header.
