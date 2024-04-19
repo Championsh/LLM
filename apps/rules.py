@@ -10,9 +10,9 @@ def current_name_busy(name):
 
 save_prompt_path = './prompts/'
 save_comments_path = './comments/'
-uniteRule_template_path = './com-rules/unite_rules_template.txt'
-genRule_template_path = './com-rules/generate_rules_template.txt'
-save_rule_path = './com-rules/'
+uniteRule_template_path = './templates/unite_rules_template.txt'
+genRule_template_path = './templates/generate_rules_template.txt'
+save_rule_path = './templates/'
 save_specs_path = './protos-auto/{}'
 
 
@@ -161,7 +161,7 @@ def parse_scra(scra_pwd):
         protos += [func_proto]
         presence_types += [func_presence_type]
     
-    protos_lib_pwd = "./lib-protos/res_openssl"
+    protos_lib_pwd = "./protos/res_openssl"
     lib = open(protos_lib_pwd, "r")
     proto_names = lib.readlines()
     lib.close()
@@ -177,7 +177,7 @@ def parse_scra(scra_pwd):
             res_protos += [proto]
     protos = res_protos
 
-    scra_protos_pwd = "lib-usages/%s"
+    scra_protos_pwd = "usages/%s"
     path, _, name = scra_pwd.rpartition('/')
 
     scra_proto_file = open(scra_protos_pwd % name, "w")
@@ -232,14 +232,14 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--parse-scra')
     parser.add_argument('-f', '--form', action="store_true")
     parser.add_argument('-tp', '--template-path', default="./template.txt")
-    parser.add_argument('-rp', '--rules-path', default="./res-rules/simplified_rules")
+    parser.add_argument('-rp', '--rules-path', default="./spec-rules/simplified_rules")
     parser.add_argument('-pp', '--prototypes-path')
     parser.add_argument('-r', '--rule-numbers')
     parser.add_argument('-gr', '--gen-rules')
     parser.add_argument('-ur', '--unite-rules')
     parser.add_argument('-ss', '--squeeze-specs')
 
-    # parser.add_argument('-sp', '--save-path', default="/home/champion/Projects/LLM/lib-usages/prompt{num}.txt")
+    # parser.add_argument('-sp', '--save-path', default="/home/champion/Projects/LLM/usages/prompt{num}.txt")
     args = parser.parse_args()
 
     parse_scra_path = args.parse_scra
