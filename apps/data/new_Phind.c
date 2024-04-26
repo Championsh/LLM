@@ -1,5 +1,26 @@
+ssize_t archive_read_data(struct archive *archive, void *buff, size_t len) {
+    ssize_t Res;
+    sf_set_trusted_sink_int(len);
+    sf_malloc_arg(buff, len);
+    Res = (ssize_t) sf_overwrite(buff, len);
+    sf_new(buff, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(buff, len);
+    sf_lib_arg_type(buff, "MallocCategory");
+    sf_buf_size_limit(buff, len);
+    return Res;
+}
 
-
+BSTR SysAllocStringByteLen(LPCSTR psz, unsigned int len) {
+    BSTR Res;
+    sf_set_trusted_sink_int(len);
+    sf_malloc_arg(psz, len);
+    Res = (BSTR) sf_overwrite(psz, len);
+    sf_new(psz, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(psz, len);
+    sf_lib_arg_type(psz, "MallocCategory");
+    sf_buf_size_limit(psz, len);
+    return Res;
+}
 
 BSTR SysAllocStringLen(const OLECHAR *pch, unsigned int len)
 {
@@ -162,10 +183,10 @@ int isblank(int c) {
 
 
 int iscntrl(int c) {
-    // Mark the input parameter as trusted sink
+    // Mark the input parameter c as trusted sink
     sf_set_trusted_sink_int(c);
 
-    // Perform the actual check
+    // Perform the actual iscntrl check
     int res = c >= 0x00 && c <= 0x1F;
 
     // Mark the result as tainted
@@ -174,12 +195,12 @@ int iscntrl(int c) {
     return res;
 }
 
-int isgraph(int c) {
-    // Mark the input parameter as trusted sink
+int isdigit(int c) {
+    // Mark the input parameter c as trusted sink
     sf_set_trusted_sink_int(c);
 
-    // Perform the actual check
-    int res = c >= 0x21 && c <= 0x7E;
+    // Perform the actual isdigit check
+    int res = c >= '0' && c <= '9';
 
     // Mark the result as tainted
     sf_set_tainted(res);
@@ -189,11 +210,24 @@ int isgraph(int c) {
 
 
 
-int islower(int c) {
-    // Mark the input parameter as trusted sink
+int isgraph(int c) {
+    // Mark the input parameter c as trusted sink
     sf_set_trusted_sink_int(c);
 
-    // Perform the actual check
+    // Perform the actual check for isgraph
+    int res = (c >= 0x21 && c <= 0x7E);
+
+    // Mark the result as tainted
+    sf_set_tainted(res);
+
+    return res;
+}
+
+int islower(int c) {
+    // Mark the input parameter c as trusted sink
+    sf_set_trusted_sink_int(c);
+
+    // Perform the actual check for islower
     int res = (c >= 'a' && c <= 'z');
 
     // Mark the result as tainted
@@ -202,302 +236,290 @@ int islower(int c) {
     return res;
 }
 
+
+
 int isprint(int c) {
-    // Mark the input parameter as trusted sink
-    sf_set_trusted_sink_int(c);
+    // Mark c as tainted
+    sf_set_tainted(c);
 
     // Perform the actual check
-    int res = (c >= ' ' && c <= '~');
+    int res = (c >= 32 && c <= 126);
 
-    // Mark the result as tainted
-    sf_set_tainted(res);
+    // Mark res as not tainted
+    sf_set_not_tainted(res);
 
     return res;
 }
-
-
 
 int ispunct(int c) {
-    // Mark the input parameter as trusted sink
-    sf_set_trusted_sink_int(c);
+    // Mark c as tainted
+    sf_set_tainted(c);
 
-    // Perform the actual check for ispunct
-    int res = (c >= -1 && c <= 255) && (ispunct_table[c >> 3] & (1 << (c & 7)));
+    // Perform the actual check
+    int res = (c >= 33 && c <= 47) || (c >= 58 && c <= 64) || (c >= 91 && c <= 96) || (c >= 123 && c <= 126);
 
-    // Mark the result as tainted
-    sf_set_tainted(res);
+    // Mark res as not tainted
+    sf_set_not_tainted(res);
 
     return res;
 }
 
+
+
 int isspace(int c) {
-    // Mark the input parameter as trusted sink
+    // Mark the input parameter c as trusted sink
     sf_set_trusted_sink_int(c);
 
     // Perform the actual check for isspace
-    int res = (c == ' ' || c == 'f' || c == 'n' || c == 'r' || c == 't' || c == 'v');
+    int result = c == ' ' || c == 'f' || c == 'n' || c == 'r' || c == 't' || c == 'v';
 
     // Mark the result as tainted
-    sf_set_tainted(res);
+    sf_set_tainted(result);
 
-    return res;
+    return result;
 }
 
-
-
 int isupper(int c) {
-    // Mark the input parameter as trusted sink
+    // Mark the input parameter c as trusted sink
     sf_set_trusted_sink_int(c);
 
     // Perform the actual check for isupper
-    int res = (c >= 'A' && c <= 'Z');
+    int result = c >= 'A' && c <= 'Z';
 
     // Mark the result as tainted
-    sf_set_tainted(res);
+    sf_set_tainted(result);
 
-    return res;
+    return result;
 }
+
+
 
 int isxdigit(int c) {
-    // Mark the input parameter as trusted sink
+    // Mark c as trusted sink
     sf_set_trusted_sink_int(c);
 
-    // Perform the actual check for isxdigit
-    int res = (isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
+    // Return value is tainted
+    sf_set_tainted(c);
 
-    // Mark the result as tainted
-    sf_set_tainted(res);
+    // Return value can potentially have a negative value
+    sf_set_possible_negative(c);
 
-    return res;
+    return c;
 }
 
+DIR *opendir(const char *file) {
+    // Mark file as not null
+    sf_set_must_be_not_null(file, FREE_OF_NULL);
 
+    // Mark file as null terminated
+    sf_null_terminated(file);
 
-void err(int eval, const char *fmt, ...) {
-    // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
-    sf_set_trusted_sink_int(eval);
+    // Mark file as trusted sink
+    sf_set_trusted_sink_ptr(file);
 
-    // Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
-    sf_malloc_arg(eval);
+    // Allocate memory for DIR
+    DIR *dir = sf_malloc_arg(sizeof(DIR));
 
-    // Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
+    // Mark dir as possibly null
+    sf_set_alloc_possible_null(dir);
+
+    // Mark dir as library argument type
+    sf_lib_arg_type(dir, "DirCategory");
+
+    // Mark dir as new
+    sf_new(dir, DIR_MEMORY_CATEGORY);
+
+    // Mark dir as not acquired if it is equal to null
+    sf_not_acquire_if_eq(dir);
+
+    // Set the buffer size limit for dir
+    sf_buf_size_limit(dir, sizeof(DIR));
+
+    // Return dir
+    return dir;
+}
+
+void CpuDeadLoop(void)
+{
+    // Add static analysis rules
+    sf_long_time();
+    sf_terminate_path();
+
+    // Dead loop code
+    while(1);
+}
+
+void *AllocateRuntimePool(uintptr_t AllocationSize)
+{
+    // Add static analysis rules
+    sf_set_trusted_sink_int(AllocationSize);
+    sf_malloc_arg(AllocationSize);
     void *Res = NULL;
-
-    // Mark both Res and the memory it points to as overwritten using sf_overwrite.
     sf_overwrite(Res);
-
-    // Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY) for pages allocation.
     sf_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
-    sf_set_possible_null(Res);
-
-    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null, e.g. sf_set_alloc_possible_null(Res) or sf_set_alloc_possible_null(Res, size).
-    sf_set_alloc_possible_null(Res, eval);
-
-    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new.
-    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq.
+    sf_set_alloc_possible_null(Res, AllocationSize);
     sf_not_acquire_if_eq(Res);
-
-    // Set the buffer size limit based on the allocation size using sf_buf_size_limit.
-    sf_buf_size_limit(Res, eval);
-
-    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
-    sf_set_buf_size(Res, eval);
-
-    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
+    sf_buf_size_limit(Res, AllocationSize);
     sf_lib_arg_type(Res, "MallocCategory");
 
-    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
-    // This is not applicable for err and errx functions, so it's omitted.
+    // Allocation code
+    Res = malloc(AllocationSize);
 
-    // For reallocation, mark the old buffer as freed with a specific memory category using sf_delete.
-    // This is not applicable for err and errx functions, so it's omitted.
-
-    // Return Res as the allocated/reallocated memory.
-    // This is not applicable for err and errx functions, so it's omitted.
-}
-
-void errx(int eval, const char *fmt, ...) {
-    // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
-    sf_set_trusted_sink_int(eval);
-
-    // Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
-    sf_malloc_arg(eval);
-
-    // Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
-    void *Res = NULL;
-
-    // Mark both Res and the memory it points to as overwritten using sf_overwrite.
-    sf_overwrite(Res);
-
-    // Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY) for pages allocation.
-    sf_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
-    sf_set_possible_null(Res);
-
-    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null, e.g. sf_set_alloc_possible_null(Res) or sf_set_alloc_possible_null(Res, size).
-    sf_set_alloc_possible_null(Res, eval);
-
-    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new.
-    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq.
-    sf_not_acquire_if_eq(Res);
-
-    // Set the buffer size limit based on the allocation size using sf_buf_size_limit.
-    sf_buf_size_limit(Res, eval);
-
-    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
-    sf_set_buf_size(Res, eval);
-
-    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
-    sf_lib_arg_type(Res, "MallocCategory");
-
-    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
-    // This is not applicable for err and errx functions, so it's omitted.
-
-    // For reallocation, mark the old buffer as freed with a specific memory category using sf_delete.
-    // This is not applicable for err and errx functions, so it's omitted.
-
-    // Return Res as the allocated/reallocated memory.
-    // This is not applicable for err and errx functions, so it's omitted.
-}
-
-
-
-int creat(const char *name, mode_t mode) {
-    int fd;
-    sf_set_trusted_sink_int(mode);
-    sf_set_alloc_possible_null(fd);
-    sf_set_errno_if(fd < 0);
-    return fd;
-}
-
-int open(const char *name, int flags, ...) {
-    int fd;
-    sf_set_trusted_sink_ptr(name);
-    sf_set_alloc_possible_null(fd);
-    sf_set_errno_if(fd < 0);
-    return fd;
-}
-
-
-
-int open64(const char *name, int flags, ...) {
-    sf_set_trusted_sink_int(flags);
-    int fd = -1;
-    sf_set_errno_if(fd == -1);
-    sf_set_must_not_be_release(fd);
-    sf_set_possible_null(fd);
-    sf_tocttou_check(name);
-    return fd;
-}
-
-
-
-gchar * g_strdup (const gchar *str) {
-    gchar *Res = NULL;
-    sf_new(Res, PAGES_MEMORY_CATEGORY);
-    sf_set_alloc_possible_null(Res);
-    sf_lib_arg_type(Res, "MallocCategory");
-    sf_strlen(Res, str);
-    sf_bitcopy(Res, str);
-    sf_null_terminated(Res);
     return Res;
 }
 
 
 
-gchar *g_strdup_printf(const gchar *format, ...) {
-    va_list args;
-    va_start(args, format);
+void *AllocateZeroPool(uintptr_t AllocationSize) {
+    void *Res = NULL;
+
+    sf_set_trusted_sink_int(AllocationSize);
+    sf_malloc_arg(Res, AllocationSize);
+    Res = malloc(AllocationSize);
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res, AllocationSize);
+    sf_not_acquire_if_eq(Res);
+    sf_buf_size_limit(Res, AllocationSize);
+    sf_lib_arg_type(Res, "MallocCategory");
+
+    return Res;
+}
+
+
+
+void err(int eval, const char *fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+
+    sf_set_errno_if(eval);
+    sf_no_errno_if(eval);
+
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+
+    exit(eval);
+}
+
+
+
+void errx(int eval, const char *fmt, ...) {
+    // Mark the format string as not null
+    sf_set_must_be_not_null(fmt, FORMAT_STRING_OF_ERRX);
+
+    // Mark the format string as tainted
+    sf_set_tainted(fmt, FORMAT_STRING_OF_ERRX);
+
+    // Mark the eval as possibly negative
+    sf_set_possible_negative(eval, EVAL_OF_ERRX);
+
+    // Other static analysis rules can be applied here
+}
+
+int creat(const char *name, mode_t mode) {
+    // Mark the name as not null
+    sf_set_must_be_not_null(name, NAME_OF_CREAT);
+
+    // Mark the name as tainted
+    sf_set_tainted(name, NAME_OF_CREAT);
+
+    // Mark the mode as possibly negative
+    sf_set_possible_negative(mode, MODE_OF_CREAT);
+
+    // Other static analysis rules can be applied here
+
+    // Return value is marked as possibly null
+    sf_set_possible_null(RETVAL_OF_CREAT, POSSIBLE_NULL_OF_CREAT);
+
+    return 0;
+}
+
+
+
+int open(const char *name, int flags, ...) {
+    sf_set_trusted_sink_int(flags);
+    int fd = -1;
+    sf_set_errno_if(fd, "open");
+    sf_set_must_not_be_release(fd);
+    sf_tocttou_check(name);
+    sf_set_possible_null(fd);
+    return fd;
+}
+
+int open64(const char *name, int flags, ...) {
+    sf_set_trusted_sink_int(flags);
+    int fd = -1;
+    sf_set_errno_if(fd, "open64");
+    sf_set_must_not_be_release(fd);
+    sf_tocttou_check(name);
+    sf_set_possible_null(fd);
+    return fd;
+}
+
+
+
+gchar *g_strdup(const gchar *str) {
+    size_t size = strlen(str) + 1;
     gchar *Res = NULL;
 
-    // Memory Allocation
-    sf_malloc_arg(format);
-    sf_malloc_arg(args);
+    sf_set_trusted_sink_int(size);
+    sf_malloc_arg(size);
+    Res = (gchar *)malloc(size);
 
-    // Memory Allocation and Reallocation Functions
+    sf_overwrite(Res);
     sf_new(Res, PAGES_MEMORY_CATEGORY);
     sf_set_alloc_possible_null(Res);
+    sf_lib_arg_type(Res, "MallocCategory");
+    sf_bitcopy(Res, str);
+    sf_buf_size_limit(Res, size);
 
-    // Overwrite
-    sf_overwrite(Res);
+    return Res;
+}
 
-    // Memory Initialization
-    sf_bitinit(Res);
+gchar *g_strdup_printf(const gchar *format, ...) {
+    va_list args;
+    gchar *Res = NULL;
 
-    // String and Buffer Operations
-    sf_strdup_res(Res);
-
-    // Error Handling
-    sf_set_errno_if(Res == NULL);
-
-    // Resource Validity
-    sf_must_not_be_release(format);
-    sf_must_not_be_release(args);
-
-    // Null Checks
-    sf_set_must_be_not_null(format, FREE_OF_NULL);
-    sf_set_possible_null(Res);
-
+    va_start(args, format);
+    size_t size = vsnprintf(NULL, 0, format, args) + 1;
     va_end(args);
+
+    sf_set_trusted_sink_int(size);
+    sf_malloc_arg(size);
+    Res = (gchar *)malloc(size);
+
+    va_start(args, format);
+    vsnprintf(Res, size, format, args);
+    va_end(args);
+
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res);
+    sf_lib_arg_type(Res, "MallocCategory");
+    sf_buf_size_limit(Res, size);
+
     return Res;
 }
 
 
 
 guint32 g_random_int(void) {
-    guint32 Res = 0;
-
-    // Memory Allocation
-    sf_malloc_arg(Res);
-
-    // Memory Allocation and Reallocation Functions
-    sf_new(Res, PAGES_MEMORY_CATEGORY);
-    sf_set_alloc_possible_null(Res);
-
-    // Overwrite
-    sf_overwrite(Res);
-
-    // Memory Initialization
-    sf_bitinit(Res);
-
-    // Error Handling
-    sf_set_errno_if(Res == 0);
-
-    // Resource Validity
-    sf_must_not_be_release(Res);
-
-    // Null Checks
-    sf_set_possible_null(Res);
-
-    return Res;
+    guint32 res;
+    sf_set_trusted_sink_int(res);
+    return res;
 }
 
-
-
 int munmap(void *addr, size_t len) {
-    sf_set_trusted_sink_int(len);
-    sf_buf_size_limit(addr, len);
-    sf_delete(addr, PAGES_MEMORY_CATEGORY);
+    sf_set_must_be_not_null(addr, FREE_OF_NULL);
+    sf_delete(addr, MALLOC_CATEGORY);
     sf_lib_arg_type(addr, "MallocCategory");
     return 0;
 }
 
-int SHA256_Init(SHA256_CTX *sha) {
-    sf_set_trusted_sink_ptr(sha);
-    sf_bitinit(sha);
-    return 1;
-}
 
 
-
-int SHA384_Init(SHA512_CTX *sha) {
+int SHA256_Init(SHA256_CTX *sha)
+{
     // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
     sf_set_trusted_sink_int(sha);
 
@@ -544,7 +566,8 @@ int SHA384_Init(SHA512_CTX *sha) {
     return Res;
 }
 
-int SHA512_Init(SHA512_CTX *sha) {
+int SHA384_Init(SHA512_CTX *sha)
+{
     // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
     sf_set_trusted_sink_int(sha);
 
@@ -593,135 +616,465 @@ int SHA512_Init(SHA512_CTX *sha) {
 
 
 
-int pthread_mutex_destroy(pthread_mutex_t *mutex) {
-    // Check if mutex is null
+int SHA512_Init(SHA512_CTX *sha)
+{
+    // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
+    sf_set_trusted_sink_int(sha);
+
+    // Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
+    sf_malloc_arg(sha);
+
+    // Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
+    void *Res = NULL;
+
+    // Mark both Res and the memory it points to as overwritten using sf_overwrite.
+    sf_overwrite(Res);
+
+    // Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY) for pages allocation.
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+
+    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
+    sf_set_possible_null(Res);
+
+    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null, e.g. sf_set_alloc_possible_null(Res) or sf_set_alloc_possible_null(Res, size).
+    sf_set_alloc_possible_null(Res);
+
+    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new.
+    sf_raw_new(Res);
+
+    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq.
+    sf_not_acquire_if_eq(Res);
+
+    // Set the buffer size limit based on the allocation size using sf_buf_size_limit.
+    sf_buf_size_limit(Res);
+
+    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
+    sf_set_buf_size(Res);
+
+    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
+    sf_lib_arg_type(Res, "MallocCategory");
+
+    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
+    sf_bitcopy(Res);
+
+    // For reallocation, mark the old buffer as freed with a specific memory category using sf_delete.
+    sf_delete(Res);
+
+    // Return Res as the allocated/reallocated memory.
+    return Res;
+}
+
+int pthread_mutex_destroy(pthread_mutex_t *mutex)
+{
+    // Check if the buffer is null using sf_set_must_be_not_null(buffer, FREE_OF_NULL) if the function doesn't accept nulls;
     sf_set_must_be_not_null(mutex, FREE_OF_NULL);
 
-    // Mark mutex as freed
-    sf_delete(mutex, PTHREAD_MUTEX_CATEGORY);
+    // Mark the input buffer as freed using sf_delete, e.g. sf_delete(buffer, MALLOC_CATEGORY);
+    sf_delete(mutex);
 
-    // Unmark mutex library argument type
-    sf_lib_arg_type(mutex, "PthreadMutexCategory");
+    // Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory");
+    sf_lib_arg_type(mutex, "MallocCategory");
 
+    // Return an appropriate value
     return 0;
 }
 
-int pthread_mutex_lock(pthread_mutex_t *mutex) {
+
+
+int pthread_mutex_lock(pthread_mutex_t *mutex)
+{
     // Check if mutex is null
-    sf_set_must_be_not_null(mutex, LOCK_OF_NULL);
+    sf_set_must_be_not_null(mutex, "MutexLockOfNull");
 
     // Mark mutex as acquired
-    sf_set_acquire(mutex, PTHREAD_MUTEX_CATEGORY);
+    sf_set_acquired(mutex);
 
-    // Mark mutex library argument type
-    sf_lib_arg_type(mutex, "PthreadMutexCategory");
+    // Perform actual lock operation
+    // ...
+
+    return 0;
+}
+
+int pthread_spin_lock(pthread_spinlock_t *mutex)
+{
+    // Check if mutex is null
+    sf_set_must_be_not_null(mutex, "SpinLockOfNull");
+
+    // Mark mutex as acquired
+    sf_set_acquired(mutex);
+
+    // Perform actual lock operation
+    // ...
 
     return 0;
 }
 
 
 
-int pthread_spin_lock(pthread_spinlock_t *mutex) {
-    // Mark the mutex as trusted sink pointer
-    sf_set_trusted_sink_ptr(mutex);
+void *OEM_Realloc(void *p, uint32 uSize)
+{
+    void *Res = NULL;
 
-    // Mark the mutex as not acquired if it is equal to null
-    sf_not_acquire_if_eq(mutex);
+    sf_set_trusted_sink_int(uSize);
+    sf_malloc_arg(uSize);
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res, uSize);
+    sf_not_acquire_if_eq(Res);
+    sf_buf_size_limit(Res, uSize);
+    sf_lib_arg_type(Res, "MallocCategory");
 
-    // Mark the mutex as possibly null after allocation
-    sf_set_alloc_possible_null(mutex);
+    Res = realloc(p, uSize);
 
-    // Mark the mutex as rawly allocated with a specific memory category
-    sf_raw_new(mutex, PAGES_MEMORY_CATEGORY);
+    sf_delete(p, MALLOC_CATEGORY);
+    sf_lib_arg_type(p, "MallocCategory");
 
-    // Mark the mutex as overwritten
-    sf_overwrite(mutex);
-
-    // Return the mutex
-    return 0;
+    return Res;
 }
+
+void *aee_realloc(void *p, uint32 dwSize)
+{
+    void *Res = NULL;
+
+    sf_set_trusted_sink_int(dwSize);
+    sf_malloc_arg(dwSize);
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res, dwSize);
+    sf_not_acquire_if_eq(Res);
+    sf_buf_size_limit(Res, dwSize);
+    sf_lib_arg_type(Res, "MallocCategory");
+
+    Res = realloc(p, dwSize);
+
+    sf_delete(p, MALLOC_CATEGORY);
+    sf_lib_arg_type(p, "MallocCategory");
+
+    return Res;
+}
+
+
 
 int setjmp(jmp_buf env) {
     // Mark the env as trusted sink pointer
     sf_set_trusted_sink_ptr(env);
 
+    // Mark the env as tainted
+    sf_set_tainted(env);
+
+    // Mark the env as uncontrolled pointer
+    sf_uncontrolled_ptr(env);
+
     // Mark the env as not acquired if it is equal to null
     sf_not_acquire_if_eq(env);
 
-    // Mark the env as possibly null after allocation
-    sf_set_alloc_possible_null(env);
+    // Mark the env as long time
+    sf_long_time(env);
 
-    // Mark the env as rawly allocated with a specific memory category
-    sf_raw_new(env, PAGES_MEMORY_CATEGORY);
-
-    // Mark the env as overwritten
-    sf_overwrite(env);
-
-    // Return the env
-    return 0;
+    // ... rest of the function implementation
 }
-
-
 
 int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
-    // Check if sockfd is not null
-    sf_set_must_be_not_null(sockfd, FD_OF_NULL);
+    // Mark the sockfd as must be not null
+    sf_set_must_be_not_null(sockfd, FREE_OF_NULL);
 
-    // Check if addr is not null
-    sf_set_must_be_not_null(addr, ADDR_OF_NULL);
+    // Mark the addr as trusted sink pointer
+    sf_set_trusted_sink_ptr(addr);
 
-    // Check if addrlen is not null
-    sf_set_must_be_not_null(addrlen, ADDRLEN_OF_NULL);
+    // Mark the addrlen as trusted sink int
+    sf_set_trusted_sink_int(addrlen);
 
-    // Set errno if getsockname fails
-    sf_set_errno_if(sockfd, EBADF);
-    sf_set_errno_if(sockfd, ENOTSOCK);
+    // Mark the addr as tainted
+    sf_set_tainted(addr);
 
-    // Set errno if getsockname fails
-    sf_set_errno_if(addr, EFAULT);
+    // Mark the addrlen as tainted
+    sf_set_tainted(addrlen);
 
-    // Set errno if getsockname fails
-    sf_set_errno_if(addrlen, EFAULT);
+    // Mark the addr as uncontrolled pointer
+    sf_uncontrolled_ptr(addr);
 
-    // Return value is 0 on success, -1 on error
-    sf_set_possible_negative(RETVAL);
+    // Mark the addrlen as uncontrolled pointer
+    sf_uncontrolled_ptr(addrlen);
 
-    return 0;
+    // Mark the addr as not acquired if it is equal to null
+    sf_not_acquire_if_eq(addr);
+
+    // Mark the addrlen as not acquired if it is equal to null
+    sf_not_acquire_if_eq(addrlen);
+
+    // Mark the addr as long time
+    sf_long_time(addr);
+
+    // Mark the addrlen as long time
+    sf_long_time(addrlen);
+
+    // ... rest of the function implementation
 }
+
+
 
 int listen(int sockfd, int backlog) {
-    // Check if sockfd is not null
-    sf_set_must_be_not_null(sockfd, FD_OF_NULL);
+    sf_set_trusted_sink_int(backlog);
+    sf_set_must_be_not_null(sockfd, "SocketCategory");
+    // other checks and operations
+    return 0;
+}
 
-    // Set errno if listen fails
-    sf_set_errno_if(sockfd, EBADF);
-    sf_set_errno_if(sockfd, ENOTSOCK);
-
-    // Set errno if listen fails
-    sf_set_errno_if(backlog, EINVAL);
-
-    // Return value is 0 on success, -1 on error
-    sf_set_possible_negative(RETVAL);
-
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+    sf_set_trusted_sink_ptr(addr);
+    sf_set_trusted_sink_ptr(addrlen);
+    sf_set_must_be_not_null(sockfd, "SocketCategory");
+    // other checks and operations
     return 0;
 }
 
 
 
-int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
+ssize_t recv(int s, void *buf, size_t len, int flags) {
+    // Check if buf is null
+    sf_set_must_be_not_null(buf, FREE_OF_NULL);
+
+    // Mark buf as possibly null
+    sf_set_possible_null(buf);
+
+    // Mark buf as tainted
+    sf_set_tainted(buf);
+
+    // Mark buf as not acquired if it is equal to null
+    sf_not_acquire_if_eq(buf);
+
+    // Set the buffer size limit based on the input parameter
+    sf_buf_size_limit(buf, len);
+
+    // Mark buf as rawly allocated with a specific memory category
+    sf_raw_new(buf, MALLOC_CATEGORY);
+
+    // Mark buf as newly allocated with a specific memory category
+    sf_new(buf, PAGES_MEMORY_CATEGORY);
+
+    // Mark buf as copied from the input buffer
+    sf_bitcopy(buf);
+
+    // Mark buf as overwritten
+    sf_overwrite(buf);
+
+    // Mark buf as initialized
+    sf_bitinit(buf);
+
+    // Mark buf as null-terminated
+    sf_null_terminated(buf);
+
+    // Mark buf as stopped at null
+    sf_buf_stop_at_null(buf);
+
+    // Mark buf as appended
+    sf_append_string(buf);
+
+    // Mark buf as duplicated
+    sf_strdup_res(buf);
+
+    // Set the buffer size limit for reading
+    sf_buf_size_limit_read(buf, len);
+
+    // Mark buf as controlled by the program
+    sf_uncontrolled_ptr(buf);
+
+    // Mark buf as trusted sink
+    sf_set_trusted_sink_ptr(buf);
+
+    // Mark buf as trusted sink integer
+    sf_set_trusted_sink_int(len);
+
+    // Mark buf as trusted sink library argument type
+    sf_lib_arg_type(buf, "MallocCategory");
+
+    // Mark buf as must not be released
+    sf_must_not_be_release(buf);
+
+    // Mark buf as must be positive
+    sf_set_must_be_positive(len);
+
+    // Mark buf as must be not null
+    sf_set_must_be_not_null(buf);
+
+    // Mark buf as long time
+    sf_long_time(buf);
+
+    // Mark buf as file offset or size
+    sf_buf_size_limit(buf, len);
+
+    // Mark buf as terminated path
+    sf_terminate_path(buf);
+
+    // Mark buf as error handling
+    sf_set_errno_if(buf);
+    sf_no_errno_if(buf);
+
+    // Mark buf as TOCTTOU check
+    sf_tocttou_check(buf);
+    sf_tocttou_access(buf);
+
+    // Mark buf as possible negative
+    sf_set_possible_negative(len);
+
+    // Mark buf as password use
+    sf_password_use(buf);
+
+    // Mark buf as password set
+    sf_password_set(buf);
+
+    // Return buf
+    return buf;
+}
+
+ssize_t recvfrom(int s, void *buf, size_t len, int flags, struct sockaddr *from, socklen_t *fromlen) {
+    // Check if buf is null
+    sf_set_must_be_not_null(buf, FREE_OF_NULL);
+
+    // Mark buf as possibly null
+    sf_set_possible_null(buf);
+
+    // Mark buf as tainted
+    sf_set_tainted(buf);
+
+    // Mark buf as not acquired if it is equal to null
+    sf_not_acquire_if_eq(buf);
+
+    // Set the buffer size limit based on the input parameter
+    sf_buf_size_limit(buf, len);
+
+    // Mark buf as rawly allocated with a specific memory category
+    sf_raw_new(buf, MALLOC_CATEGORY);
+
+    // Mark buf as newly allocated with a specific memory category
+    sf_new(buf, PAGES_MEMORY_CATEGORY);
+
+    // Mark buf as copied from the input buffer
+    sf_bitcopy(buf);
+
+    // Mark buf as overwritten
+    sf_overwrite(buf);
+
+    // Mark buf as initialized
+    sf_bitinit(buf);
+
+    // Mark buf as null-terminated
+    sf_null_terminated(buf);
+
+    // Mark buf as stopped at null
+    sf_buf_stop_at_null(buf);
+
+    // Mark buf as appended
+    sf_append_string(buf);
+
+    // Mark buf as duplicated
+    sf_strdup_res(buf);
+
+    // Set the buffer size limit for reading
+    sf_buf_size_limit_read(buf, len);
+
+    // Mark buf as controlled by the program
+    sf_uncontrolled_ptr(buf);
+
+    // Mark buf as trusted sink
+    sf_set_trusted_sink_ptr(buf);
+
+    // Mark buf as trusted sink integer
+    sf_set_trusted_sink_int(len);
+
+    // Mark buf as trusted sink library argument type
+    sf_lib_arg_type(buf, "MallocCategory");
+
+    // Mark buf as must not be released
+    sf_must_not_be_release(buf);
+
+    // Mark buf as must be positive
+    sf_set_must_be_positive(len);
+
+    // Mark buf as must be not null
+    sf_set_must_be_not_null(buf);
+
+    // Mark buf as long time
+    sf_long_time(buf);
+
+    // Mark buf as file offset or size
+    sf_buf_size_limit(buf, len);
+
+    // Mark buf as terminated path
+    sf_terminate_path(buf);
+
+    // Mark buf as error handling
+    sf_set_errno_if(buf);
+    sf_no_errno_if(buf);
+
+    // Mark buf as TOCTTOU check
+    sf_tocttou_check(buf);
+    sf_tocttou_access(buf);
+
+    // Mark buf as possible negative
+    sf_set_possible_negative(len);
+
+    // Mark buf as password use
+    sf_password_use(buf);
+
+    // Mark buf as password set
+    sf_password_set(buf);
+
+    // Return buf
+    return buf;
+}
+
+
+
+ssize_t __recvfrom_chk(int s, void *buf, size_t len, size_t buflen, int flags, struct sockaddr *from, socklen_t *fromlen) {
+    ssize_t Res;
+    sf_set_trusted_sink_int(len);
+    sf_malloc_arg(buf, len);
+    Res = recvfrom(s, buf, len, flags, from, fromlen);
+    sf_overwrite(buf);
+    sf_new(buf, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(buf, len);
+    sf_lib_arg_type(buf, "MallocCategory");
+    sf_buf_size_limit(buf, len);
+    return Res;
+}
+
+ssize_t recvmsg(int s, struct msghdr *msg, int flags) {
+    ssize_t Res;
+    Res = recvmsg(s, msg, flags);
+    sf_overwrite(msg);
+    sf_buf_size_limit(msg, sizeof(struct msghdr));
+    return Res;
+}
+
+
+
+ssize_t send(int s, const void *buf, size_t len, int flags) {
+    // Check if buf is null
+    sf_set_must_be_not_null(buf, FREE_OF_NULL);
+
+    // Check if len is negative
+    sf_set_must_be_positive(len);
+
+    // Check for TOCTTOU race conditions
+    sf_tocttou_check(buf);
+
+    // Set the buffer size limit
+    sf_buf_size_limit(buf, len);
+
     // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int.
-    sf_set_trusted_sink_int(sockfd);
+    sf_set_trusted_sink_int(len);
 
     // Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions.
-    sf_malloc_arg(addr);
+    sf_malloc_arg(len);
 
-    // Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
-    int *Res = NULL;
+    // Create a pointer variable Res to hold the allocated/reallocated memory
+    void *Res = NULL;
 
     // Mark both Res and the memory it points to as overwritten using sf_overwrite.
     sf_overwrite(Res);
 
-    // Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY) for pages allocation.
+    // Mark the memory as newly allocated with a specific memory category using sf_new
     sf_new(Res, PAGES_MEMORY_CATEGORY);
 
     // Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
@@ -737,112 +1090,32 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     sf_not_acquire_if_eq(Res);
 
     // Set the buffer size limit based on the allocation size using sf_buf_size_limit.
-    sf_buf_size_limit(Res);
+    sf_buf_size_limit(Res, len);
 
-    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
-    sf_set_buf_size(Res, sizeof(int));
-
-    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
-    sf_lib_arg_type(Res, "MallocCategory");
-
-    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
-    sf_bitcopy(Res, addr);
-
-    // For reallocation, mark the old buffer as freed with a specific memory category using sf_delete.
-    sf_delete(Res);
-
-    // Return Res as the allocated/reallocated memory.
-    return *Res;
-}
-
-
-
-ssize_t recvfrom(int s, void *buf, size_t len, int flags, struct sockaddr *from, socklen_t *fromlen) {
-    // Mark the input parameter specifying the buffer size with sf_set_trusted_sink_int.
-    sf_set_trusted_sink_int(len);
-
-    // Mark the input parameter specifying the buffer size with sf_malloc_arg for malloc functions.
-    sf_malloc_arg(buf, len);
-
-    // Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
-    void *Res = NULL;
-
-    // Mark both Res and the memory it points to as overwritten using sf_overwrite.
-    sf_overwrite(Res);
-
-    // Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY)
-    sf_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
-    sf_set_possible_null(Res);
-
-    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null, e.g. sf_set_alloc_possible_null(Res) or sf_set_alloc_possible_null(Res, size).
-    sf_set_alloc_possible_null(Res, len);
-
-    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new.
-    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq.
-    sf_not_acquire_if_eq(Res);
-
-    // Set the buffer size limit based on the allocation size using sf_buf_size_limit.
-    sf_buf_size_limit(buf, len);
-
-    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
-    sf_set_buf_size(buf, len);
-
-    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
-    sf_lib_arg_type(Res, "MallocCategory");
-
-    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
+    // Mark the memory as copied from the input buffer using sf_bitcopy.
     sf_bitcopy(Res, buf);
+
+    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
+    sf_lib_arg_type(Res, "MallocCategory");
 
     // Return Res as the allocated/reallocated memory.
     return Res;
 }
 
-ssize_t __recvfrom_chk(int s, void *buf, size_t len, size_t buflen, int flags, struct sockaddr *from, socklen_t *fromlen) {
-    // Mark the input parameter specifying the buffer size with sf_set_trusted_sink_int.
-    sf_set_trusted_sink_int(len);
 
-    // Mark the input parameter specifying the buffer size with sf_malloc_arg for malloc functions.
-    sf_malloc_arg(buf, len);
 
-    // Create a pointer variable Res to hold the allocated/reallocated memory, e.g. void *Res = NULL
-    void *Res = NULL;
+int sf_get_values(int min, int max) {
+    // Check if min is negative
+    sf_set_must_be_positive(min);
 
-    // Mark both Res and the memory it points to as overwritten using sf_overwrite.
-    sf_overwrite(Res);
+    // Check if max is negative
+    sf_set_must_be_positive(max);
 
-    // Mark the memory as newly allocated with a specific memory category using sf_new, e.g. sf_new(Res, PAGES_MEMORY_CATEGORY)
-    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    // Check if min is greater than max
+    sf_set_must_be_less_than(min, max);
 
-    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null.
-    sf_set_possible_null(Res);
-
-    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null, e.g. sf_set_alloc_possible_null(Res) or sf_set_alloc_possible_null(Res, size).
-    sf_set_alloc_possible_null(Res, len);
-
-    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new.
-    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
-
-    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq.
-    sf_not_acquire_if_eq(Res);
-
-    // Set the buffer size limit based on the allocation size using sf_buf_size_limit.
-    sf_buf_size_limit(buf, len);
-
-    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size).
-    sf_set_buf_size(buf, len);
-
-    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory").
-    sf_lib_arg_type(Res, "MallocCategory");
-
-    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy.
-    sf_bitcopy(Res, buf);
-
-    // Return Res as the allocated/reallocated memory.
-    return Res;
+    // Return the value
+    return min;
 }
 
 
@@ -872,24 +1145,55 @@ void sf_get_values_with_max(int max) {
 
 
 char *__mprintf(const char *zFormat) {
-    size_t size = strlen(zFormat) + 1;
-    sf_set_trusted_sink_int(size);
-    void *Res = NULL;
-    Res = sf_malloc_arg(size);
+    char *Res = NULL;
+    sf_malloc_arg(zFormat);
     sf_overwrite(Res);
     sf_new(Res, PAGES_MEMORY_CATEGORY);
     sf_set_alloc_possible_null(Res);
     sf_lib_arg_type(Res, "MallocCategory");
+    // Copy the format string to the allocated memory
     sf_bitcopy(Res, zFormat);
-    sf_null_terminated(Res);
     return Res;
 }
 
+char *__snprintf(int n, char *zBuf, const char *zFormat) {
+    char *Res = zBuf;
+    sf_set_trusted_sink_int(n);
+    sf_overwrite(Res);
+    sf_buf_size_limit(Res, n);
+    sf_lib_arg_type(Res, "MallocCategory");
+    // Copy the format string to the allocated memory
+    sf_bitcopy(Res, zFormat);
+    return Res;
+}
+
+
+
+void sqlite3_randomness(int N, void *P) {
+    sf_set_trusted_sink_int(N);
+    void *Res = NULL;
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res);
+    sf_not_acquire_if_eq(Res);
+    sf_buf_size_limit(Res, N);
+    sf_lib_arg_type(Res, "MallocCategory");
+    Res = P;
+    return;
+}
+
+
+
 char *sqlite3_uri_parameter(const char *zFilename, const char *zParam) {
+    sf_tocttou_check(zFilename);
     char *Res = NULL;
-    sf_password_use(zFilename);
-    sf_password_use(zParam);
-    // Add the actual implementation of the function here
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res);
+    sf_not_acquire_if_eq(Res);
+    sf_buf_size_limit(Res, strlen(zParam));
+    sf_lib_arg_type(Res, "MallocCategory");
+    Res = strdup(zParam);
     return Res;
 }
 
@@ -960,28 +1264,27 @@ void sqlite3_transfer_bindings(sqlite3_stmt *pFromStmt, sqlite3_stmt *pToStmt) {
     sf_lib_arg_type(bindings, "SqliteBindingsCategory");
 
     // Copy bindings to pToStmt
-    sf_bitcopy(/* get memory block in pToStmt */, bindings);
+    sf_bitcopy(/* get memory from pToStmt */, bindings);
 
-    // Set bindings as overwritten
+    // Mark bindings as overwritten
     sf_overwrite(bindings);
 }
 
 void sqlite3_result_error(sqlite3_context *pCtx, const char *z, int n) {
-    // Set error message as tainted
-    sf_set_tainted(z);
+    // Assuming that sqlite3_context is a structure containing a pointer to the memory
+    sf_lib_arg_type(pCtx, "SqliteContextCategory");
 
-    // Set error length as trusted sink
-    sf_set_trusted_sink_int(n);
+    // Set the error message
+    char *errorMsg = /* get error message memory from pCtx */;
+    sf_bitcopy(errorMsg, z);
 
-    // Assuming that error message is stored in a separate memory block
-    void *errorMsg = /* get error message from pCtx */;
-    sf_lib_arg_type(errorMsg, "SqliteErrorMsgCategory");
+    // Set the error message length
+    int *errorMsgLen = /* get error message length from pCtx */;
+    *errorMsgLen = n;
 
-    // Copy error message to pCtx
-    sf_buf_copy(errorMsg, z, n);
-
-    // Set error message as overwritten
+    // Mark error message as overwritten
     sf_overwrite(errorMsg);
+    sf_overwrite(errorMsgLen);
 }
 
 
@@ -1087,7 +1390,7 @@ void sqlite3_result_text16(sqlite3_context *pCtx, const char *z, int n, void (*x
     sf_set_errno_if(Res == NULL);
     sf_no_errno_if(Res != NULL);
     sf_tocttou_check(z);
-    sf_set_possible_negative(Res);
+    sf_set_possible_negative(n);
     sf_must_not_be_release(pCtx);
     sf_set_must_be_positive(n);
     sf_lib_arg_type(pCtx, "ContextCategory");
@@ -1095,9 +1398,9 @@ void sqlite3_result_text16(sqlite3_context *pCtx, const char *z, int n, void (*x
     sf_long_time();
     sf_buf_size_limit_read(z, n);
     sf_terminate_path();
-    sf_set_must_be_not_null(z, FREE_OF_NULL);
-    sf_set_possible_null(Res);
-    sf_uncontrolled_ptr(xDel);
+    sf_set_must_be_not_null(pCtx, FREE_OF_NULL);
+    sf_set_possible_null(pCtx);
+    sf_uncontrolled_ptr(pCtx);
 }
 
 void sqlite3_result_text16le(sqlite3_context *pCtx, const char *z, int n, void (*xDel)(void *)) {
@@ -1117,7 +1420,7 @@ void sqlite3_result_text16le(sqlite3_context *pCtx, const char *z, int n, void (
     sf_set_errno_if(Res == NULL);
     sf_no_errno_if(Res != NULL);
     sf_tocttou_check(z);
-    sf_set_possible_negative(Res);
+    sf_set_possible_negative(n);
     sf_must_not_be_release(pCtx);
     sf_set_must_be_positive(n);
     sf_lib_arg_type(pCtx, "ContextCategory");
@@ -1125,9 +1428,9 @@ void sqlite3_result_text16le(sqlite3_context *pCtx, const char *z, int n, void (
     sf_long_time();
     sf_buf_size_limit_read(z, n);
     sf_terminate_path();
-    sf_set_must_be_not_null(z, FREE_OF_NULL);
-    sf_set_possible_null(Res);
-    sf_uncontrolled_ptr(xDel);
+    sf_set_must_be_not_null(pCtx, FREE_OF_NULL);
+    sf_set_possible_null(pCtx);
+    sf_uncontrolled_ptr(pCtx);
 }
 
 
@@ -1240,61 +1543,23 @@ int sqlite3_declare_vtab(sqlite3 *db, const char *zSQL) {
     // Overwrite
     sf_overwrite(db);
 
-    // Password Usage
-    sf_password_use(zSQL);
-
-    // Memory Initialization
-    sf_bitinit(db);
-
-    // Password Setting
-    sf_password_set(zSQL);
-
-    // Trusted Sink Pointer
-    sf_set_trusted_sink_ptr(db);
-
-    // String and Buffer Operations
-    sf_append_string((char *)db, (const char *)zSQL);
-    sf_null_terminated((char *)db);
-    sf_buf_overlap(db, zSQL);
-    sf_buf_copy(db, zSQL);
-    sf_buf_size_limit(zSQL, sizeof(zSQL));
-    sf_buf_stop_at_null(zSQL);
-    sf_strlen(db, (const char *)zSQL);
-    sf_strdup_res(db);
-
     // Error Handling
     sf_set_errno_if(db == NULL);
-    sf_no_errno_if(db != NULL);
-
-    // TOCTTOU Race Conditions
-    sf_tocttou_check(zSQL);
-
-    // Possible Negative Values
-    sf_set_possible_negative(db);
 
     // Resource Validity
     sf_must_not_be_release(db);
-    sf_set_must_be_positive(db);
-    sf_lib_arg_type(db, "MallocCategory");
 
     // Tainted Data
-    sf_set_tainted(db);
-
-    // Sensitive Data
-    sf_password_set(zSQL);
+    sf_set_tainted(zSQL);
 
     // Time
-    sf_long_time(db);
+    sf_long_time();
 
     // File Offsets or Sizes
-    sf_buf_size_limit(db, sizeof(db));
-    sf_buf_size_limit_read(db, sizeof(db));
-
-    // Program Termination
-    sf_terminate_path(db);
+    sf_buf_size_limit_read(zSQL, strlen(zSQL));
 
     // Null Checks
-    sf_set_must_be_not_null(db);
+    sf_set_must_be_not_null(db, FREE_OF_NULL);
     sf_set_possible_null(db);
 
     // Uncontrolled Pointers
@@ -1304,61 +1569,141 @@ int sqlite3_declare_vtab(sqlite3 *db, const char *zSQL) {
 }
 
 int sqlite3_blob_open(sqlite3 *db, const char *zDb, const char *zTable, const char *zColumn, sqlite3_int64 iRow, int flags, sqlite3_blob **ppBlob) {
-    // Similar implementation as sqlite3_declare_vtab
-    // ...
+    // Memory Allocation and Reallocation Functions
+    sf_set_trusted_sink_int(iRow);
+    void *Res = NULL;
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res);
+    sf_lib_arg_type(Res, "MallocCategory");
+
+    // Memory Free Function
+    sf_delete(Res, MALLOC_CATEGORY);
+    sf_lib_arg_type(Res, "MallocCategory");
+
+    // Overwrite
+    sf_overwrite(db);
+    sf_overwrite(zDb);
+    sf_overwrite(zTable);
+    sf_overwrite(zColumn);
+
+    // Error Handling
+    sf_set_errno_if(db == NULL);
+
+    // Resource Validity
+    sf_must_not_be_release(db);
+
+    // Tainted Data
+    sf_set_tainted(zDb);
+    sf_set_tainted(zTable);
+    sf_set_tainted(zColumn);
+
+    // Time
+    sf_long_time();
+
+    // File Offsets or Sizes
+    sf_buf_size_limit_read(zDb, strlen(zDb));
+    sf_buf_size_limit_read(zTable, strlen(zTable));
+    sf_buf_size_limit_read(zColumn, strlen(zColumn));
+
+    // Null Checks
+    sf_set_must_be_not_null(db, FREE_OF_NULL);
+    sf_set_possible_null(db);
+
+    // Uncontrolled Pointers
+    sf_uncontrolled_ptr(db);
+
     return 0;
 }
 
 
 
 int sqlite3_blob_read(sqlite3_blob *pBlob, void *z, int n, int iOffset) {
-    // Check if the blob is null
-    sf_set_must_be_not_null(pBlob, BLOB_OF_NULL);
-
-    // Allocate memory for the data
-    void *Res = NULL;
+    // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int
     sf_set_trusted_sink_int(n);
-    sf_malloc_arg(Res, n);
+
+    // Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions
+    sf_malloc_arg(z, n);
+
+    // Create a pointer variable Res to hold the allocated/reallocated memory
+    void *Res = NULL;
+
+    // Mark both Res and the memory it points to as overwritten using sf_overwrite
     sf_overwrite(Res);
+
+    // Mark the memory as newly allocated with a specific memory category using sf_new
     sf_new(Res, PAGES_MEMORY_CATEGORY);
-    sf_set_alloc_possible_null(Res);
+
+    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null
+    sf_set_possible_null(Res);
+
+    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null
+    sf_set_alloc_possible_null(Res, n);
+
+    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new
+    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
+
+    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq
+    sf_not_acquire_if_eq(Res);
+
+    // Set the buffer size limit based on the allocation size using sf_buf_size_limit
+    sf_buf_size_limit(Res, n);
+
+    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size)
+    sf_set_buf_size(Res, n);
+
+    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory")
     sf_lib_arg_type(Res, "MallocCategory");
 
-    // Read the data into the allocated memory
-    // Assume that the function sqlite3_blob_read reads data into the provided buffer
-    // and returns the number of bytes read
-    int bytesRead = sqlite3_blob_read(pBlob, Res, n, iOffset);
+    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy
+    sf_bitcopy(Res, z);
 
-    // Check if the number of bytes read is less than n
-    if (bytesRead < n) {
-        // If so, resize the buffer
-        void *newRes = realloc(Res, bytesRead);
-        sf_delete(Res, PAGES_MEMORY_CATEGORY);
-        sf_overwrite(newRes);
-        sf_new(newRes, PAGES_MEMORY_CATEGORY);
-        sf_set_alloc_possible_null(newRes);
-        sf_lib_arg_type(newRes, "MallocCategory");
-        Res = newRes;
-    }
-
-    // Return the allocated memory
+    // Return Res as the allocated/reallocated memory
     return Res;
 }
 
 int sqlite3_blob_write(sqlite3_blob *pBlob, const void *z, int n, int iOffset) {
-    // Check if the blob is null
-    sf_set_must_be_not_null(pBlob, BLOB_OF_NULL);
+    // Mark the input parameter specifying the allocation size with sf_set_trusted_sink_int
+    sf_set_trusted_sink_int(n);
 
-    // Check if the data to be written is null
-    sf_set_must_be_not_null(z, WRITE_OF_NULL);
+    // Mark the input parameter specifying the allocation size with sf_malloc_arg for malloc functions
+    sf_malloc_arg(z, n);
 
-    // Write the data
-    // Assume that the function sqlite3_blob_write writes the data from the provided buffer
-    // and returns the number of bytes written
-    int bytesWritten = sqlite3_blob_write(pBlob, z, n, iOffset);
+    // Create a pointer variable Res to hold the allocated/reallocated memory
+    void *Res = NULL;
 
-    // Return the number of bytes written
-    return bytesWritten;
+    // Mark both Res and the memory it points to as overwritten using sf_overwrite
+    sf_overwrite(Res);
+
+    // Mark the memory as newly allocated with a specific memory category using sf_new
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+
+    // Mark Res as possibly null using sf_set_possible_null if Res is possibly null
+    sf_set_possible_null(Res);
+
+    // Mark Res (or both Res and input parameter specifying the allocation size) as possibly null after allocationin functions that allocate memory using sf_set_alloc_possible_null
+    sf_set_alloc_possible_null(Res, n);
+
+    // Mark the memory as rawly allocated with a specific memory category using sf_raw_new
+    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
+
+    // Mark Res as not acquired if it is equal to null using sf_not_acquire_if_eq
+    sf_not_acquire_if_eq(Res);
+
+    // Set the buffer size limit based on the allocation size using sf_buf_size_limit
+    sf_buf_size_limit(Res, n);
+
+    // Set the buffer size limit based on the input parameter for malloc functions using sf_set_buf_size(ptr, size)
+    sf_set_buf_size(Res, n);
+
+    // Mark the Res with it's library argument type using sf_lib_arg_type, e.g. for malloc functions sf_lib_arg_type(ptr, "MallocCategory")
+    sf_lib_arg_type(Res, "MallocCategory");
+
+    // If the function copies a buffer to the allocated memory, mark the memory as copied from the input buffer using sf_bitcopy
+    sf_bitcopy(Res, z);
+
+    // Return Res as the allocated/reallocated memory
+    return Res;
 }
 
 
@@ -1546,16 +1891,16 @@ int atoi(const char *arg) {
     // Check for valid input
     sf_set_must_be_not_null(arg, "Invalid input");
 
-    // Convert number
+    // Convert to integer
     while (sf_isdigit(*arg)) {
         res = res * 10 + (*arg - '0');
         arg++;
     }
 
-    // Check for read overflow
-    sf_buf_size_limit_read(start, arg - start);
+    // Check for overflow
+    sf_set_must_not_be_overflow(res, "Integer overflow");
 
-    // Return result with sign
+    // Return the result
     return sign * res;
 }
 
@@ -2008,7 +2353,7 @@ pid_t getpgid(pid_t pid) {
 }
 
 char *getwd(char *buf) {
-    sf_set_must_be_not_null(buf, GETWD_BUF_NULL);
+    sf_set_must_be_not_null(buf, GETWD_BUF_OF_NULL);
     // other checks and operations
     sf_null_terminated(buf);
     return buf;
@@ -2016,105 +2361,325 @@ char *getwd(char *buf) {
 
 
 
-ssize_t read(int fd, void *buf, size_t nbytes) {
-    ssize_t res;
-    sf_set_must_be_not_null(buf, READ_OF_NULL);
-    sf_set_buf_size(buf, nbytes);
-    sf_set_errno_if(res < 0);
-    sf_set_possible_negative(res);
-    sf_set_possible_null(res);
-    sf_set_tainted(buf);
-    sf_buf_size_limit_read(buf, nbytes);
-    return res;
+void link(const char *path1, const char *path2) {
+    // Mark the input parameters as not null
+    sf_set_must_be_not_null(path1, LINK_OF_NULL);
+    sf_set_must_be_not_null(path2, LINK_OF_NULL);
+
+    // Mark the input parameters as tainted
+    sf_set_tainted(path1);
+    sf_set_tainted(path2);
+
+    // Mark the input parameters as trusted sink pointers
+    sf_set_trusted_sink_ptr(path1);
+    sf_set_trusted_sink_ptr(path2);
+
+    // Check for TOCTTOU race conditions
+    sf_tocttou_check(path1);
+    sf_tocttou_check(path2);
+
+    // Set the errno if the function fails
+    sf_set_errno_if(/* link operation fails */);
 }
+
+
+
+ssize_t pread(int fd, void *buf, size_t nbytes, off_t offset) {
+    // Mark the buffer size limit
+    sf_buf_size_limit(buf, nbytes);
+
+    // Mark the input parameters as not null
+    sf_set_must_be_not_null(buf, PREAD_OF_NULL);
+
+    // Mark the file descriptor as not released
+    sf_must_not_be_release(fd);
+
+    // Set the errno if the function fails
+    sf_set_errno_if(/* pread operation fails */);
+
+    // Return the number of bytes read
+    return /* number of bytes read */;
+}
+
+
+
+ssize_t pwrite(int fd, const void *buf, size_t nbytes, off_t offset) {
+    // Check if buf is null
+    sf_set_must_be_not_null(buf, FREE_OF_NULL);
+
+    // Check if nbytes is negative
+    sf_set_must_be_positive(nbytes);
+
+    // Check if fd is valid
+    sf_must_not_be_release(fd);
+
+    // Check for TOCTTOU race condition
+    sf_tocttou_check(fd);
+
+    // Mark buf as tainted
+    sf_set_tainted(buf);
+
+    // Mark nbytes as trusted sink
+    sf_set_trusted_sink_int(nbytes);
+
+    // Mark offset as trusted sink
+    sf_set_trusted_sink_int(offset);
+
+    // Mark buf as password
+    sf_password_set(buf);
+
+    // Mark fd as file pointer
+    sf_lib_arg_type(fd, "FilePointerCategory");
+
+    // Mark buf as malloc category
+    sf_lib_arg_type(buf, "MallocCategory");
+
+    // Mark buf as rawly allocated
+    sf_raw_new(buf);
+
+    // Mark buf as new category
+    sf_new(buf);
+
+    // Mark buf as not acquired if it is equal to null
+    sf_not_acquire_if_eq(buf);
+
+    // Set the buffer size limit based on the input parameter
+    sf_buf_size_limit(buf, nbytes);
+
+    // Mark buf as copied from input buffer
+    sf_bitcopy(buf);
+
+    // Mark buf as overwritten
+    sf_overwrite(buf);
+
+    // Return the number of bytes written
+    return nbytes;
+}
+
+
+
+ssize_t read(int fd, void *buf, size_t nbytes) {
+    // Check if buf is null
+    sf_set_must_be_not_null(buf, FREE_OF_NULL);
+
+    // Check if nbytes is negative
+    sf_set_must_be_positive(nbytes);
+
+    // Check if fd is valid
+    sf_must_not_be_release(fd);
+
+    // Check for TOCTTOU race condition
+    sf_tocttou_check(fd);
+
+    // Mark buf as tainted
+    sf_set_tainted(buf);
+
+    // Mark nbytes as trusted sink
+    sf_set_trusted_sink_int(nbytes);
+
+    // Mark buf as malloc category
+    sf_lib_arg_type(buf, "MallocCategory");
+
+    // Mark buf as rawly allocated
+    sf_raw_new(buf);
+
+    // Mark buf as new category
+    sf_new(buf);
+
+    // Mark buf as not acquired if it is equal to null
+    sf_not_acquire_if_eq(buf);
+
+    // Set the buffer size limit based on the input parameter
+    sf_buf_size_limit(buf, nbytes);
+
+    // Mark buf as copied from input buffer
+    sf_bitcopy(buf);
+
+    // Mark buf as overwritten
+    sf_overwrite(buf);
+
+    // Return the number of bytes read
+    return nbytes;
+}
+
+
 
 ssize_t __read_chk(int fd, void *buf, size_t nbytes, size_t buflen) {
-    ssize_t res;
-    sf_set_must_be_not_null(buf, READ_OF_NULL);
-    sf_set_buf_size(buf, buflen);
-    sf_set_errno_if(res < 0);
-    sf_set_possible_negative(res);
-    sf_set_possible_null(res);
-    sf_set_tainted(buf);
-    sf_buf_size_limit_read(buf, nbytes);
-    return res;
-}
-
-
-
-int readlink(const char *path, char *buf, int buf_size) {
-    sf_set_trusted_sink_int(buf_size);
-    void *Res = NULL;
-    sf_overwrite(Res);
-    sf_new(Res, PAGES_MEMORY_CATEGORY);
-    sf_set_alloc_possible_null(Res, buf_size);
-    sf_lib_arg_type(Res, "MallocCategory");
-    sf_buf_size_limit(Res, buf_size);
-    sf_bitcopy(Res, path);
-    sf_null_terminated(Res);
-    sf_strlen(Res, path);
-    sf_strdup_res(Res);
-    sf_append_string((char *)buf, (const char *)Res);
-    sf_buf_overlap(buf, Res);
-    sf_buf_copy(buf, Res);
-    sf_buf_stop_at_null(buf);
-    sf_set_errno_if(buf == NULL);
-    sf_tocttou_check(path);
-    sf_set_possible_negative(buf_size);
-    sf_set_must_be_positive(buf_size);
-    sf_lib_arg_type(buf, "MallocCategory");
-    sf_must_not_be_release(buf);
-    sf_set_tainted(buf);
+    // Check if buf is null
     sf_set_must_be_not_null(buf, FREE_OF_NULL);
+
+    // Mark the buffer as possibly null after allocation
+    sf_set_alloc_possible_null(buf);
+
+    // Mark the buffer as newly allocated with a specific memory category
+    sf_new(buf, PAGES_MEMORY_CATEGORY);
+
+    // Set the buffer size limit based on the allocation size
+    sf_buf_size_limit(buf, buflen);
+
+    // Mark the buffer as rawly allocated with a specific memory category
+    sf_raw_new(buf, PAGES_MEMORY_CATEGORY);
+
+    // Mark the buffer as not acquired if it is equal to null
+    sf_not_acquire_if_eq(buf);
+
+    // Mark the buffer as copied from the input buffer
+    sf_bitcopy(buf);
+
+    // Mark the buffer as initialized
+    sf_bitinit(buf);
+
+    // Mark the buffer as null-terminated
+    sf_null_terminated(buf);
+
+    // Mark the buffer as overwritten
+    sf_overwrite(buf);
+
+    // Mark the buffer as stopped at null
+    sf_buf_stop_at_null(buf);
+
+    // Set the buffer size limit for reading
+    sf_buf_size_limit_read(buf, nbytes);
+
+    // Set the buffer size limit
+    sf_buf_size_limit(buf, buflen);
+
+    // Mark the buffer as tainted
+    sf_set_tainted(buf);
+
+    // Mark the buffer as password
+    sf_password_set(buf);
+
+    // Mark the buffer as long time
+    sf_long_time(buf);
+
+    // Mark the buffer as file pointer category
+    sf_lib_arg_type(buf, "FilePointerCategory");
+
+    // Mark the buffer as must be positive
+    sf_set_must_be_positive(buf);
+
+    // Mark the buffer as must not be released
+    sf_must_not_be_release(buf);
+
+    // Mark the buffer as trusted sink pointer
+    sf_set_trusted_sink_ptr(buf);
+
+    // Mark the buffer as trusted sink int
+    sf_set_trusted_sink_int(buf);
+
+    // Mark the buffer as malloc argument
+    sf_malloc_arg(buf);
+
+    // Mark the buffer as possibly null
     sf_set_possible_null(buf);
+
+    // Mark the buffer as uncontrolled pointer
     sf_uncontrolled_ptr(buf);
-    sf_long_time();
-    sf_buf_size_limit_read(buf, buf_size);
-    sf_terminate_path();
-    return 0;
+
+    // Mark the buffer as tocttou check
+    sf_tocttou_check(buf);
+
+    // Mark the buffer as tocttou access
+    sf_tocttou_access(buf);
+
+    // Mark the buffer as errno if
+    sf_set_errno_if(buf);
+
+    // Mark the buffer as no errno if
+    sf_no_errno_if(buf);
+
+    // Mark the buffer as terminate path
+    sf_terminate_path(buf);
+
+    // Mark the buffer as strlen
+    sf_strlen(buf);
+
+    // Mark the buffer as strdup res
+    sf_strdup_res(buf);
+
+    // Mark the buffer as append string
+    sf_append_string(buf);
+
+    // Mark the buffer as buf overlap
+    sf_buf_overlap(buf);
+
+    // Mark the buffer as buf copy
+    sf_buf_copy(buf);
+
+    // Mark the buffer as password use
+    sf_password_use(buf);
+
+    // Return the read bytes
+    return read(fd, buf, nbytes);
 }
 
-int setpgid(pid_t pid, pid_t pgid) {
-    sf_set_must_be_not_null(pid);
-    sf_set_must_be_not_null(pgid);
-    sf_set_must_be_positive(pid);
-    sf_set_must_be_positive(pgid);
-    sf_tocttou_access(pid);
-    sf_no_errno_if(pid == pgid);
-    return 0;
-}
 
-
-
-int symlink(const char *path1, const char *path2) {
-    sf_set_trusted_sink_int(path1);
-    sf_set_trusted_sink_int(path2);
-    // Other code for creating symlink
-}
 
 struct utmp *pututline(struct utmp *ut) {
-    sf_set_tainted(ut);
-    // Other code for putting utmp line
+    // Allocate memory for the new utmp structure
+    struct utmp *Res = NULL;
+    sf_malloc_arg(Res, sizeof(struct utmp));
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res);
+
+    // Copy the data from the input utmp structure to the new one
+    sf_bitcopy(Res, ut);
+
+    // Add the new utmp structure to the utmp file
+    // ...
+
+    return Res;
+}
+
+struct utmp *getutxline(struct utmp *ut) {
+    // Read the next utmp structure from the utmp file
+    // ...
+
+    // Allocate memory for the new utmp structure
+    struct utmp *Res = NULL;
+    sf_malloc_arg(Res, sizeof(struct utmp));
+    sf_overwrite(Res);
+    sf_new(Res, PAGES_MEMORY_CATEGORY);
+    sf_set_alloc_possible_null(Res);
+
+    // Copy the data from the read utmp structure to the new one
+    sf_bitcopy(Res, ut);
+
+    return Res;
 }
 
 
 
-struct utmp *getutxline(struct utmp *ut) {
-    // Assume that the function returns a pointer to a new utmp structure
-    struct utmp *Res = NULL;
+struct utmp *pututxline(struct utmp *ut) {
+    // Memory Allocation
+    void *Res = NULL;
+    sf_malloc_arg(Res, ut->size);
+    sf_overwrite(Res);
     sf_new(Res, PAGES_MEMORY_CATEGORY);
     sf_set_alloc_possible_null(Res);
     sf_lib_arg_type(Res, "MallocCategory");
+
+    // Copy the content
+    sf_bitcopy(Res, ut);
+
+    // Return the allocated memory
     return Res;
 }
 
-struct utmp *pututxline(struct utmp *ut) {
-    // Assume that the function returns a pointer to a reallocated utmp structure
-    struct utmp *Res = NULL;
-    sf_raw_new(Res, PAGES_MEMORY_CATEGORY);
-    sf_set_alloc_possible_null(Res);
-    sf_lib_arg_type(Res, "MallocCategory");
-    return Res;
+int uname(struct utsname *name) {
+    // Null Check
+    sf_set_must_be_not_null(name, FREE_OF_NULL);
+
+    // Memory Initialization
+    sf_bitinit(name);
+
+    // Set the content
+    // ...
+
+    // Return the result
+    return 0;
 }
 
 

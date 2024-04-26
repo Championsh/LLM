@@ -21,8 +21,11 @@ Memory Free Function:
     Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory");
 
 Overwrite:
-    For each overwritten parameter p of global variable v it must be labeled using sf_overwrite(p) or sf_overwrite(v)
+    Each overwritten function's parameter or variable must be checked using sf_overwrite, e.g. sf_overwrite(ptr).
     Functions that overwrite data should use sf_overwrite to mark the variable as assigned the new correct data, e.g. sf_overwrite(buf).
+
+Pure result:
+    Functions that has purely determined by the parameters return value should use sf_pure with the first parameter always being the return value of the function that sf_pure is used in. The remaining parameters of sf_pure are the parameters of the function that sf_pure is used in. If the function has only one parameter, then sf_pure takes only one parameter (the return value of the function). If the function has multiple parameters, then sf_pure takes all of the parameters as its remaining parameters, e.g. sf_pure(res, arg).
 
 Password Usage:
     Functions that take a password or key as an argument should use all the password and key arguments using sf_password_use, e.g. sf_password_use(key).
@@ -37,15 +40,15 @@ Trusted Sink Pointer:
     Use sf_set_trusted_sink_ptr to mark a pointer as a trusted sink when it is passed to a function that is known to handle it safely, e.g. sf_set_trusted_sink_ptr(name).
 
 String and Buffer Operations:
-    Use sf_append_string to append one string to another, e.g. sf_append_string((char *)s, (const char *)append).
-    Use sf_null_terminated to to ensure that a string is null-terminated, e.g. sf_null_terminated((char *)s).
-    Use sf_buf_overlap to check for potential buffer overlaps, e.g. sf_buf_overlap(s, append).
-    Use sf_buf_copy to copy one buffer to another, e.g. sf_buf_copy(s, append).
-    Use sf_buf_size_limit to set a limit on the size of a buffer, e.g. sf_buf_size_limit(append, size).
-    Use sf_buf_size_limit_read to set a limit on the number of bytes that can be read from a buffer, e.g. sf_buf_size_limit_read(append, size).
-    Use sf_buf_stop_at_null to ensure that a buffer stops at a null character, e.g. sf_buf_stop_at_null(append).
-    Use sf_strlen to get the length of a string, e.g. to assign variable res a size of string s use sf_strlen(res, (const char *)s).
-    Use sf_strdup_res to duplicate a string, e.g. sf_strdup_res(res).
+    Use sf_append_string to append one string from the function to another, e.g. sf_append_string((char *)s, (const char *)append).
+    Use sf_null_terminated to to ensure that a string from the function is null-terminated, e.g. sf_null_terminated((char *)s).
+    Use sf_buf_overlap to check for potential buffer from the function overlaps, e.g. sf_buf_overlap(s, append).
+    Use sf_buf_copy to copy one function's buffer to another, e.g. sf_buf_copy(s, append).
+    Use sf_buf_size_limit to set a limit on the size of a buffer from the function, e.g. sf_buf_size_limit(append, size).
+    Use sf_buf_size_limit_read to set a limit on the number of bytes that can be read from a buffer from the function, e.g. sf_buf_size_limit_read(append, size).
+    Use sf_buf_stop_at_null to ensure that a buffer used in the function stops at a null character, e.g. sf_buf_stop_at_null(append).
+    Use sf_strlen to get the length of a string used in the function, e.g. to assign variable res a size of string s use sf_strlen(res, (const char *)s).
+    Use sf_strdup_res to duplicate a string used in the function, e.g. sf_strdup_res(res).
 
 Error Handling:
     Check all functions for their return values and handle errors appropriately using sf_set_errno_if and sf_no_errno_if.

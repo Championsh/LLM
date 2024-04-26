@@ -228,7 +228,7 @@ def gen_rules_prompt(spec_pwd):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Spec Gen')
+    parser = argparse.ArgumentParser(description='Main Specification File')
     parser.add_argument('-p', '--parse-scra')
     parser.add_argument('-f', '--form', action="store_true")
     parser.add_argument('-tp', '--template-path', default="./template.txt")

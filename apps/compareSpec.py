@@ -1,9 +1,9 @@
 import os
-from collections import Counter
+import argparse
 from tree_sitter import Language, Parser
 
 
-def transformCode(code):
+def parseCode(code: str) -> list:
     Language.build_library(
         'build/my-languages.so',
         [
@@ -22,6 +22,7 @@ def transformCode(code):
     func_query = CPP_LANGUAGE.query(
         """
     (function_definition
+    type: (_) @func.type
     declarator: 
     [
         (pointer_declarator declarator: 
@@ -34,18 +35,22 @@ def transformCode(code):
             name: (identifier) @func.name
             parameters: (_) @func.params
         )
-    ]
-    body: (compound_statement) @func.body)
+    ] @func.declarator
+    body: (compound_statement) @func.body) @func
     """)
 
-    matches = func_query.matches(tree.root_node)
+    return func_query.matches(tree.root_node)
+
+
+def squeezeCode(code: str) -> dict:
+    matches = parseCode(code)
     functions = {}
     for i in range(len(matches)):
         func = matches[i][1]
 
         func_name = func['func.name'].text.decode()
         functions[func_name] = {}
-        functions[func_name][""] = []
+        functions[func_name][""] = []  # TODO: Remove this declarations without breaking the function
         # print(func_name)
         # print(func['func.params'].sexp())
         param_types = {}
@@ -78,7 +83,7 @@ def transformCode(code):
                     called_func_arguments = param.child(0).child_by_field_name("arguments").children
 
                     if len(called_func_arguments) == 2:
-                        functions[func_name][''] += [called_func]
+                        functions[func_name][""] = functions[func_name].setdefault("", []) + [called_func]
 
                     for argument in called_func_arguments:
                         if argument.type != 'identifier' and argument.type != 'pointer_expression':
@@ -98,13 +103,60 @@ def transformCode(code):
     return functions
 
 
-def dictSort(var, amount=None):
+def current_name_busy(name):
+    return os.path.exists(name)
+
+
+def createRetry(base_file: str, retryFunctions: list[str], retry_filename: str):
+    directory = './apps/new/'
+    matches = []
+    with open(base_file, 'r') as reader:
+        baseCode = reader.read()
+        matches = parseCode(baseCode)
+
+    functions = {}
+    for i in range(len(matches)):
+        func = matches[i][1]
+
+        func_name = func['func.name'].text.decode()
+        functions[func_name] = {}
+        functions[func_name]['proto'] = func['func.type'].text.decode() + ' ' + func['func.declarator'].text.decode()
+        functions[func_name]['code'] = func['func'].text.decode()
+
+    i = 0
+    base_retry_path = directory + f"codes_{retry_filename}.c"
+    retry_codes_path = base_retry_path
+    while(current_name_busy(retry_codes_path)):
+        i += 1
+        retry_codes_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
+
+    i = 0
+    base_retry_path = directory + f"protos_{retry_filename}.c"
+    retry_protos_path = base_retry_path
+    while(current_name_busy(retry_protos_path)):
+        i += 1
+        retry_protos_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
+    print(retry_protos_path)
+    print(retry_codes_path)
+
+    with open(retry_codes_path, 'w') as codes_writer:
+        with open(retry_protos_path, 'w') as protos_writer:
+            for func_name, func_info in functions.items():
+                if func_name not in retryFunctions:
+                    continue
+                proto, code = func_info.values()
+                codes_writer.write(code + '\n\n')
+                protos_writer.write(proto + ';\n')
+
+    return functions
+
+
+def dictSort(var: dict, amount: int = None):
     amount = len(var) if amount is None else amount
     return dict(sorted(var.items(), key=lambda x: x[1], reverse=True)[:amount])
 
 
-def compare(baseDict, curDict):
-    # try:
+def compare(baseDict: dict, curDict: dict):
     extra_functions_amount = 5
     compare_full = 0
     compare_miss = 0
@@ -116,13 +168,13 @@ def compare(baseDict, curDict):
 
     functions_amount = len(baseDict)
     res = 0
-    for func in baseDict:
-        # print(func)
-        if func not in curDict.keys():
-            no_spec += [func]
+    for funcName in baseDict:
+        # print(funcName)
+        if funcName not in curDict:
+            no_spec += [funcName]
             continue
-        baseFunc = baseDict[func]
-        curFunc = curDict[func]
+        baseFunc = baseDict[funcName]
+        curFunc = curDict[funcName]
 
         mapping = {'' : ''}
         for var in baseFunc['param_types']:
@@ -158,10 +210,7 @@ def compare(baseDict, curDict):
                 continue
             if mapping[var] == 'None':
                 for func in baseFunc[var]:
-                    if func not in top_miss.keys():
-                        top_miss[func] = 1
-                    else:
-                        top_miss[func] += 1
+                    top_miss[func] = top_miss.setdefault(func, 0) + 1
                 var_compare_miss += 1
                 continue
                     
@@ -172,10 +221,7 @@ def compare(baseDict, curDict):
             if var_functions_amount == 0:
                 cur_var_res += 1
                 for func in curVarFunctions:
-                    if func not in top_extr.keys():
-                        top_extr[func] = 1
-                    else:
-                        top_extr[func] += 1
+                    top_extr[func] = top_extr.setdefault(func, 0) + 1
                 var_compare_extr += 1
                 continue
             
@@ -184,10 +230,7 @@ def compare(baseDict, curDict):
                 if baseVarFunction in curVarFunctions:
                     cur_var_functions_res += 1
                 else:
-                    if baseVarFunction not in top_miss.keys():
-                        top_miss[baseVarFunction] = 1
-                    else:
-                        top_miss[baseVarFunction] += 1
+                    top_miss[baseVarFunction] = top_miss.setdefault(baseVarFunction, 0) + 1
             
             tmp = cur_var_functions_res / var_functions_amount
             cur_var_res += tmp
@@ -200,10 +243,7 @@ def compare(baseDict, curDict):
             for curVarFunction in curVarFunctions:
                 if curVarFunction not in baseVarFunctions:
                     extr_fl = True
-                    if curVarFunction not in top_extr.keys():
-                        top_extr[curVarFunction] = 1
-                    else:
-                        top_extr[curVarFunction] += 1
+                    top_extr[curVarFunction] = top_extr.setdefault(curVarFunction, 0) + 1
             if extr_fl:
                 var_compare_extr += 1
         
@@ -212,7 +252,7 @@ def compare(baseDict, curDict):
         compare_miss += var_compare_miss / var_amount
         compare_extr += var_compare_extr / var_amount
         
-        func_results[func] = cur_var_res / var_amount
+        func_results[funcName] = cur_var_res / var_amount
 
     return 100 * res / functions_amount,\
         100 * compare_full / functions_amount,\
@@ -224,54 +264,56 @@ def compare(baseDict, curDict):
         no_spec[:extra_functions_amount],\
         dict(filter(lambda x: x[1] < 0.5 , sorted(func_results.items(), key=lambda x: x[1])))
 
-    # return "Similarity: {:.1f}%\n".format(100 * res / functions_amount) + \
-    #         "\tFull Specifications: {:.1f}%\n".format(100 * compare_full / functions_amount) + \
-    #         "\tMissed Specifications: {:.1f}%\n".format(100 * compare_miss / functions_amount) + \
-    #         "\tExtra Specifications: {:.1f}%\n".format(100 * compare_extr / functions_amount) + \
-    #         "\tNo Specifications: {:.1f}%\n".format(100 * len(no_spec) / functions_amount) + \
-    #         "\tTop extr functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in dict(sorted(top_extr.items(), key=lambda x: x[1], reverse=True)[:extra_functions_amount]).items()) + \
-    #         "\n\tTop miss functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in dict(sorted(top_miss.items(), key=lambda x: x[1], reverse=True)[:extra_functions_amount]).items()))) + \
-    #         "\n\tNo spec functions: {:s}".format(', '.join(no_spec[:extra_functions_amount])) + \
-    #         "\n\tLess Hit: {:s}".format(', '.join(f'{key}' for key in dict(filter(lambda x: x[1] < 0.5 , sorted(func_results.items(), key=lambda x: x[1]))).keys()))
-            
-                
-    # except Exception as e:
-    #     print('Error occured: ', e)
-    # return 0
 
-
-def main():
-    directory = './apps/data/specs'
-    base_file = './apps/data/allSpecs.c'
+def main(base_file, specs_path):
+    pwd = []
+    if os.path.isdir(specs_path):
+        specs_template = specs_path + \
+                         ('' if specs_path.endswith('/') else '/') + '{}'
+        files = (os.fsdecode(file) for file in os.listdir(os.fsencode(specs_path)))
+        files = (file for file in files if not os.path.isdir(os.path.join(specs_path, file)))
+        pwd = [specs_template.format(file) for file in files]
+    else:
+        pwd = [specs_path]
 
     baseDict = {}
     with open(base_file, 'r') as reader:
         code = reader.read()
-        baseDict = transformCode(code)
+        baseDict = squeezeCode(code)
 
-    for filename in os.listdir(directory):
-        spec_file = os.path.join(directory, filename)
-        if os.path.isdir(spec_file):
-            continue
-
+    max_compare, max_retry_functions, max_filename = 0, [], ''
+    for spec_file in pwd:
         code = ''
         with open(spec_file, "r") as reader:
             code = reader.read()
-        curDict = transformCode(code)
+        curDict = squeezeCode(code)
 
         compare_res, compare_full, compare_miss, compare_extr, noSpec, \
             functions_extr, functions_miss, functions_noSpec, functions_lessHit = compare(baseDict, curDict)
 
+        filename = spec_file.rsplit('/', 1)[-1].rsplit('.', 1)[0]
         print(f"{filename}:\n" + \
-              "Similarity: {:.1f}%\n".format(compare_res) + \
+              "    Similarity: {:.1f}%\n".format(compare_res) + \
               "\tFull Specifications: {:.1f}%\n".format(compare_full) + \
               "\tMissed Specifications: {:.1f}%\n".format(compare_miss) + \
               "\tExtra Specifications: {:.1f}%\n".format(compare_extr) + \
               "\tNo Specifications: {:.1f}%\n".format(noSpec) + \
-              "\tTop extr functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in functions_extr.items())) + \
-              "\n\tTop miss functions: {:s}".format(', '.join(f'{key}: {value}' for key, value in functions_miss.items())) + \
-              "\n\tNo spec functions: {:s}".format(', '.join(functions_noSpec)))
+              "\tTop extr functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_extr.items())) + \
+              "\tTop miss functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_miss.items())) + \
+              "\tLess hit similarity: {:.1f}%".format(100 * sum(functions_lessHit.values()) / len(functions_lessHit.values())))
+        if compare_res > max_compare:
+            max_compare = compare_res
+            max_retry_functions = functions_noSpec + list(functions_lessHit.keys())
+            max_filename = filename
+    createRetry(base_file, max_retry_functions, max_filename)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Specifications Comparator')
+    parser.add_argument('-b', '--base-path', default="./apps/data/allSpecs.c")
+    parser.add_argument('-s', '--specs-path', default="./apps/data/specs")
+    args = parser.parse_args()
+
+    base_path = args.base_path
+    specs_path = args.specs_path
+    main(base_path, specs_path)

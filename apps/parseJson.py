@@ -4,9 +4,6 @@ import json
 
 
 def extract_substrings(text):
-    # pattern1 = r"```c(.*?)```"
-    # matches1 = re.findall(pattern1, text, re.DOTALL | re.MULTILINE)
-
     if "```" not in text:
         return text
 
@@ -56,4 +53,4 @@ with open(c_file_path, 'w') as file:
         tmp_strings = obj['result'].replace(include1, "").replace(include2, "").replace("\\", "")
         strings = extract_substrings(tmp_strings)
 
-        file.writelines([string.replace("\nc\n", "") for string in strings] if strings else tmp_strings)
+        file.writelines([string.replace("\nc\n", "") for string in strings] if strings else "")

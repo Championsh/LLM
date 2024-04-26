@@ -1,26 +1,4 @@
-void Oem_Debug_Assert(int expression, char *f_assertcmd, char* f_file, int line)
-{
-    if (!expression)
-	sf_terminate_path();
-}
-
-void checkDevParam(const char *assert, int v1, int v2, int v3, const char *file, int line)
-{
-    sf_terminate_path();
-}
-
-void assertfail(DevAssertFailType assertFailType, const char *cond, const char *file, int line)
-{
-    sf_terminate_path();
-}
-
-void utilsAssertFail(const char *cond, const char *file, signed short line, unsigned char allowDiag)
-{
-    sf_terminate_path();
-}
-
-ssize_t
-archive_read_data(struct archive *archive, void *buff, size_t len) {
+ssize_t archive_read_data(struct archive *archive, void *buff, size_t len) {
     sf_bitinit(buff);
 
     sf_overwrite(buff);
@@ -41,8 +19,7 @@ archive_read_data(struct archive *archive, void *buff, size_t len) {
     return x;
 }
 
-void __assert_fail(const char *assertion, const char *file,
-                   unsigned int line, const char *function) {
+void __assert_fail(const char *assertion, const char *file, unsigned int line, const char *function) {
     sf_terminate_path();
 }
 
@@ -168,25 +145,11 @@ void memory_full(void) {
     sf_terminate_path();
 }
 
-int _CrtDbgReport(
-   int reportType,
-   const char *filename,
-   int linenumber,
-   const char *moduleName,
-   const char *format,
-   ...
-) {
+int _CrtDbgReport( int reportType, const char *filename, int linenumber, const char *moduleName, const char *format, ...) {
     sf_terminate_path();
 }
 
-int _CrtDbgReportW(
-   int reportType,
-   const wchar_t *filename,
-   int linenumber,
-   const wchar_t *moduleName,
-   const wchar_t *format,
-   ...
-) {
+int _CrtDbgReportW( int reportType, const wchar_t *filename, int linenumber, const wchar_t *moduleName, const wchar_t *format, ...) {
     sf_terminate_path();
 }
 
@@ -238,27 +201,47 @@ int xdecrypt(char *secret, char *passwd) {
 
 int isalnum(int c) {
     sf_set_trusted_sink_char(c);//TODO: remove 1 of 2 lines
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isalpha(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isascii(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isblank(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int iscntrl(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isdigit(int c) {
@@ -270,40 +253,68 @@ int isdigit(int c) {
 
 int isgraph(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int islower(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isprint(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int ispunct(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isspace(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isupper(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
 int isxdigit(int c) {
     sf_set_trusted_sink_char(c);
-    return_PURE(c);
+    int res;
+    sf_overwrite(&res);
+    sf_pure(res, c);
+    return res
+    ;
 }
 
-const unsigned short **__ctype_b_loc(void) {
+unsigned short **__ctype_b_loc(void) {
     const unsigned short **res;
     sf_overwrite(&res);
     sf_not_null(res);
@@ -363,27 +374,15 @@ void *dlsym(void *handle, const char *symbol) {
     return res;
 }
 
-bool
-DebugAssertEnabled (
-  void
-  )
-{
+bool DebugAssertEnabled ( void ) {
   return true;
 }
 
-void
-CpuDeadLoop (
-  void
-  )
-{
+void CpuDeadLoop ( void ) {
   sf_terminate_path();
 }
 
-void *
-AllocatePages (
-  uintptr_t  Pages
-  )
-{
+void *AllocatePages ( uintptr_t Pages ) {
   sf_set_trusted_sink_int(Pages);
 
   void *Res;
@@ -398,11 +397,7 @@ AllocatePages (
   return Res;
 }
 
-void *
-AllocateRuntimePages (
-  uintptr_t  Pages
-  )
-{
+void *AllocateRuntimePages ( uintptr_t Pages ) {
   sf_set_trusted_sink_int(Pages);
 
   void *Res;
@@ -417,11 +412,7 @@ AllocateRuntimePages (
   return Res;
 }
 
-void *
-AllocateReservedPages (
-  uintptr_t  Pages
-  )
-{
+void *AllocateReservedPages ( uintptr_t Pages ) {
   sf_set_trusted_sink_int(Pages);
 
   void *Res;
@@ -436,21 +427,11 @@ AllocateReservedPages (
   return Res;
 }
 
-void
-FreePages (
-  void       *Buffer,
-  uintptr_t  Pages
-  )
-{
+void FreePages ( void *Buffer, uintptr_t Pages ) {
   sf_delete (Buffer, PAGES_MEMORY_CATEGORY);
 }
 
-void *
-AllocateAlignedPages (
-  uintptr_t  Pages,
-  uintptr_t  Alignment
-  )
-{
+void *AllocateAlignedPages ( uintptr_t Pages, uintptr_t Alignment ) {
   sf_set_trusted_sink_int(Pages);
 
   void *Res;
@@ -472,12 +453,7 @@ AllocateAlignedPages (
   return Res;
 }
 
-void *
-AllocateAlignedRuntimePages (
-  uintptr_t  Pages,
-  uintptr_t  Alignment
-  )
-{
+void *AllocateAlignedRuntimePages ( uintptr_t Pages, uintptr_t Alignment ) {
   sf_set_trusted_sink_int(Pages);
 
   void *Res;
@@ -499,12 +475,7 @@ AllocateAlignedRuntimePages (
   return Res;
 }
 
-void *
-AllocateAlignedReservedPages (
-  uintptr_t  Pages,
-  uintptr_t  Alignment
-  )
-{
+void *AllocateAlignedReservedPages ( uintptr_t Pages, uintptr_t Alignment ) {
   sf_set_trusted_sink_int(Pages);
 
   void *Res;
@@ -526,20 +497,11 @@ AllocateAlignedReservedPages (
   return Res;
 }
 
-void
-FreeAlignedPages (
-  void   *Buffer,
-  uintptr_t  Pages
-  )
-{
+void FreeAlignedPages ( void *Buffer, uintptr_t Pages ) {
   sf_delete (Buffer, ALIGNED_MEMORY_CATEGORY);
 }
 
-void *
-AllocatePool (
-  uintptr_t  AllocationSize
-  )
-{
+void *AllocatePool ( uintptr_t AllocationSize ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -554,11 +516,7 @@ AllocatePool (
   return Res;
 }
 
-void *
-AllocateRuntimePool (
-  uintptr_t  AllocationSize
-  )
-{
+void *AllocateRuntimePool ( uintptr_t AllocationSize ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -573,11 +531,7 @@ AllocateRuntimePool (
   return Res;
 }
 
-void *
-AllocateReservedPool (
-  uintptr_t  AllocationSize
-  )
-{
+void *AllocateReservedPool ( uintptr_t AllocationSize ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -592,11 +546,7 @@ AllocateReservedPool (
   return Res;
 }
 
-void *
-AllocateZeroPool (
-  uintptr_t  AllocationSize
-  )
-{
+void *AllocateZeroPool ( uintptr_t AllocationSize ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -611,11 +561,7 @@ AllocateZeroPool (
   return Res;
 }
 
-void *
-AllocateRuntimeZeroPool (
-  uintptr_t  AllocationSize
-  )
-{
+void *AllocateRuntimeZeroPool ( uintptr_t AllocationSize ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -630,11 +576,7 @@ AllocateRuntimeZeroPool (
   return Res;
 }
 
-void *
-AllocateReservedZeroPool (
-  uintptr_t  AllocationSize
-  )
-{
+void *AllocateReservedZeroPool ( uintptr_t AllocationSize ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -649,12 +591,7 @@ AllocateReservedZeroPool (
   return Res;
 }
 
-void *
-AllocateCopyPool (
-  uintptr_t       AllocationSize,
-  const void      *Buffer
-  )
-{
+void *AllocateCopyPool ( uintptr_t AllocationSize, const void *Buffer ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -670,12 +607,7 @@ AllocateCopyPool (
   return Res;
 }
 
-void *
-AllocateRuntimeCopyPool (
-  uintptr_t       AllocationSize,
-  const void      *Buffer
-  )
-{
+void *AllocateRuntimeCopyPool ( uintptr_t AllocationSize, const void *Buffer ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -691,12 +623,7 @@ AllocateRuntimeCopyPool (
   return Res;
 }
 
-void *
-AllocateReservedCopyPool (
-  uintptr_t       AllocationSize,
-  const void      *Buffer
-  )
-{
+void *AllocateReservedCopyPool ( uintptr_t AllocationSize, const void *Buffer ) {
   sf_set_trusted_sink_int(AllocationSize);
 
   void *Res;
@@ -712,13 +639,7 @@ AllocateReservedCopyPool (
   return Res;
 }
 
-void *
-ReallocatePool (
-  uintptr_t  OldSize,
-  uintptr_t  NewSize,
-  void       *OldBuffer
-  )
-{
+void *ReallocatePool ( uintptr_t OldSize, uintptr_t NewSize, void *OldBuffer ) {
   sf_set_trusted_sink_int(NewSize);
 
   void *Res;
@@ -737,13 +658,7 @@ ReallocatePool (
   return Res;
 }
 
-void *
-ReallocateRuntimePool (
-  uintptr_t  OldSize,
-  uintptr_t  NewSize,
-  void       *OldBuffer
-  )
-{
+void *ReallocateRuntimePool ( uintptr_t OldSize, uintptr_t NewSize, void *OldBuffer ) {
   sf_set_trusted_sink_int(NewSize);
 
   void *Res;
@@ -762,13 +677,7 @@ ReallocateRuntimePool (
   return Res;
 }
 
-void *
-ReallocateReservedPool (
-  uintptr_t  OldSize,
-  uintptr_t  NewSize,
-  void       *OldBuffer
-  )
-{
+void *ReallocateReservedPool ( uintptr_t OldSize, uintptr_t NewSize, void *OldBuffer ) {
   sf_set_trusted_sink_int(NewSize);
 
   void *Res;
@@ -787,11 +696,7 @@ ReallocateReservedPool (
   return Res;
 }
 
-void
-FreePool (
-  void   *Buffer
-  )
-{
+void FreePool ( void *Buffer ) {
   sf_delete (Buffer, POOL_MEMORY_CATEGORY);
 }
 
@@ -923,31 +828,23 @@ int open64(const char *name, int flags, ...) {
     return x;
 }
 
-int ftw(const char *path,
-        int (*fn)(const char *, const struct stat *ptr, int flag),
-        int ndirs) {
+int ftw(const char *path, int (*fn)(const char *, const struct stat *ptr, int flag), int ndirs) {
     sf_tocttou_access(path);
 }
 
-int ftw64(const char *path,
-        int (*fn)(const char *, const struct stat *ptr, int flag),
-        int ndirs) {
+int ftw64(const char *path, int (*fn)(const char *, const struct stat *ptr, int flag), int ndirs) {
     sf_tocttou_access(path);
 }
 
-int nftw(const char *path,
-         int (*fn)(const char *, const struct stat *, int, struct FTW *),
-         int fd_limit, int flags) {
+int nftw(const char *path, int (*fn)(const char *, const struct stat *, int, struct FTW *), int fd_limit, int flags) {
     sf_tocttou_access(path);
 }
 
-int nftw64(const char *path,
-         int (*fn)(const char *, const struct stat *, int, struct FTW *),
-         int fd_limit, int flags) {
+int nftw64(const char *path, int (*fn)(const char *, const struct stat *, int, struct FTW *), int fd_limit, int flags) {
     sf_tocttou_access(path);
 }
 
-gcry_error_t gcry_cipher_setkey(gcry_cipher_hd_t h , const void *key , size_t l) {
+gcry_error_t gcry_cipher_setkey(gcry_cipher_hd_t h, const void *key, size_t l) {
     sf_password_use(key);
 }
 
@@ -977,7 +874,7 @@ void g_free (gpointer ptr) {
 	sf_delete(ptr, GLIB_CATEGORY);
 }
 
-gchar* g_strfreev(const gchar **str_array) {
+gchar * g_strfreev(const gchar **str_array) {
 	if(!str_array)
 		return;
 
@@ -1003,59 +900,59 @@ gboolean g_thread_pool_push (GThreadPool *pool, gpointer data, GError **error) {
 	sf_escape(data);
 }
 
-GList* g_list_append(GList *list, gpointer data) {
+GList * g_list_append(GList *list, gpointer data) {
 	sf_escape(data);
 }
 
-GList* g_list_prepend(GList *list, gpointer data) {
+GList * g_list_prepend(GList *list, gpointer data) {
 	sf_escape(data);
 }
 
-GList* g_list_insert(GList *list, gpointer data, gint position) {
+GList * g_list_insert(GList *list, gpointer data, gint position) {
 	sf_escape(data);
 }
 
-GList* g_list_insert_before(GList *list, gpointer data, gint position) {
+GList * g_list_insert_before(GList *list, gpointer data, gint position) {
 	sf_escape(data);
 }
 
-GList* g_list_insert_sorted(GList *list, gpointer data, GCompareFunc func) {
+GList * g_list_insert_sorted(GList *list, gpointer data, GCompareFunc func) {
 	sf_escape(data);
 }
 
-GSList* g_slist_append(GSList *list, gpointer data) {
+GSList * g_slist_append(GSList *list, gpointer data) {
 	sf_escape(data);
 }
 
-GSList* g_slist_prepend(GSList *list, gpointer data) {
+GSList * g_slist_prepend(GSList *list, gpointer data) {
 	sf_escape(data);
 }
 
-GSList* g_slist_insert(GSList *list, gpointer data, gint position) {
+GSList * g_slist_insert(GSList *list, gpointer data, gint position) {
 	sf_escape(data);
 }
 
-GSList* g_slist_insert_before(GSList *list, gpointer data, gint position) {
+GSList * g_slist_insert_before(GSList *list, gpointer data, gint position) {
 	sf_escape(data);
 }
 
-GSList* g_slist_insert_sorted(GSList *list, gpointer data, GCompareFunc func) {
+GSList * g_slist_insert_sorted(GSList *list, gpointer data, GCompareFunc func) {
 	sf_escape(data);
 }
 
-GArray* g_array_append_vals(GArray *array, gconstpointer data, guint len) {
+GArray * g_array_append_vals(GArray *array, gconstpointer data, guint len) {
 	sf_escape(data);
 }
 
-GArray* g_array_prepend_vals(GArray *array, gconstpointer data, guint len) {
+GArray * g_array_prepend_vals(GArray *array, gconstpointer data, guint len) {
 	sf_escape(data);
 }
 
-GArray* g_array_insert_vals(GArray *array, gconstpointer data, guint len) {
+GArray * g_array_insert_vals(GArray *array, gconstpointer data, guint len) {
 	sf_escape(data);
 }
 
-gchar* g_strdup (const gchar *str) {
+gchar * g_strdup (const gchar *str) {
 	//note: str may be null
 	sf_buf_stop_at_null(str);
 
@@ -1069,7 +966,7 @@ gchar* g_strdup (const gchar *str) {
 	return res;
 }
 
-gchar* g_strdup_printf (const gchar *format, ...) {
+gchar * g_strdup_printf (const gchar *format, ...) {
 	gchar d1 = *format;
 	sf_buf_stop_at_null(format);
 	sf_use_format(format);//not sure what it does
@@ -1318,84 +1215,97 @@ int ioctl(int d, int request, ...) {
   sf_fun_updates_vargs(2);
 }
 
-const char * GetStringUTFChars(JNIEnv *env, jstring string, jboolean *isCopy) {
-	RES_MAY_BE_NULL
+char * GetStringUTFChars(JNIEnv *env, jstring string, jboolean *isCopy) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jobjectArray  NewObjectArray(JNIEnv *env, jsize length, jclass elementClass, jobject initialElement) {
-	RES_MAY_BE_NULL
+jobjectArray NewObjectArray(JNIEnv *env, jsize length, jclass elementClass, jobject initialElement) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
 jbooleanArray NewBooleanArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jbyteArray    NewByteArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+jbyteArray NewByteArray(JNIEnv *env, jsize length) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jcharArray    NewCharArray(JNIEnv *env, jsize length) {
+jcharArray NewCharArray(JNIEnv *env, jsize length) {
 }
 
-jshortArray   NewShortArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+jshortArray NewShortArray(JNIEnv *env, jsize length) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jintArray     NewIntArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+jintArray NewIntArray(JNIEnv *env, jsize length) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jlongArray    NewLongArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+jlongArray NewLongArray(JNIEnv *env, jsize length) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jfloatArray   NewFloatArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+jfloatArray NewFloatArray(JNIEnv *env, jsize length) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-jdoubleArray  NewDoubleArray(JNIEnv *env, jsize length) {
-	RES_MAY_BE_NULL
+jdoubleArray NewDoubleArray(JNIEnv *env, jsize length) {
+	jobject *res;
+ sf_overwrite(&res);
+ sf_set_possible_null(res);
+ return res;
 }
 
-struct JsonGenerator *	json_generator_new() {
+struct JsonGenerator * json_generator_new() {
 }
 
-void
-json_generator_set_root (struct JsonGenerator *generator,
-                         struct JsonNode *node) {
+void json_generator_set_root (struct JsonGenerator *generator, struct JsonNode *node) {
 }
 
-struct JsonNode *
-json_generator_get_root (struct JsonGenerator *generator) {
+struct JsonNode *json_generator_get_root (struct JsonGenerator *generator) {
 }
 
-void
-json_generator_set_pretty (struct JsonGenerator *generator,
-                           gboolean is_pretty) {
+void json_generator_set_pretty (struct JsonGenerator *generator, gboolean is_pretty) {
 }
 
-void
-json_generator_set_indent (struct JsonGenerator *generator,
-                           guint indent_level) {
+void json_generator_set_indent (struct JsonGenerator *generator, guint indent_level) {
 }
 
-guint
-json_generator_get_indent (struct JsonGenerator *generator) {
+guint json_generator_get_indent (struct JsonGenerator *generator) {
 }
 
-gunichar
-json_generator_get_indent_char (struct JsonGenerator *generator) {
+gunichar json_generator_get_indent_char (struct JsonGenerator *generator) {
 }
 
-gboolean
-json_generator_to_file (struct JsonGenerator *generator,
-                        const gchar *filename,
-                        struct GError **error) {
+gboolean json_generator_to_file (struct JsonGenerator *generator, const gchar *filename, struct GError **error) {
 }
 
-gchar *
-json_generator_to_data (struct JsonGenerator *generator,
-                        gsize *length) {
+gchar *json_generator_to_data (struct JsonGenerator *generator, gsize *length) {
     void *ptr;
     sf_overwrite(&ptr);
     sf_overwrite(ptr);
@@ -1409,11 +1319,7 @@ json_generator_to_data (struct JsonGenerator *generator,
 
 }
 
-gboolean
-json_generator_to_stream (struct JsonGenerator *generator,
-                          struct GOutputStream *stream,
-                          struct GCancellable *cancellable,
-                          struct GError **error) {
+gboolean json_generator_to_stream (struct JsonGenerator *generator, struct GOutputStream *stream, struct GCancellable *cancellable, struct GError **error) {
     //cancellable, error may be 0
     //return TRUE or FALSE
 }
@@ -1442,54 +1348,94 @@ char *bindtextdomain(const char *domainname, const char *dirname) {
     return res;
 }
 
-/*static*/ void *kcalloc(size_t n, size_t size, gfp_t flags) {
+void *kcalloc(size_t n, size_t size, gfp_t flags) {
 	//return kmalloc_array(n, size, flags | __GFP_ZERO);
 }
 
-/*static*/ void *kmalloc_array(size_t n, size_t size, gfp_t flags) {
+void *kmalloc_array(size_t n, size_t size, gfp_t flags) {
 	//if (size != 0 && n > SIZE_MAX / size)
 	//	return NULL;
 	//return __kmalloc(n * size, flags);
 }
 
-/*static*/ void *kzalloc_node(size_t size, gfp_t flags, int node) {
+void *kzalloc_node(size_t size, gfp_t flags, int node) {
 	//return kmalloc_node(size, flags | __GFP_ZERO, node);
 }
 
-/*static*/ void *kmalloc(size_t size, gfp_t flags) {
-	KMALLOC(size);
+void *kmalloc(size_t size, gfp_t flags) {
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr, size);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ sf_set_buf_size(ptr, size);
+ return ptr;;
 }
 
-/*static*/ void *kzalloc(size_t size, gfp_t flags) {
+void *kzalloc(size_t size, gfp_t flags) {
 }
 
 void *__kmalloc(size_t size, gfp_t flags) {
     //KRAWMALLOC(size);
-	KMALLOC(size);//note: about raw initializing: flags may be __GFP_ZERO - init by zero
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr, size);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ sf_set_buf_size(ptr, size);
+ return ptr;;//note: about raw initializing: flags may be __GFP_ZERO - init by zero
 }
 
 void *__kmalloc_node(size_t size, gfp_t flags, int node) {
 	//KMALLOC_CATEGORY ??
 	//KRAWMALLOC(size);
-	KMALLOC(size);//note: about raw initializing: flags may be __GFP_ZERO - init by zero
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr, size);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ sf_set_buf_size(ptr, size);
+ return ptr;;//note: about raw initializing: flags may be __GFP_ZERO - init by zero
 }
 
 void *kmemdup(const void *src, size_t len, gfp_t gfp) {
 	//KMALLOC_CATEGORY ??
-	KMALLOC(len);
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr, len);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ sf_set_buf_len(ptr, len);
+ return ptr;;
 }
 
 void *memdup_user(const void /*__user*/ *src, size_t len) {
 	//KMALLOC_CATEGORY ??
-	KMALLOC(len);
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr, len);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ sf_set_buf_len(ptr, len);
+ return ptr;;
 }
 
 char *kstrdup(const char *s, gfp_t gfp) {
-	STRDUP();
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ return ptr;;
 }
 
 char *kasprintf(gfp_t gfp, const char *fmt, ...) {
-	STRDUP();
+	void *ptr;
+ sf_overwrite(&ptr);
+ sf_overwrite(ptr);
+ sf_set_alloc_possible_null(ptr);
+ sf_new(ptr, KMALLOC_CATEGORY);
+ return ptr;;
 }
 
 void kfree(const void *x) {
@@ -1511,7 +1457,7 @@ void _raw_spin_unlock(raw_spinlock_t *mutex) {
     sf_unlock(mutex);
 }
 
-int  _raw_spin_trylock(raw_spinlock_t *mutex) {
+int _raw_spin_trylock(raw_spinlock_t *mutex) {
 	sf_trylock(mutex);
 }
 
@@ -1523,7 +1469,7 @@ void __raw_spin_unlock(raw_spinlock_t *mutex) {
     sf_unlock(mutex);
 }
 
-int  __raw_spin_trylock(raw_spinlock_t *mutex) {
+int __raw_spin_trylock(raw_spinlock_t *mutex) {
 	sf_trylock(mutex);
 }
 
@@ -1557,7 +1503,7 @@ void *vrealloc(void *ptr, size_t size) {
     return retptr;
 }
 
-vchar_t* vdup(vchar_t* src) {
+vchar_t * vdup(vchar_t* src) {
     vchar_t* res;
     sf_overwrite(&res);
     sf_overwrite(res);
@@ -1568,228 +1514,310 @@ vchar_t* vdup(vchar_t* src) {
     return res;
 }
 
-int tty_register_driver(struct tty_driver *driver)
-{
-    __my_ptr_might_acquire__(driver, TTY_REGISTER_DRIVER_CATEGORY)
+int tty_register_driver(struct tty_driver *driver) {
+    {
+    int ret;
+    driverf_overwrite(&ret);
+    driverf_overwrite((driver)->ptr);
+    driverf_handle_acquire((driver)->ptr, (TTY_REGISTER_DRIVER_CATEGORY));
+    driverf_not_acquire_if_ledriverdriver((driver)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-int tty_unregister_driver(struct tty_driver *driver)
-{
-    __my_ptr_might_release__(driver, TTY_REGISTER_DRIVER_CATEGORY)
+int tty_unregister_driver(struct tty_driver *driver) {
+    {
+    if (driver)
+    driverf_handle_releadrivere((driver)->ptr, (TTY_REGISTER_DRIVER_CATEGORY));
+    return 0;
+    }
 }
 
-int device_create_file(struct device *dev, struct device_attribute *dev_attr)
-{
-    __my_ptr_might_acquire__(dev_attr, DEVICE_CREATE_FILE_CATEGORY)
+int device_create_file(struct device *dev, struct device_attribute *dev_attr) {
+    {
+    int ret;
+    dev_attrf_overwrite(&ret);
+    dev_attrf_overwrite((dev_attr)->ptr);
+    dev_attrf_handle_acquire((dev_attr)->ptr, (DEVICE_CREATE_FILE_CATEGORY));
+    dev_attrf_not_acquire_if_ledev_attrdev_attr((dev_attr)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void device_remove_file(struct device *dev, struct device_attribute *dev_attr)
-{
-    __my_ptr_release__(dev_attr, DEVICE_CREATE_FILE_CATEGORY)
+void device_remove_file(struct device *dev, struct device_attribute *dev_attr) {
+    {
+    if (dev_attr)
+    dev_attrf_handle_releadev_attre((dev_attr)->ptr, (DEVICE_CREATE_FILE_CATEGORY));
+    }
 }
 
-int platform_device_register(struct platform_device *pdev)
-{
-    __my_ptr_might_acquire__(pdev, PLATFORM_DEVICE_REGISTER_CATEGORY)
+int platform_device_register(struct platform_device *pdev) {
+    {
+    int ret;
+    pdevf_overwrite(&ret);
+    pdevf_overwrite((pdev)->ptr);
+    pdevf_handle_acquire((pdev)->ptr, (PLATFORM_DEVICE_REGISTER_CATEGORY));
+    pdevf_not_acquire_if_lepdevpdev((pdev)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void platform_device_unregister(struct platform_device *pdev)
-{
-    __my_ptr_release__(pdev, PLATFORM_DEVICE_REGISTER_CATEGORY)
+void platform_device_unregister(struct platform_device *pdev) {
+    {
+    if (pdev)
+    pdevf_handle_releapdeve((pdev)->ptr, (PLATFORM_DEVICE_REGISTER_CATEGORY));
+    }
 }
 
-int platform_driver_register(struct platform_driver *drv)
-{
-    __my_ptr_might_acquire__(drv, PLATFORM_DRIVER_REGISTER_CATEGORY)
+int platform_driver_register(struct platform_driver *drv) {
+    {
+    int ret;
+    drvf_overwrite(&ret);
+    drvf_overwrite((drv)->ptr);
+    drvf_handle_acquire((drv)->ptr, (PLATFORM_DRIVER_REGISTER_CATEGORY));
+    drvf_not_acquire_if_ledrvdrv((drv)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void platform_driver_unregister(struct platform_driver *drv)
-{
-    __my_ptr_release__(drv, PLATFORM_DRIVER_REGISTER_CATEGORY)
+void platform_driver_unregister(struct platform_driver *drv) {
+    {
+    if (drv)
+    drvf_handle_releadrve((drv)->ptr, (PLATFORM_DRIVER_REGISTER_CATEGORY));
+    }
 }
 
-int misc_register(struct miscdevice *misc)
-{
-    __my_ptr_might_acquire__(misc, MISC_REGISTER_CATEGORY)
+int misc_register(struct miscdevice *misc) {
+    {
+    int ret;
+    miscf_overwrite(&ret);
+    miscf_overwrite((misc)->ptr);
+    miscf_handle_acquire((misc)->ptr, (MISC_REGISTER_CATEGORY));
+    miscf_not_acquire_if_lemiscmisc((misc)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-int misc_deregister(struct miscdevice *misc)
-{
-    __my_ptr_might_release__(misc, MISC_REGISTER_CATEGORY)
+int misc_deregister(struct miscdevice *misc) {
+    {
+    if (misc)
+    miscf_handle_releamisce((misc)->ptr, (MISC_REGISTER_CATEGORY));
+    return 0;
+    }
 }
 
-int input_register_device(struct input_dev *dev)
-{
-    __my_ptr_might_acquire__(dev, INPUT_REGISTER_DEVICE_CATEGORY)
+int input_register_device(struct input_dev *dev) {
+    {
+    int ret;
+    devf_overwrite(&ret);
+    devf_overwrite((dev)->ptr);
+    devf_handle_acquire((dev)->ptr, (INPUT_REGISTER_DEVICE_CATEGORY));
+    devf_not_acquire_if_ledevdev((dev)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void input_unregister_device(struct input_dev *dev)
-{
-    __my_ptr_release__(dev, INPUT_REGISTER_DEVICE_CATEGORY)
+void input_unregister_device(struct input_dev *dev) {
+    {
+    if (dev)
+    devf_handle_releadeve((dev)->ptr, (INPUT_REGISTER_DEVICE_CATEGORY));
+    }
 }
 
-struct input_dev *input_allocate_device(void)
-{
+struct input_dev *input_allocate_device(void) {
     __my_acquire__(INPUT_ALLOCATE_DEVICE_CATEGORY)
 }
 
-void input_free_device(struct input_dev *dev)
-{
-    __my_release__(dev, INPUT_ALLOCATE_DEVICE_CATEGORY)
+void input_free_device(struct input_dev *dev) {
+    {
+    sf_handle_release((dev), (INPUT_ALLOCATE_DEVICE_CATEGORY));
+    }
 }
 
-int rfkill_register(struct rfkill *rfkill)
-{
-    __my_ptr_might_acquire__(rfkill, RFKILL_REGISTER_CATEGORY)
+int rfkill_register(struct rfkill *rfkill) {
+    {
+    int ret;
+    rfkillf_overwrite(&ret);
+    rfkillf_overwrite((rfkill)->ptr);
+    rfkillf_handle_acquire((rfkill)->ptr, (RFKILL_REGISTER_CATEGORY));
+    rfkillf_not_acquire_if_lerfkillrfkill((rfkill)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void rfkill_unregister(struct rfkill *rfkill)
-{
-    __my_ptr_release__(rfkill, RFKILL_REGISTER_CATEGORY)
+void rfkill_unregister(struct rfkill *rfkill) {
+    {
+    if (rfkill)
+    rfkillf_handle_relearfkille((rfkill)->ptr, (RFKILL_REGISTER_CATEGORY));
+    }
 }
 
-int snd_soc_register_codec(struct device *dev,
-      const struct snd_soc_codec_driver *codec_drv,
-      struct snd_soc_dai_driver *dai_drv,
-      int num_dai)
-{
-    __my_ptr_might_acquire__(dev, SND_SOC_REGISTER_CODEC_CATEGORY)
+int snd_soc_register_codec(struct device *dev, const struct snd_soc_codec_driver *codec_drv, struct snd_soc_dai_driver *dai_drv, int num_dai) {
+    {
+    int ret;
+    devf_overwrite(&ret);
+    devf_overwrite((dev)->ptr);
+    devf_handle_acquire((dev)->ptr, (SND_SOC_REGISTER_CODEC_CATEGORY));
+    devf_not_acquire_if_ledevdev((dev)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void snd_soc_unregister_codec(struct device *dev)
-{
-    __my_ptr_release__(dev, SND_SOC_REGISTER_CODEC_CATEGORY)
+void snd_soc_unregister_codec(struct device *dev) {
+    {
+    if (dev)
+    devf_handle_releadeve((dev)->ptr, (SND_SOC_REGISTER_CODEC_CATEGORY));
+    }
 
 }
 
-struct class *class_create(void *owner, void *name)
-{
+struct class *class_create(void *owner, void *name) {
     __my_acquire__(CLASS_CREATE_CATEGORY)
 }
 
-struct class *__class_create(void *owner, void *name)
-{
+struct class *__class_create(void *owner, void *name) {
     __my_acquire__(CLASS_CREATE_CATEGORY)
 }
 
-void class_destroy(struct class *cls)
-{
-    __my_release__(cls, CLASS_CREATE_CATEGORY)
+void class_destroy(struct class *cls) {
+    {
+    sf_handle_release((cls), (CLASS_CREATE_CATEGORY));
+    }
 }
 
-struct platform_device *platform_device_alloc(const char *name, int id)
-{
+struct platform_device *platform_device_alloc(const char *name, int id) {
     __my_acquire__(PLATFORM_DEVICE_ALLOC_CATEGORY)
 }
 
-void platform_device_put(struct platform_device *pdev)
-{
-    __my_release__(pdev, PLATFORM_DEVICE_ALLOC_CATEGORY)
+void platform_device_put(struct platform_device *pdev) {
+    {
+    sf_handle_release((pdev), (PLATFORM_DEVICE_ALLOC_CATEGORY));
+    }
 }
 
-void rfkill_alloc(struct rfkill *rfkill, bool blocked)
-{
-    __my_ptr_acquire__(rfkill, RFKILL_ALLOC_CATEGORY);
+void rfkill_alloc(struct rfkill *rfkill, bool blocked) {
+    {
+    if (rfkill)
+    rfkillf_handle_acquire((rfkill)->ptr, (RFKILL_ALLOC_CATEGORY));
+    };
 }
 
-void rfkill_destroy(struct rfkill *rfkill)
-{
+void rfkill_destroy(struct rfkill *rfkill) {
     //__my_ptr_release__(rfkill, RFKILL_ALLOC_CATEGORY)
 }
 
-static inline void *ioremap(struct phys_addr_t offset, unsigned long size)
-{
+void *ioremap(struct phys_addr_t offset, unsigned long size) {
     __my_acquire__(IOREMAP_CATEGORY)
 }
 
-static inline void iounmap(void *addr)
-{
-    __my_release__(addr, IOREMAP_CATEGORY)
+void iounmap(void *addr) {
+    {
+    sf_handle_release((addr), (IOREMAP_CATEGORY));
+    }
 }
 
-int clk_enable(struct clk *clk)
-{
-    __my_ptr_might_acquire__(clk, CLK_ENABLE_CATEGORY)
+int clk_enable(struct clk *clk) {
+    {
+    int ret;
+    clkf_overwrite(&ret);
+    clkf_overwrite((clk)->ptr);
+    clkf_handle_acquire((clk)->ptr, (CLK_ENABLE_CATEGORY));
+    clkf_not_acquire_if_leclkclk((clk)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-void clk_disable(struct clk *clk)
-{
-    __my_ptr_release__(clk, CLK_ENABLE_CATEGORY)
+void clk_disable(struct clk *clk) {
+    {
+    if (clk)
+    clkf_handle_releaclke((clk)->ptr, (CLK_ENABLE_CATEGORY));
+    }
 }
 
-struct regulator *regulator_get(struct device *dev, const char *id)
-{
+struct regulator *regulator_get(struct device *dev, const char *id) {
     __my_acquire__(REGULATOR_GET_CATEGORY)
 }
 
-void regulator_put(struct regulator *regulator)
-{
-    __my_release__(regulator, REGULATOR_GET_CATEGORY)
+void regulator_put(struct regulator *regulator) {
+    {
+    sf_handle_release((regulator), (REGULATOR_GET_CATEGORY));
+    }
 }
 
-int regulator_enable(struct regulator *regulator)
-{
-    __my_ptr_might_acquire__(regulator, REGULATOR_ENABLE_CATEGORY)
+int regulator_enable(struct regulator *regulator) {
+    {
+    int ret;
+    regulatorf_overwrite(&ret);
+    regulatorf_overwrite((regulator)->ptr);
+    regulatorf_handle_acquire((regulator)->ptr, (REGULATOR_ENABLE_CATEGORY));
+    regulatorf_not_acquire_if_leregulatorregulator((regulator)->ptr, ret, 0);
+    return ret;
+    }
 }
 
-int regulator_disable(struct regulator *regulator)
-{
-    __my_ptr_might_release__(regulator, REGULATOR_ENABLE_CATEGORY)
+int regulator_disable(struct regulator *regulator) {
+    {
+    if (regulator)
+    regulatorf_handle_relearegulatore((regulator)->ptr, (REGULATOR_ENABLE_CATEGORY));
+    return 0;
+    }
 }
 
-struct workqueue_struct *create_workqueue(void *name)
-{
+struct workqueue_struct *create_workqueue(void *name) {
     __my_acquire__(CREATE_WORKQUEUE_CATEGORY)
 }
 
-struct workqueue_struct *create_singlethread_workqueue(void *name)
-{
+struct workqueue_struct *create_singlethread_workqueue(void *name) {
     __my_acquire__(CREATE_WORKQUEUE_CATEGORY)
 }
 
-struct workqueue_struct *create_freezable_workqueue(void *name)
-{
+struct workqueue_struct *create_freezable_workqueue(void *name) {
     __my_acquire__(CREATE_WORKQUEUE_CATEGORY)
 }
 
-void destroy_workqueue(struct workqueue_struct *wq)
-{
-    __my_release__(wq, CREATE_WORKQUEUE_CATEGORY)
+void destroy_workqueue(struct workqueue_struct *wq) {
+    {
+    sf_handle_release((wq), (CREATE_WORKQUEUE_CATEGORY));
+    }
 }
 
-void add_timer (struct timer_list *timer)
-{
-    __my_ptr_acquire__(timer, ADD_TIMER_CATEGORY)
+void add_timer (struct timer_list *timer) {
+    {
+    if (timer)
+    timerf_handle_acquire((timer)->ptr, (ADD_TIMER_CATEGORY));
+    }
 }
 
-int del_timer(struct timer_list *timer)
-{
-    __my_ptr_might_release__(timer, ADD_TIMER_CATEGORY)
+int del_timer(struct timer_list *timer) {
+    {
+    if (timer)
+    timerf_handle_releatimere((timer)->ptr, (ADD_TIMER_CATEGORY));
+    return 0;
+    }
 }
 
-struct task_struct *kthread_create(int(*threadfn)(void *data), void *data, const char namefmt[])
-{
+struct task_struct *kthread_create(int(*threadfn)(void *data), void *data, const char namefmt[]) {
     __my_acquire__(KTHREAD_CREATE_CATEGORY)
 }
 
-void put_task_struct(struct task_struct *t)
-{
-    __my_release__(t, KTHREAD_CREATE_CATEGORY)
+void put_task_struct(struct task_struct *t) {
+    {
+    sf_handle_release((t), (KTHREAD_CREATE_CATEGORY));
+    }
 }
 
-struct tty_driver *alloc_tty_driver(int lines)
-{
+struct tty_driver *alloc_tty_driver(int lines) {
     __my_acquire__(ALLOC_TTY_DRIVER_CATEGORY)
 }
 
-struct tty_driver *__alloc_tty_driver(int lines)
-{
+struct tty_driver *__alloc_tty_driver(int lines) {
     __my_acquire__(ALLOC_TTY_DRIVER_CATEGORY)
 }
 
-void put_tty_driver(struct tty_driver *d)
-{
-    __my_release__(d, ALLOC_TTY_DRIVER_CATEGORY)
+void put_tty_driver(struct tty_driver *d) {
+    {
+    sf_handle_release((d), (ALLOC_TTY_DRIVER_CATEGORY));
+    }
 }
 
 int luaL_error(struct lua_State *L, const char *fmt, ...) {
@@ -1800,8 +1828,7 @@ int luaL_error(struct lua_State *L, const char *fmt, ...) {
     return res;    
 }
 
-void *mmap(void *addr, size_t len, int prot, int flags,
-int fildes, off_t off) {
+void *mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off) {
 	sf_set_trusted_sink_int(len);
 
 	void *res;
@@ -1831,8 +1858,7 @@ FILE *setmntent(const char *filename, const char *type) {
     sf_tocttou_access(filename);
 }
 
-int mount(const char *source, const char *target, const char *filesystemtype,
-          unsigned long mountflags, const void *data) {
+int mount(const char *source, const char *target, const char *filesystemtype, unsigned long mountflags, const void *data) {
     sf_tocttou_access(source);
     sf_tocttou_access(target);
 
@@ -1853,15 +1879,11 @@ void mutex_unlock(struct mutex *lock) {
     sf_unlock(lock);
 }
 
-void mutex_lock_nested(struct mutex *lock, unsigned int subclass)
-{
+void mutex_lock_nested(struct mutex *lock, unsigned int subclass) {
     sf_lock(lock);
 }
 
-int getaddrinfo(const char *node,
-                const char *service,
-                const struct addrinfo *hints,
-                struct addrinfo **res) {
+int getaddrinfo(const char *node, const char *service, const struct addrinfo *hints, struct addrinfo **res) {
     sf_overwrite(res);
 	sf_handle_acquire(*res, GETADDRINFO_CATEGORY);
 
@@ -2161,8 +2183,7 @@ PGconn *PQconnectdb(const char *conninfo) {
     sf_password_use(conninfo);
 }
 
-PGconn *PQsetdbLogin(const char *pghost, const char *pgport, const char *pgoptions,
-                        const char *pgtty, const char *dbName, const char *login, const char *pwd) {
+PGconn *PQsetdbLogin(const char *pghost, const char *pgport, const char *pgoptions, const char *pgtty, const char *dbName, const char *login, const char *pwd) {
     sf_password_use(pwd);
 }
 
@@ -2201,8 +2222,7 @@ int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr) 
     return res;
 }
 
-int pthread_mutex_destroy(pthread_mutex_t *mutex)
-{
+int pthread_mutex_destroy(pthread_mutex_t *mutex) {
     char deref = *((char *)mutex);
     int ret;
     sf_overwrite(&ret);
@@ -2244,8 +2264,7 @@ int pthread_spin_trylock(pthread_spinlock_t *mutex) {
     sf_trylock(mutex);
 }
 
-int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                          void *(*start_routine) (void *), void *arg) {
+int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg) {
     sf_bitinit(thread);
     sf_escape(arg);
     sf_thread_shared(arg);
@@ -2284,8 +2303,7 @@ void Py_FatalError(const char *message) {
     sf_terminate_path();
 }
 
-void *OEM_Malloc(uint32 uSize)
-{
+void *OEM_Malloc(uint32 uSize) {
     void *ptr;
     sf_overwrite(&ptr);
     sf_overwrite(ptr);
@@ -2296,8 +2314,7 @@ void *OEM_Malloc(uint32 uSize)
     return ptr;
 }
 
-void *aee_malloc(uint32 dwSize)
-{
+void *aee_malloc(uint32 dwSize) {
     void *ptr;
     sf_overwrite(&ptr);
     sf_overwrite(ptr);
@@ -2308,20 +2325,17 @@ void *aee_malloc(uint32 dwSize)
     return ptr;
 }
 
-void OEM_Free(void *p)
-{
+void OEM_Free(void *p) {
     sf_overwrite(p);
     sf_delete(p, MALLOC_CATEGORY);
 }
 
-void aee_free(void *p)
-{
+void aee_free(void *p) {
     sf_overwrite(p);
     sf_delete(p, MALLOC_CATEGORY);
 }
 
-void *OEM_Realloc(void *p, uint32 uSize)
-{
+void *OEM_Realloc(void *p, uint32 uSize) {
     void *ptr;
     sf_escape(p);
     sf_overwrite(&ptr);
@@ -2333,8 +2347,7 @@ void *OEM_Realloc(void *p, uint32 uSize)
     return ptr;
 }
 
-void *aee_realloc(void *p, uint32 dwSize)
-{
+void *aee_realloc(void *p, uint32 dwSize) {
     void *ptr;
     sf_escape(p);
     sf_overwrite(&ptr);
@@ -2346,8 +2359,7 @@ void *aee_realloc(void *p, uint32 dwSize)
     return ptr;
 }
 
-void err_fatal_core_dump(unsigned int line, const char *file_name, const char *format)
-{
+void err_fatal_core_dump(unsigned int line, const char *file_name, const char *format) {
     sf_terminate_path();
 }
 
@@ -2388,14 +2400,12 @@ int sigsetjmp(sigjmp_buf env, int savesigs) {
     return ret;
 }
 
-void pal_MemFreeDebug(void** mem, char* file, int line)
-{
+void pal_MemFreeDebug(void** mem, char* file, int line) {
     sf_overwrite(*mem);
     sf_delete(*mem, PAL_MALLOC_CATEGORY);
 }
 
-void* pal_MemAllocTrack(int mid, int size, char* file, int line)
-{
+void * pal_MemAllocTrack(int mid, int size, char* file, int line) {
     void *ptr;
     sf_overwrite(&ptr);
     sf_overwrite(ptr);
@@ -2407,8 +2417,7 @@ void* pal_MemAllocTrack(int mid, int size, char* file, int line)
     return ptr;
 }
 
-void* pal_MemAllocGuard(int mid, int size)
-{
+void * pal_MemAllocGuard(int mid, int size) {
     void *ptr;
     sf_overwrite(&ptr);
     sf_overwrite(ptr);
@@ -2420,8 +2429,7 @@ void* pal_MemAllocGuard(int mid, int size)
     return ptr;
 }
 
-void* pal_MemAllocInternal(int mid, int size, char* file, int line)
-{
+void * pal_MemAllocInternal(int mid, int size, char* file, int line) {
     void *ptr;
     sf_overwrite(&ptr);
     sf_overwrite(ptr);
@@ -2457,8 +2465,7 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t len) {
     return res;
 }
 
-int getpeername(int sockfd, struct sockaddr *addr, socklen_t
-       *addrlen)  {
+int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
 	sf_must_not_be_release(sockfd);
     sf_set_must_be_positive(sockfd);
     sf_lib_arg_type(sockfd, "SocketCategory");
@@ -2483,8 +2490,7 @@ int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     return res;
 }
 
-int getsockopt(int sockfd, int level, int optname,
-                      void *optval, socklen_t *optlen) {
+int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen) {
   sf_bitinit(optval);
 	sf_must_not_be_release(sockfd);
     sf_set_must_be_positive(sockfd);
@@ -2580,8 +2586,7 @@ ssize_t recv(int s, void *buf, size_t len, int flags) {
     return res;
 }
 
-ssize_t recvfrom(int s, void *buf, size_t len, int flags,
-                 struct sockaddr *from, socklen_t *fromlen) {
+ssize_t recvfrom(int s, void *buf, size_t len, int flags, struct sockaddr *from, socklen_t *fromlen) {
 
     sf_bitinit(from);
     if(from!=0) {
@@ -2611,8 +2616,7 @@ ssize_t recvfrom(int s, void *buf, size_t len, int flags,
     return res;
 }
 
-ssize_t __recvfrom_chk(int s, void *buf, size_t len, size_t buflen, int flags,
-                 struct sockaddr *from, socklen_t *fromlen) {
+ssize_t __recvfrom_chk(int s, void *buf, size_t len, size_t buflen, int flags, struct sockaddr *from, socklen_t *fromlen) {
   sf_bitinit(from);
 	socklen_t d1 = *fromlen;
 
@@ -2688,8 +2692,7 @@ ssize_t sendmsg(int s, const struct msghdr*msg, int flags) {
 	return res;
 }
 
-int setsockopt(int socket, int level, int option_name,
-       const void *option_value, socklen_t option_len) {
+int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_len) {
 	sf_must_not_be_release(socket);
     sf_set_must_be_positive(socket);
     sf_lib_arg_type(socket, "SocketCategory");
@@ -2725,56 +2728,56 @@ int socket(int domain, int type, int protocol) {
     return res;
 }
 
-static int sf_get_values(int min, int max) {
+int sf_get_values(int min, int max) {
     int res = sf_get_some_int();
     sf_set_values(res, min, max);
     return res;
 }
 
-static int sf_get_bool(void) {
+int sf_get_bool(void) {
     return sf_get_values(0, 1);
 }
 
-static int sf_get_values_with_min(int min) {
+int sf_get_values_with_min(int min) {
     //int res = sf_get_values(min, sf_get_some_int()); // will this work?
     int res = sf_get_some_int();
     sf_assert_cond(res, ">=", min);
     return res;
 }
 
-static int sf_get_values_with_max(int max) {
+int sf_get_values_with_max(int max) {
     //int res = sf_get_values(sf_get_some_int(), max); // will this work?
     int res = sf_get_some_int();
     sf_assert_cond(res, "<=", max);
     return res;
 }
 
-static int sf_get_some_nonnegative_int(void) {
+int sf_get_some_nonnegative_int(void) {
     int res = sf_get_some_int();
     sf_assert_cond(res, ">=", 0);
     return res;
 }
 
-static int sf_get_some_int_to_check(void) {
+int sf_get_some_int_to_check(void) {
     int res = sf_get_some_int();
     sf_must_be_checked(res);
     return res;
 }
 
-static void *sf_get_uncontrolled_ptr(void) {
+void *sf_get_uncontrolled_ptr(void) {
     void *res;
     sf_overwrite(&res);
     sf_uncontrolled_ptr(res);
     return res;
 }
 
-static void sf_set_trusted_sink_nonnegative_int(int n) {
+void sf_set_trusted_sink_nonnegative_int(int n) {
     if (n >= 0) {
         sf_set_trusted_sink_int(n);
     }
 }
 
-static char *__alloc_some_string(void) {
+char *__alloc_some_string(void) {
     char *res = (char *)sf_get_uncontrolled_ptr();
     sf_new(res, SQLITE3_MALLOC_CATEGORY);
     sf_set_alloc_possible_null(res);
@@ -2783,72 +2786,72 @@ static char *__alloc_some_string(void) {
     return res;
 }
 
-static void *__get_nonfreeable(void) {
+void *__get_nonfreeable(void) {
     void *res = sf_get_uncontrolled_ptr();
     sf_new(res, SQLITE3_NONFREEABLE_CATEGORY);
     sf_escape(res);
     return res;
 }
 
-static void *__get_nonfreeable_tainted(void) {
+void *__get_nonfreeable_tainted(void) {
     void *res = __get_nonfreeable();
     sf_set_tainted(res);
     return res;
 }
 
-static void *__get_nonfreeable_possible_null(void) {
+void *__get_nonfreeable_possible_null(void) {
     void *res = __get_nonfreeable();
     //sf_set_alloc_possible_null(res); // ?
     sf_set_possible_null(res);
     return res;
 }
 
-static void *__get_nonfreeable_tainted_possible_null(void) {
+void *__get_nonfreeable_tainted_possible_null(void) {
     void *res = __get_nonfreeable_tainted();
     //sf_set_alloc_possible_null(res); // ?
     sf_set_possible_null(res);
     return res;
 }
 
-static void *__get_nonfreeable_not_null(void) {
+void *__get_nonfreeable_not_null(void) {
     void *res = __get_nonfreeable();
     sf_not_null(res);
     return res;
 }
 
-static char *__get_nonfreeable_string(void) {
+char *__get_nonfreeable_string(void) {
     char *res = (char *)__get_nonfreeable();
     sf_null_terminated(res); // ?
     sf_strdup_res(res); // ?
     return res;
 }
 
-static char *__get_nonfreeable_possible_null_string(void) {
+char *__get_nonfreeable_possible_null_string(void) {
     char *res = (char *)__get_nonfreeable_possible_null();
     sf_null_terminated(res); // ?
     sf_strdup_res(res); // ?
     return res;
 }
 
-static char *__get_nonfreeable_not_null_string(void) {
+char *__get_nonfreeable_not_null_string(void) {
     char *res = (char *)__get_nonfreeable_not_null();
     sf_null_terminated(res); // ?
     sf_strdup_res(res); // ?
     return res;
 }
 
-static char *__get_nonfreeable_tainted_possible_null_string(void) {
+char *__get_nonfreeable_tainted_possible_null_string(void) {
     char *res = (char *)__get_nonfreeable_tainted_possible_null();
     sf_null_terminated(res); // ?
     sf_strdup_res(res); // ?
     return res;
 }
 
-const char *sqlite3_libversion(void) {
+char *sqlite3_libversion(void) {
     return __get_nonfreeable_not_null_string();
 }
 
-const char *sqlite3_sourceid(void) {
+char *sqlite3_sourceid(void) {
     return __get_nonfreeable_not_null_string();
 }
 
@@ -2860,12 +2863,12 @@ int sqlite3_libversion_number(void) {
 }
 
 int sqlite3_compileoption_used(const char *zOptName) {
-    SF_DEREF_READ(zOptName);
+    { unsigned char tmp = *(unsigned char *)(zOptName); tmp++; };
     sf_buf_stop_at_null(zOptName);
     return sf_get_bool();
 }
 
-const char *sqlite3_compileoption_get(int N) {
+char *sqlite3_compileoption_get(int N) {
     return __get_nonfreeable_possible_null_string();
 }
 
@@ -2875,8 +2878,10 @@ int sqlite3_threadsafe(void) {
     return sf_get_values(0, 2);
 }
 
-static int __close(sqlite3 *db) {
-    __SQLITE_RELEASE_IMPLEMENTATION(db, SQLITE3_DB_CATEGORY)
+int __close(sqlite3 *db) {
+    sf_must_not_be_release(db);
+    sf_handle_release(db, SQLITE3_DB_CATEGORY);
+    
 }
 
 int sqlite3_close(sqlite3 *db) {
@@ -2887,24 +2892,27 @@ int sqlite3_close_v2(sqlite3 *db) {
     return __close(db);
 }
 
-int sqlite3_exec(
-    sqlite3 *db,                                /* An open database */
-    const char *zSql,                           /* SQL to be evaluated */
-    int (*xCallback)(void*,int,char**,char**),  /* Callback function */
-    void *pArg,                                 /* 1st argument to callback */
-    char **pzErrMsg                             /* Error msg written here */
-)
-{
+int sqlite3_exec( sqlite3 *db, /* An open database */ const char *zSql, /* SQL to be evaluated */ int (*xCallback)(void*, int, char**, char**), /* Callback function */ void *pArg, /* 1st argument to callback */ char **pzErrMsg /* Error msg written here */) {
     sf_vulnerable_fun_type("Use parameterized query with sqlite3_prepare, directly use of sqlite3_exec() is not allowed", SQLITE);
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zSql);
-    SF_CHECKED_DEREF_READ(zSql);
+    if (zSql) SF_DEREF_READ(zSql);
     sf_buf_stop_at_null(zSql);
 
     sf_escape(xCallback);
 
-    __SQLITE_RETURN_RETCODE_AND_SET_ERROR_MESSAGE_VAR(pzErrMsg);
+    int rc = sf_get_some_int();
+    if (pzErrMsg) {
+    if (rc != SQLITE_OK) {
+    *(pzErrMsg) = __alloc_some_string();
+    } else {
+    *(pzErrMsg) = 0;
+    }
+    }
+    sf_must_be_checked(rc);
+    return rc;;
 }
 
 int sqlite3_initialize(void) {
@@ -2930,12 +2938,14 @@ int sqlite3_config(int stub, ...) {
 }
 
 int sqlite3_db_config(sqlite3 *db, int op, ...) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_extended_result_codes(sqlite3 *db, int onoff) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int();
 }
 
@@ -2945,7 +2955,8 @@ sqlite3_int64 sqlite3_last_insert_rowid(sqlite3 *db) {
 }
 
 void sqlite3_set_last_insert_rowid(sqlite3 *db, sqlite3_int64 rowid) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 }
 
 int sqlite3_changes(sqlite3 *db) {
@@ -2959,11 +2970,12 @@ int sqlite3_total_changes(sqlite3 *db) {
 }
 
 void sqlite3_interrupt(sqlite3 *db) {
-    __SQLITE_DB_RW_ACCESS(db); // ? in fact: w, and then r
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db); // ? in fact: w, and then r
 }
 
-static int __complete(const char *sql) {
-    SF_DEREF_READ(sql);
+int __complete(const char *sql) {
+    { unsigned char tmp = *(unsigned char *)(sql); tmp++; };
     sf_buf_stop_at_null(sql);
     return sf_get_bool();
 }
@@ -2976,33 +2988,25 @@ int sqlite3_complete16(const void *sql) {
     return __complete(sql);
 }
 
-int sqlite3_busy_handler(
-    sqlite3 *db,
-    int (*xBusy)(void*,int),
-    void *pArg
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_busy_handler( sqlite3 *db, int (*xBusy)(void*, int), void *pArg) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_escape(xBusy); // ?
     // sf_escape(pArg); // ?
     return sf_get_some_int();
 }
 
 int sqlite3_busy_timeout(sqlite3 *db, int ms) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int();
 }
 
-int sqlite3_get_table(
-    sqlite3 *db,          /* An open database */
-    const char *zSql,     /* SQL to be evaluated */
-    char ***pazResult,    /* Results of the query */
-    int *pnRow,           /* Number of result rows written here */
-    int *pnColumn,        /* Number of result columns written here */
-    char **pzErrMsg       /* Error msg written here */
-) {
+int sqlite3_get_table( sqlite3 *db, /* An open database */ const char *zSql, /* SQL to be evaluated */ char ***pazResult, /* Results of the query */ int *pnRow, /* Number of result rows written here */ int *pnColumn, /* Number of result columns written here */ char **pzErrMsg /* Error msg written here */) {
     sf_vulnerable_fun_type("sqlite3_get_table is a legacy interface that is preserved for backwards compatibility, use of this interface is not recommended", SQLITE);
 
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zSql);
     sf_buf_stop_at_null(zSql);
@@ -3056,10 +3060,10 @@ void sqlite3_free_table(char **result) {
     sf_delete(result, SQLITE3_TABLE_CATEGORY);
 }
 
-static char *__mprintf(const char *zFormat) {
+char *__mprintf(const char *zFormat) {
     sf_buf_stop_at_null(zFormat);
     sf_use_format(zFormat); // for tainted
-    SF_DEREF_READ(zFormat);
+    { unsigned char tmp = *(unsigned char *)(zFormat); tmp++; };
 
     char *res;
     sf_overwrite(&res);
@@ -3080,13 +3084,13 @@ char *sqlite3_vmprintf(const char *zFormat, va_list ap) {
     return __mprintf(zFormat);
 }
 
-static char *__snprintf(int n, char *zBuf, const char *zFormat) {
-    SF_DEREF_READ(zFormat);
+char *__snprintf(int n, char *zBuf, const char *zFormat) {
+    { unsigned char tmp = *(unsigned char *)(zFormat); tmp++; };
     sf_buf_stop_at_null(zFormat);
     sf_use_format(zFormat); // for tainted
 
     sf_buf_size_limit(zBuf, n);
-    SF_DEREF_WRITE(zBuf);
+    { *(unsigned char *)(zBuf) = (unsigned char)sf_get_some_int(); };
     sf_bitinit(zBuf);
 
     return zBuf;
@@ -3102,7 +3106,7 @@ char *sqlite3_vsnprintf(int n, char *zBuf, const char *zFormat, va_list ap) {
     return __snprintf(n, zBuf, zFormat);
 }
 
-static void *__malloc(sqlite3_int64 size) {
+void *__malloc(sqlite3_int64 size) {
     sf_set_trusted_sink_int(size);
     sf_malloc_arg(size);
 
@@ -3125,7 +3129,7 @@ void *sqlite3_malloc64(sqlite3_uint64 size) {
     return __malloc(size);
 }
 
-static void *__realloc(void *ptr, sqlite3_uint64 size) {
+void *__realloc(void *ptr, sqlite3_uint64 size) {
     sf_escape(ptr);
     sf_set_trusted_sink_int(size);
 
@@ -3176,24 +3180,18 @@ void sqlite3_randomness(int N, void *P) {
     sf_overwrite(P);
 }
 
-int sqlite3_set_authorizer(
-    sqlite3 *db,
-    int (*xAuth)(void*,int,const char*,const char*,const char*,const char*),
-    void *pUserData
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_set_authorizer( sqlite3 *db, int (*xAuth)(void*, int, const char*, const char*, const char*, const char*), void *pUserData) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_escape(xAuth);
     sf_escape(pUserData);
     return sf_get_some_int_to_check();
 }
 
-void *sqlite3_trace(
-    sqlite3 *db,
-    void (*xTrace)(void*,const char*),
-    void *pArg
-) {
+void *sqlite3_trace( sqlite3 *db, void (*xTrace)(void*, const char*), void *pArg) {
     sf_vulnerable_fun_type("sqlite3_trace is deprecated, use the sqlite3_trace_v2() interface instead", SQLITE);
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_escape(xTrace); // ?
     //sf_escape(pArg); // ?
     void *res = sf_get_uncontrolled_ptr();
@@ -3201,13 +3199,10 @@ void *sqlite3_trace(
     return res;
 }
 
-void *sqlite3_profile(
-    sqlite3 *db,
-    void (*xProfile)(void*,const char*,sqlite3_uint64),
-    void *pArg
-) {
+void *sqlite3_profile( sqlite3 *db, void (*xProfile)(void*, const char*, sqlite3_uint64), void *pArg) {
     sf_vulnerable_fun_type("sqlite3_profile is deprecated, use the sqlite3_trace_v2() interface instead", SQLITE);
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_escape(xProfile); // ?
     //sf_escape(pArg); // ?
     void *res = sf_get_uncontrolled_ptr();
@@ -3215,73 +3210,66 @@ void *sqlite3_profile(
     return res;
 }
 
-int sqlite3_trace_v2(
-    sqlite3 *db,
-    unsigned uMask,
-    int(*xCallback)(unsigned,void*,void*,void*),
-    void *pCtx
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_trace_v2( sqlite3 *db, unsigned uMask, int(*xCallback)(unsigned, void*, void*, void*), void *pCtx) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_escape(xCallback);
     sf_escape(pCtx);
     int res = sf_get_some_int();
     return res;
 }
 
-void sqlite3_progress_handler(
-    sqlite3 *db,
-    int nOps,
-    int (*xProgress)(void*),
-    void *pArg
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+void sqlite3_progress_handler( sqlite3 *db, int nOps, int (*xProgress)(void*), void *pArg) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_escape(xProgress); // ?
     //sf_escape(pArg); // ?
 }
 
-static int __sqlite3_open(
-    const char *filename,
-    sqlite3 **ppDb
-) {
+int __sqlite3_open( const char *filename, sqlite3 **ppDb) {
     sf_tocttou_access(filename);
     sf_set_trusted_sink_ptr(filename);
     sf_buf_stop_at_null(filename);
 
 
-    SF_DEREF_WRITE(ppDb);
+    { *(unsigned char *)(ppDb) = (unsigned char)sf_get_some_int(); };
 
-    __SQLITE_ACQUIRE(sqlite3, ppDb, rc, SQLITE3_DB_CATEGORY);
+    int rc = sf_get_some_int_to_check();
+    {
+    sqlite3 *result;
+    sf_overwrite(&result);
+    sf_overwrite(result);
+    sf_uncontrolled_value((int)(long long int)result);
+    sf_uncontrolled_ptr(result);
+    if (rc != SQLITE_OK) {
+    sf_set_possible_null(result);
+    }
+    sf_handle_acquire(result, SQLITE3_DB_CATEGORY);
+    sf_not_acquire_if_eq(result, (int)(long long int)result, 0);
+    sf_not_acquire_if_less(result, rc, SQLITE_OK);
+    sf_not_acquire_if_greater(result, rc, SQLITE_OK);
+    *(ppDb) = result;
+    };
 
     return rc;
 }
 
-int sqlite3_open(
-    const char *filename,
-    sqlite3 **ppDb
-) {
+int sqlite3_open( const char *filename, sqlite3 **ppDb) {
     return __sqlite3_open(filename, ppDb);
 }
 
-int sqlite3_open16(
-    const void *filename,
-    sqlite3 **ppDb
-) {
+int sqlite3_open16( const void *filename, sqlite3 **ppDb) {
     return __sqlite3_open(filename, ppDb);
 }
 
-int sqlite3_open_v2(
-    const char *filename,
-    sqlite3 **ppDb,
-    int flags,
-    const char *zVfs
-) {
+int sqlite3_open_v2( const char *filename, sqlite3 **ppDb, int flags, const char *zVfs) {
     sf_tocttou_access(zVfs);
     sf_set_trusted_sink_ptr(zVfs);
     sf_buf_stop_at_null(zVfs);
     return __sqlite3_open(filename, ppDb);
 }
 
-const char *sqlite3_uri_parameter(const char *zFilename, const char *zParam) {
+char *sqlite3_uri_parameter(const char *zFilename, const char *zParam) {
     sf_buf_stop_at_null(zFilename);
     sf_buf_stop_at_null(zParam);
     return __get_nonfreeable_possible_null_string();
@@ -3303,46 +3291,42 @@ sqlite3_int64 sqlite3_uri_int64(const char *zFilename, const char *zParam, sqlit
 }
 
 int sqlite3_errcode(sqlite3 *db) {
-    SF_CHECKED_DEREF_READ(db); // or to treat as non-checked ?
+    if (db) SF_DEREF_READ(db); // or to treat as non-checked ?
 //    return sf_get_some_int();
     return db->errCode;
 }
 
 int sqlite3_extended_errcode(sqlite3 *db) {
-    SF_CHECKED_DEREF_READ(db); // or to treat as non-checked ?
+    if (db) SF_DEREF_READ(db); // or to treat as non-checked ?
 //    return sf_get_some_int();
     return db->errCode;
 }
 
-const char *sqlite3_errmsg(sqlite3 *db) {
-    SF_CHECKED_DEREF_READ(db); // or to treat as non-checked ?
+char *sqlite3_errmsg(sqlite3 *db) {
+    if (db) SF_DEREF_READ(db); // or to treat as non-checked ?
     return __get_nonfreeable_not_null_string();
 }
 
-const void *sqlite3_errmsg16(sqlite3 *db) {
-    SF_CHECKED_DEREF_READ(db); // or to treat as non-checked ?
+void *sqlite3_errmsg16(sqlite3 *db) {
+    if (db) SF_DEREF_READ(db); // or to treat as non-checked ?
     return __get_nonfreeable_not_null_string();
 }
 
-const char *sqlite3_errstr(int rc) {
+char *sqlite3_errstr(int rc) {
     return __get_nonfreeable_not_null_string();
 }
 
 int sqlite3_limit(sqlite3 *db, int id, int newVal) {
     sf_set_trusted_sink_nonnegative_int(id);
     sf_set_trusted_sink_nonnegative_int(newVal);
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int(); // non-negative
 }
 
-static int __prepare(
-    sqlite3 *db,
-    const char *zSql,
-    int nByte,
-    sqlite3_stmt **ppStmt,
-    const char **pzTail
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int __prepare( sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zSql);
     if (nByte < 0) {
@@ -3350,11 +3334,26 @@ static int __prepare(
     } else {
         sf_buf_size_limit_read(zSql, nByte);
     }
-    SF_DEREF_READ(zSql);
+    { unsigned char tmp = *(unsigned char *)(zSql); tmp++; };
 
-    SF_DEREF_WRITE(ppStmt);
+    { *(unsigned char *)(ppStmt) = (unsigned char)sf_get_some_int(); };
 
-    __SQLITE_ACQUIRE(sqlite3_stmt, ppStmt, rc, SQLITE3_STMT_CATEGORY);
+    int rc = sf_get_some_int_to_check();
+    {
+    sqlite3_stmt *result;
+    sf_overwrite(&result);
+    sf_overwrite(result);
+    sf_uncontrolled_value((int)(long long int)result);
+    sf_uncontrolled_ptr(result);
+    if (rc != SQLITE_OK) {
+    sf_set_possible_null(result);
+    }
+    sf_handle_acquire(result, SQLITE3_STMT_CATEGORY);
+    sf_not_acquire_if_eq(result, (int)(long long int)result, 0);
+    sf_not_acquire_if_less(result, rc, SQLITE_OK);
+    sf_not_acquire_if_greater(result, rc, SQLITE_OK);
+    *(ppStmt) = result;
+    };
     db->errCode = rc;
 
     if (pzTail) {
@@ -3365,75 +3364,37 @@ static int __prepare(
     return rc;
 }
 
-int sqlite3_prepare(
-    sqlite3 *db,
-    const char *zSql,
-    int nByte,
-    sqlite3_stmt **ppStmt,
-    const char **pzTail
-) {
+int sqlite3_prepare( sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail) {
     return __prepare(db, zSql, nByte, ppStmt, pzTail);
 }
 
-int sqlite3_prepare_v2(
-    sqlite3 *db,
-    const char *zSql,
-    int nByte,
-    sqlite3_stmt **ppStmt,
-    const char **pzTail
-) {
+int sqlite3_prepare_v2( sqlite3 *db, const char *zSql, int nByte, sqlite3_stmt **ppStmt, const char **pzTail) {
     return __prepare(db, zSql, nByte, ppStmt, pzTail);
 }
 
-int sqlite3_prepare_v3(
-    sqlite3 *db,
-    const char *zSql,
-    int nByte,
-    unsigned int prepFlags,
-    sqlite3_stmt **ppStmt,
-    const char **pzTail
-) {
+int sqlite3_prepare_v3( sqlite3 *db, const char *zSql, int nByte, unsigned int prepFlags, sqlite3_stmt **ppStmt, const char **pzTail) {
     return __prepare(db, zSql, nByte, ppStmt, pzTail);
 }
 
-int sqlite3_prepare16(
-    sqlite3 *db,
-    const void *zSql,
-    int nByte,
-    sqlite3_stmt **ppStmt,
-    const void **pzTail
-) {
+int sqlite3_prepare16( sqlite3 *db, const void *zSql, int nByte, sqlite3_stmt **ppStmt, const void **pzTail) {
     return __prepare(db, zSql, nByte, ppStmt, (const char **)pzTail);
 }
 
-int sqlite3_prepare16_v2(
-    sqlite3 *db,
-    const void *zSql,
-    int nByte,
-    sqlite3_stmt **ppStmt,
-    const void **pzTail
-) {
+int sqlite3_prepare16_v2( sqlite3 *db, const void *zSql, int nByte, sqlite3_stmt **ppStmt, const void **pzTail) {
     return __prepare(db, zSql, nByte, ppStmt, (const char **)pzTail);
 }
 
-int sqlite3_prepare16_v3(
-    sqlite3 *db,
-    const void *zSql,
-    int nByte,
-    unsigned int prepFlags,
-    sqlite3_stmt **ppStmt,
-    const void **pzTail
-) {
+int sqlite3_prepare16_v3( sqlite3 *db, const void *zSql, int nByte, unsigned int prepFlags, sqlite3_stmt **ppStmt, const void **pzTail) {
     return __prepare(db, zSql, nByte, ppStmt, (const char **)pzTail);
 }
 
-const char *sqlite3_sql(sqlite3_stmt *pStmt) {
+char *sqlite3_sql(sqlite3_stmt *pStmt) {
     if (! pStmt) {
         return 0;
     }
 
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
 
     return __get_nonfreeable_not_null_string();
 }
@@ -3444,7 +3405,7 @@ char *sqlite3_expanded_sql(sqlite3_stmt *pStmt) {
     }
 
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
 
     return __alloc_some_string();
 }
@@ -3453,7 +3414,7 @@ int sqlite3_stmt_readonly(sqlite3_stmt *pStmt) {
     if (! pStmt)
         return 1; // not a mistake: NULL statement will not modify database
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
     return sf_get_bool();
 }
 
@@ -3461,19 +3422,13 @@ int sqlite3_stmt_busy(sqlite3_stmt *pStmt) {
     if (! pStmt)
         return 0;
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
     return sf_get_bool();
 }
 
-int sqlite3_bind_blob(
-    sqlite3_stmt *pStmt,
-    int i,
-    const void *zData,
-    int nData,
-    void (*xDel)(void*)
-) {
+int sqlite3_bind_blob( sqlite3_stmt *pStmt, int i, const void *zData, int nData, void (*xDel)(void*)) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     // sf_set_trusted_sink_int(i); // ?
     // sf_set_trusted_sink_ptr(zData); // ?
     sf_set_must_be_positive(nData);
@@ -3484,15 +3439,9 @@ int sqlite3_bind_blob(
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_bind_blob64(
-    sqlite3_stmt *pStmt,
-    int i,
-    const void *zData,
-    sqlite3_uint64 nData,
-    void (*xDel)(void*)
-){
+int sqlite3_bind_blob64( sqlite3_stmt *pStmt, int i, const void *zData, sqlite3_uint64 nData, void (*xDel)(void*)) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     // sf_set_trusted_sink_int(i); // ?
     // sf_set_trusted_sink_ptr(zData); // ?
     sf_set_must_be_positive(nData);
@@ -3505,13 +3454,13 @@ int sqlite3_bind_blob64(
 
 int sqlite3_bind_double(sqlite3_stmt *pStmt, int i, double rValue) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_bind_int(sqlite3_stmt *pStmt, int i, int iValue) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     // sf_set_trusted_sink_int(i); // ?
     // sf_set_trusted_sink_int(iValue); // ?
     return sf_get_some_int_to_check();
@@ -3519,7 +3468,7 @@ int sqlite3_bind_int(sqlite3_stmt *pStmt, int i, int iValue) {
 
 int sqlite3_bind_int64(sqlite3_stmt *pStmt, int i, sqlite3_int64 iValue) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     // sf_set_trusted_sink_int(i); // ?
     // sf_set_trusted_sink_int(iValue); // ?
     return sf_get_some_int_to_check();
@@ -3527,19 +3476,13 @@ int sqlite3_bind_int64(sqlite3_stmt *pStmt, int i, sqlite3_int64 iValue) {
 
 int sqlite3_bind_null(sqlite3_stmt *pStmt, int i) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_int_to_check();
 }
 
-static int __bind_text(
-    sqlite3_stmt *pStmt,
-    int i,
-    const char *zData,
-    int nData,
-    void (*xDel)(void*)
-) {
+int __bind_text( sqlite3_stmt *pStmt, int i, const char *zData, int nData, void (*xDel)(void*)) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
 
     // sf_set_trusted_sink_int(i); // ?
 
@@ -3560,62 +3503,37 @@ static int __bind_text(
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_bind_text(
-    sqlite3_stmt *pStmt,
-    int i,
-    const char *zData,
-    int nData,
-    void (*xDel)(void*)
-) {
+int sqlite3_bind_text( sqlite3_stmt *pStmt, int i, const char *zData, int nData, void (*xDel)(void*)) {
     return __bind_text(pStmt, i, zData, nData, xDel);
 }
 
-int sqlite3_bind_text16(
-    sqlite3_stmt *pStmt,
-    int i,
-    const char *zData,
-    int nData,
-    void (*xDel)(void*)
-) {
+int sqlite3_bind_text16( sqlite3_stmt *pStmt, int i, const char *zData, int nData, void (*xDel)(void*)) {
     return __bind_text(pStmt, i, zData, nData, xDel);
 }
 
-int sqlite3_bind_text64(
-    sqlite3_stmt *pStmt,
-    int i,
-    const char *zData,
-    sqlite3_uint64 nData,
-    void (*xDel)(void*),
-    unsigned char enc
-) {
+int sqlite3_bind_text64( sqlite3_stmt *pStmt, int i, const char *zData, sqlite3_uint64 nData, void (*xDel)(void*), unsigned char enc) {
     return __bind_text(pStmt, i, zData, nData, xDel);
 }
 
 int sqlite3_bind_value(sqlite3_stmt *pStmt, int i, const sqlite3_value *pValue) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     // sf_set_trusted_sink_int(i); // ?
-    SF_DEREF_READ(pValue);
+    { unsigned char tmp = *(unsigned char *)(pValue); tmp++; };
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_bind_pointer(
-    sqlite3_stmt *pStmt,
-    int i,
-    void *pPtr,
-    const char *zPTtype,
-    void (*xDestructor)(void*)
-) {
+int sqlite3_bind_pointer( sqlite3_stmt *pStmt, int i, void *pPtr, const char *zPTtype, void (*xDestructor)(void*)) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
 
     // sf_set_trusted_sink_int(i); // ?
 
     // sf_set_trusted_sink_ptr(pPtr); // ?
 
-    SF_CHECKED_DEREF_READ(pPtr);
+    if (pPtr) SF_DEREF_READ(pPtr);
 
-    SF_CHECKED_DEREF_READ(zPTtype);
+    if (zPTtype) SF_DEREF_READ(zPTtype);
     sf_buf_stop_at_null(zPTtype);
 
     sf_escape(xDestructor); // ?
@@ -3627,9 +3545,9 @@ int sqlite3_bind_pointer(
     return sf_get_some_int_to_check();
 }
 
-static int __bind_zeroblob(sqlite3_stmt *pStmt, int i, sqlite3_uint64 n) {
+int __bind_zeroblob(sqlite3_stmt *pStmt, int i, sqlite3_uint64 n) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     // sf_set_trusted_sink_int(i); // ?
     return sf_get_some_int_to_check();
 }
@@ -3644,7 +3562,7 @@ int sqlite3_bind_zeroblob64(sqlite3_stmt *pStmt, int i, sqlite3_uint64 n) {
 
 int sqlite3_bind_parameter_count(sqlite3_stmt *pStmt) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     int res;
     if (! pStmt) {
@@ -3655,16 +3573,16 @@ int sqlite3_bind_parameter_count(sqlite3_stmt *pStmt) {
     return res;
 }
 
-const char *sqlite3_bind_parameter_name(sqlite3_stmt *pStmt, int i) {
+char *sqlite3_bind_parameter_name(sqlite3_stmt *pStmt, int i) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
     // sf_set_trusted_sink_int(i); // ?
     return __get_nonfreeable_possible_null_string();
 }
 
 int sqlite3_bind_parameter_index(sqlite3_stmt *pStmt, const char *zName) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     int res;
     if (! pStmt || ! zName) {
@@ -3677,7 +3595,7 @@ int sqlite3_bind_parameter_index(sqlite3_stmt *pStmt, const char *zName) {
 
 int sqlite3_clear_bindings(sqlite3_stmt *pStmt) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
     return sf_get_some_int(); // SQLITE_OK
 }
 
@@ -3691,50 +3609,50 @@ int sqlite3_column_count(sqlite3_stmt *pStmt) {
     return res;
 }
 
-static const char *__column_name(sqlite3_stmt *pStmt, int N) {
+char *__column_name(sqlite3_stmt *pStmt, int N) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
 
     return __get_nonfreeable_possible_null_string();
 }
 
-const char *sqlite3_column_name(sqlite3_stmt *pStmt, int N) {
+char *sqlite3_column_name(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const void *sqlite3_column_name16(sqlite3_stmt *pStmt, int N) {
+void *sqlite3_column_name16(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const char *sqlite3_column_database_name(sqlite3_stmt *pStmt, int N) {
+char *sqlite3_column_database_name(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const void *sqlite3_column_database_name16(sqlite3_stmt *pStmt, int N) {
+void *sqlite3_column_database_name16(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const char *sqlite3_column_table_name(sqlite3_stmt *pStmt, int N) {
+char *sqlite3_column_table_name(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const void *sqlite3_column_table_name16(sqlite3_stmt *pStmt, int N) {
+void *sqlite3_column_table_name16(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const char *sqlite3_column_origin_name(sqlite3_stmt *pStmt, int N) {
+char *sqlite3_column_origin_name(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const void *sqlite3_column_origin_name16(sqlite3_stmt *pStmt, int N) {
+void *sqlite3_column_origin_name16(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const char *sqlite3_column_decltype(sqlite3_stmt *pStmt, int N) {
+char *sqlite3_column_decltype(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
-const void *sqlite3_column_decltype16(sqlite3_stmt *pStmt, int N) {
+void *sqlite3_column_decltype16(sqlite3_stmt *pStmt, int N) {
     return __column_name(pStmt, N);
 }
 
@@ -3743,14 +3661,14 @@ int sqlite3_step(sqlite3_stmt *pStmt) {
 
     sf_must_not_be_release(pStmt);
     //SF_DEREF_WRITE(pStmt); ?
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
 
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_data_count(sqlite3_stmt *pStmt) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_READ(pStmt);
+    { unsigned char tmp = *(unsigned char *)(pStmt); tmp++; };
 
     int res;
     if (! pStmt) {
@@ -3761,78 +3679,80 @@ int sqlite3_data_count(sqlite3_stmt *pStmt) {
     return res;
 }
 
-const void *sqlite3_column_blob(sqlite3_stmt *pStmt, int iCol) {
+void *sqlite3_column_blob(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return __get_nonfreeable_possible_null();
 }
 
 double sqlite3_column_double(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return sf_get_tainted_double();
 }
 
 int sqlite3_column_int(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return sf_get_tainted_int();
 }
 
 sqlite3_int64 sqlite3_column_int64(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return sf_get_tainted_int64();
 }
 
-const unsigned char *sqlite3_column_text(sqlite3_stmt *pStmt, int iCol) {
+unsigned char *sqlite3_column_text(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return (const unsigned char *)__get_nonfreeable_tainted_possible_null_string();
 }
 
-const void *sqlite3_column_text16(sqlite3_stmt *pStmt, int iCol) {
+void *sqlite3_column_text16(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return __get_nonfreeable_tainted_possible_null_string();
 }
 
 sqlite3_value *sqlite3_column_value(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return (sqlite3_value *)__get_nonfreeable_possible_null();
 }
 
 int sqlite3_column_bytes(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return sf_get_some_nonnegative_int();
 }
 
 int sqlite3_column_bytes16(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return sf_get_some_nonnegative_int();
 }
 
 int sqlite3_column_type(sqlite3_stmt *pStmt, int iCol) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     return sf_get_some_int();
 }
 
 int sqlite3_finalize(sqlite3_stmt *pStmt) {
-    __SQLITE_RELEASE_IMPLEMENTATION(pStmt, SQLITE3_STMT_CATEGORY)
+    sf_must_not_be_release(pStmt);
+    sf_handle_release(pStmt, SQLITE3_STMT_CATEGORY);
+    
 }
 
 int sqlite3_reset(sqlite3_stmt *pStmt) {
@@ -3846,21 +3766,12 @@ int sqlite3_reset(sqlite3_stmt *pStmt) {
     return res;
 }
 
-int __create_function(
-    sqlite3 *db,
-    const char *zFunctionName,
-    int nArg,
-    int eTextRep,
-    void *pApp,
-    void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-    void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-    void (*xFinal)(sqlite3_context*),
-    void(*xDestroy)(void*)
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int __create_function( sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp, void (*xFunc)(sqlite3_context*, int, sqlite3_value**), void (*xStep)(sqlite3_context*, int, sqlite3_value**), void (*xFinal)(sqlite3_context*), void(*xDestroy)(void*)) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zFunctionName);
-    SF_DEREF_READ(zFunctionName); // return SQLITE_MISUSE_BKPT
+    { unsigned char tmp = *(unsigned char *)(zFunctionName); tmp++; }; // return SQLITE_MISUSE_BKPT
     sf_buf_stop_at_null(zFunctionName);
 
     // Quote: "If the third parameter is less than -1 or greater than 127 then the behavior is undefined."
@@ -3880,57 +3791,29 @@ int __create_function(
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_create_function(
-    sqlite3 *db,
-    const char *zFunctionName,
-    int nArg,
-    int eTextRep,
-    void *pApp,
-    void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-    void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-    void (*xFinal)(sqlite3_context*)
-) {
+int sqlite3_create_function( sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp, void (*xFunc)(sqlite3_context*, int, sqlite3_value**), void (*xStep)(sqlite3_context*, int, sqlite3_value**), void (*xFinal)(sqlite3_context*)) {
     return __create_function(db, zFunctionName, nArg, eTextRep, pApp, xFunc, xStep, xFinal, 0);
 }
 
-int sqlite3_create_function16(
-    sqlite3 *db,
-    const void *zFunctionName,
-    int nArg,
-    int eTextRep,
-    void *pApp,
-    void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-    void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-    void (*xFinal)(sqlite3_context*)
-) {
+int sqlite3_create_function16( sqlite3 *db, const void *zFunctionName, int nArg, int eTextRep, void *pApp, void (*xFunc)(sqlite3_context*, int, sqlite3_value**), void (*xStep)(sqlite3_context*, int, sqlite3_value**), void (*xFinal)(sqlite3_context*)) {
     return __create_function(db, zFunctionName, nArg, eTextRep, pApp, xFunc, xStep, xFinal, 0);
 }
 
-int sqlite3_create_function_v2(
-    sqlite3 *db,
-    const char *zFunctionName,
-    int nArg,
-    int eTextRep,
-    void *pApp,
-    void (*xFunc)(sqlite3_context*,int,sqlite3_value**),
-    void (*xStep)(sqlite3_context*,int,sqlite3_value**),
-    void (*xFinal)(sqlite3_context*),
-    void(*xDestroy)(void*)
-) {
+int sqlite3_create_function_v2( sqlite3 *db, const char *zFunctionName, int nArg, int eTextRep, void *pApp, void (*xFunc)(sqlite3_context*, int, sqlite3_value**), void (*xStep)(sqlite3_context*, int, sqlite3_value**), void (*xFinal)(sqlite3_context*), void(*xDestroy)(void*)) {
     return __create_function(db, zFunctionName, nArg, eTextRep, pApp, xFunc, xStep, xFinal, xDestroy);
 }
 
 int sqlite3_aggregate_count(sqlite3_context *pCtx) {
     sf_vulnerable_fun_type("This function is deprecated. Do not use it for new code. It is provided only to avoid breaking legacy code. New aggregate function implementations should keep their own counts within their aggregate context.", SQLITE);
 
-    SF_DEREF_READ(pCtx);
+    { unsigned char tmp = *(unsigned char *)(pCtx); tmp++; };
 
     return sf_get_some_int();
 }
 
 int sqlite3_expired(sqlite3_stmt *pStmt) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     int res;
     if (! pStmt) {
@@ -3945,10 +3828,10 @@ int sqlite3_transfer_bindings(sqlite3_stmt *pFromStmt, sqlite3_stmt *pToStmt) {
     sf_vulnerable_fun_type("Deprecated external interface", SQLITE);
 
     sf_must_not_be_release(pFromStmt);
-    SF_DEREF_READ(pFromStmt);
+    { unsigned char tmp = *(unsigned char *)(pFromStmt); tmp++; };
 
     sf_must_not_be_release(pToStmt);
-    SF_DEREF_WRITE(pToStmt);
+    { *(unsigned char *)(pToStmt) = (unsigned char)sf_get_some_int(); };
 
     return sf_get_some_int_to_check();
 }
@@ -3962,84 +3845,80 @@ void sqlite3_thread_cleanup(void) {
     sf_vulnerable_fun_type("SQLite no longer uses thread-specific data so this routine is now a no-op.", SQLITE);
 }
 
-int sqlite3_memory_alarm(
-    void(*xCallback)(void *pArg, sqlite3_int64 used,int N),
-    void *pArg,
-    sqlite3_int64 iThreshold
-) {
+int sqlite3_memory_alarm( void(*xCallback)(void *pArg, sqlite3_int64 used, int N), void *pArg, sqlite3_int64 iThreshold) {
     sf_vulnerable_fun_type("Deprecated external interface. Now it is a no-op.", SQLITE);
     return sf_get_some_int();
 }
 
-const void *sqlite3_value_blob(sqlite3_value *pVal) {
+void *sqlite3_value_blob(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return __get_nonfreeable_possible_null();
 }
 
 double sqlite3_value_double(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return sf_get_tainted_double();
 }
 
 int sqlite3_value_int(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return sf_get_tainted_int();
 }
 
 sqlite3_int64 sqlite3_value_int64(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return sf_get_tainted_int64();
 }
 
 void *sqlite3_value_pointer(sqlite3_value *pVal, const char *zPType) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return __get_nonfreeable_possible_null();
 }
 
-const unsigned char *sqlite3_value_text(sqlite3_value *pVal) {
+unsigned char *sqlite3_value_text(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return (unsigned char *)__get_nonfreeable_tainted_possible_null_string();
 }
 
-const void *sqlite3_value_text16(sqlite3_value *pVal) {
+void *sqlite3_value_text16(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return __get_nonfreeable_tainted_possible_null_string();
 }
 
-const void *sqlite3_value_text16le(sqlite3_value *pVal) {
+void *sqlite3_value_text16le(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return __get_nonfreeable_tainted_possible_null_string();
 }
 
-const void *sqlite3_value_text16be(sqlite3_value *pVal) {
+void *sqlite3_value_text16be(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return __get_nonfreeable_tainted_possible_null_string();
 }
 
 int sqlite3_value_bytes(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return sf_get_some_nonnegative_int();
 }
 
 int sqlite3_value_bytes16(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return sf_get_some_nonnegative_int();
 }
 
 int sqlite3_value_type(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
 
     return sf_get_values(0, 5);
 }
@@ -4050,7 +3929,7 @@ int sqlite3_value_numeric_type(sqlite3_value *pVal) {
 
 unsigned int sqlite3_value_subtype(sqlite3_value *pVal) {
     sf_must_not_be_release(pVal);
-    SF_DEREF_READ(pVal);
+    { unsigned char tmp = *(unsigned char *)(pVal); tmp++; };
     return sf_get_some_unsigned();
 }
 
@@ -4085,7 +3964,7 @@ void sqlite3_value_free(sqlite3_value *pVal) {
 }
 
 void *sqlite3_aggregate_context(sqlite3_context *pCtx, int nBytes) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     sf_set_trusted_sink_nonnegative_int(nBytes);
     sf_malloc_arg(nBytes);
@@ -4094,13 +3973,13 @@ void *sqlite3_aggregate_context(sqlite3_context *pCtx, int nBytes) {
 }
 
 void *sqlite3_user_data(sqlite3_context *pCtx) {
-    SF_DEREF_READ(pCtx);
+    { unsigned char tmp = *(unsigned char *)(pCtx); tmp++; };
 
     return sf_get_uncontrolled_ptr();
 }
 
 sqlite3 *sqlite3_context_db_handle(sqlite3_context *pCtx) {
-    SF_DEREF_READ(pCtx);
+    { unsigned char tmp = *(unsigned char *)(pCtx); tmp++; };
 
     sqlite3 *res = sf_get_uncontrolled_ptr();
     sf_not_null(res);
@@ -4108,20 +3987,15 @@ sqlite3 *sqlite3_context_db_handle(sqlite3_context *pCtx) {
 }
 
 void *sqlite3_get_auxdata(sqlite3_context *pCtx, int N) {
-    SF_DEREF_READ(pCtx);
+    { unsigned char tmp = *(unsigned char *)(pCtx); tmp++; };
 
     sqlite3 *res = sf_get_uncontrolled_ptr();
     sf_set_possible_null(res);
     return res;
 }
 
-void sqlite3_set_auxdata(
-    sqlite3_context *pCtx,
-    int iArg,
-    void *pAux,
-    void (*xDelete)(void*)
-) {
-    SF_DEREF_WRITE(pCtx);
+void sqlite3_set_auxdata( sqlite3_context *pCtx, int iArg, void *pAux, void (*xDelete)(void*)) {
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     sf_escape(xDelete); // ?
 
@@ -4130,13 +4004,8 @@ void sqlite3_set_auxdata(
     }
 }
 
-void sqlite3_result_blob(
-    sqlite3_context *pCtx,
-    const void *z,
-    int n,
-    void (*xDel)(void *)
-) {
-    SF_DEREF_WRITE(pCtx);
+void sqlite3_result_blob( sqlite3_context *pCtx, const void *z, int n, void (*xDel)(void *)) {
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     sf_set_must_be_positive(n+1); // assert(n>=0)
 
@@ -4147,13 +4016,8 @@ void sqlite3_result_blob(
     }
 }
 
-void sqlite3_result_blob64(
-    sqlite3_context *pCtx,
-    const void *z,
-    sqlite3_uint64 n,
-    void (*xDel)(void *)
-) {
-    SF_DEREF_WRITE(pCtx);
+void sqlite3_result_blob64( sqlite3_context *pCtx, const void *z, sqlite3_uint64 n, void (*xDel)(void *)) {
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     sf_escape(xDel); // ?
 
@@ -4163,13 +4027,13 @@ void sqlite3_result_blob64(
 }
 
 void sqlite3_result_double(sqlite3_context *pCtx, double rVal) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
-static void __result_error(sqlite3_context *pCtx, const void *z, int n) {
-    SF_DEREF_WRITE(pCtx);
+void __result_error(sqlite3_context *pCtx, const void *z, int n) {
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
     sf_buf_stop_at_null(z);
-    SF_CHECKED_DEREF_READ(z);
+    if (z) SF_DEREF_READ(z);
 
     sf_set_trusted_sink_ptr(z);
 
@@ -4189,39 +4053,34 @@ void sqlite3_result_error16(sqlite3_context *pCtx, const void *z, int n) {
 }
 
 void sqlite3_result_error_toobig(sqlite3_context *pCtx) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
 void sqlite3_result_error_nomem(sqlite3_context *pCtx) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
 void sqlite3_result_error_code(sqlite3_context *pCtx, int errCode) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
 void sqlite3_result_int(sqlite3_context *pCtx, int iVal) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
 void sqlite3_result_int64(sqlite3_context *pCtx, sqlite3_int64 iVal) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
 void sqlite3_result_null(sqlite3_context *pCtx) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
-static void __result_text(
-    sqlite3_context *pCtx,
-    const char *z,
-    int n,
-    void (*xDel)(void *)
-) {
-    SF_DEREF_WRITE(pCtx);
+void __result_text( sqlite3_context *pCtx, const char *z, int n, void (*xDel)(void *)) {
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     sf_buf_stop_at_null(z);
-    SF_CHECKED_DEREF_READ(z);
+    if (z) SF_DEREF_READ(z);
 
     //sf_set_trusted_sink_ptr(z); // ?
 
@@ -4239,63 +4098,33 @@ static void __result_text(
     }
 }
 
-void sqlite3_result_text(
-    sqlite3_context *pCtx,
-    const char *z,
-    int n,
-    void (*xDel)(void *)
-) {
+void sqlite3_result_text( sqlite3_context *pCtx, const char *z, int n, void (*xDel)(void *)) {
     __result_text(pCtx, z, n, xDel);
 }
 
-void sqlite3_result_text64(
-    sqlite3_context *pCtx,
-    const char *z,
-    sqlite3_uint64 n,
-    void (*xDel)(void *)
-) {
+void sqlite3_result_text64( sqlite3_context *pCtx, const char *z, sqlite3_uint64 n, void (*xDel)(void *)) {
     __result_text(pCtx, z, n, xDel);
 }
 
-void sqlite3_result_text16(
-    sqlite3_context *pCtx,
-    const char *z,
-    int n,
-    void (*xDel)(void *)
-) {
+void sqlite3_result_text16( sqlite3_context *pCtx, const char *z, int n, void (*xDel)(void *)) {
     __result_text(pCtx, z, n, xDel);
 }
 
-void sqlite3_result_text16le(
-    sqlite3_context *pCtx,
-    const char *z,
-    int n,
-    void (*xDel)(void *)
-) {
+void sqlite3_result_text16le( sqlite3_context *pCtx, const char *z, int n, void (*xDel)(void *)) {
     __result_text(pCtx, z, n, xDel);
 }
 
-void sqlite3_result_text16be(
-    sqlite3_context *pCtx,
-    const char *z,
-    int n,
-    void (*xDel)(void *)
-) {
+void sqlite3_result_text16be( sqlite3_context *pCtx, const char *z, int n, void (*xDel)(void *)) {
     __result_text(pCtx, z, n, xDel);
 }
 
 void sqlite3_result_value(sqlite3_context *pCtx, sqlite3_value *pValue) {
-    SF_DEREF_WRITE(pCtx);
-    SF_DEREF_READ(pValue);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
+    { unsigned char tmp = *(unsigned char *)(pValue); tmp++; };
 }
 
-void sqlite3_result_pointer(
-    sqlite3_context *pCtx,
-    void *pPtr,
-    const char *zPType,
-    void (*xDestructor)(void *)
-) {
-    SF_DEREF_WRITE(pCtx);
+void sqlite3_result_pointer( sqlite3_context *pCtx, void *pPtr, const char *zPType, void (*xDestructor)(void *)) {
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     sf_escape(xDestructor); // ?
 
@@ -4304,34 +4133,29 @@ void sqlite3_result_pointer(
     }
 
     sf_buf_stop_at_null(zPType);
-    SF_CHECKED_DEREF_READ(zPType);
+    if (zPType) SF_DEREF_READ(zPType);
 }
 
 void sqlite3_result_zeroblob(sqlite3_context *pCtx, int n) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
 int sqlite3_result_zeroblob64(sqlite3_context *pCtx, sqlite3_uint64 n) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 
     return sf_get_some_int_to_check();
 }
 
 void sqlite3_result_subtype(sqlite3_context *pCtx, unsigned int eSubtype) {
-    SF_DEREF_WRITE(pCtx);
+    { *(unsigned char *)(pCtx) = (unsigned char)sf_get_some_int(); };
 }
 
-static int __create_collation(
-    sqlite3 *db,
-    const char *zName,
-    void *pArg,
-    int(*xCompare)(void*,int,const void*,int,const void*),
-    void(*xDestroy)(void*)
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int __create_collation( sqlite3 *db, const char *zName, void *pArg, int(*xCompare)(void*, int, const void*, int, const void*), void(*xDestroy)(void*)) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zName);
-    SF_DEREF_READ(zName); // ?
+    { unsigned char tmp = *(unsigned char *)(zName); tmp++; }; // ?
     sf_buf_stop_at_null(zName);
 
     // sf_set_must_be_not_null(xCompare, "???"); // ?
@@ -4355,52 +4179,27 @@ static int __create_collation(
     return rc;
 }
 
-int sqlite3_create_collation(
-    sqlite3 *db,
-    const char *zName,
-    int eTextRep,
-    void *pArg,
-    int(*xCompare)(void*,int,const void*,int,const void*)
-) {
+int sqlite3_create_collation( sqlite3 *db, const char *zName, int eTextRep, void *pArg, int(*xCompare)(void*, int, const void*, int, const void*)) {
     return __create_collation(db, zName, pArg, xCompare, 0);
 }
 
-int sqlite3_create_collation_v2(
-    sqlite3 *db,
-    const char *zName,
-    int eTextRep,
-    void *pArg,
-    int(*xCompare)(void*,int,const void*,int,const void*),
-    void(*xDestroy)(void*)
-) {
+int sqlite3_create_collation_v2( sqlite3 *db, const char *zName, int eTextRep, void *pArg, int(*xCompare)(void*, int, const void*, int, const void*), void(*xDestroy)(void*)) {
     return __create_collation(db, zName, pArg, xCompare, xDestroy);
 }
 
-int sqlite3_create_collation16(
-    sqlite3 *db,
-    const void *zName,
-    int eTextRep,
-    void *pArg,
-    int(*xCompare)(void*,int,const void*,int,const void*)
-) {
+int sqlite3_create_collation16( sqlite3 *db, const void *zName, int eTextRep, void *pArg, int(*xCompare)(void*, int, const void*, int, const void*)) {
     return __create_collation(db, zName, pArg, xCompare, 0);
 }
 
-int sqlite3_collation_needed(
-    sqlite3 *db,
-    void *pCollNeededArg,
-    void(*xCollNeeded)(void*,sqlite3*,int eTextRep,const char*)
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_collation_needed( sqlite3 *db, void *pCollNeededArg, void(*xCollNeeded)(void*, sqlite3*, int eTextRep, const char*)) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int();
 }
 
-int sqlite3_collation_needed16(
-    sqlite3 *db,
-    void *pCollNeededArg,
-    void(*xCollNeeded16)(void*,sqlite3*,int eTextRep,const void*)
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_collation_needed16( sqlite3 *db, void *pCollNeededArg, void(*xCollNeeded16)(void*, sqlite3*, int eTextRep, const void*)) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int();
 }
 
@@ -4416,7 +4215,7 @@ int sqlite3_get_autocommit(sqlite3 *db) {
 
 sqlite3 *sqlite3_db_handle(sqlite3_stmt *pStmt) {
     sf_must_not_be_release(pStmt);
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
     sqlite3 *res;
     if (! pStmt) {
         res = 0;
@@ -4427,12 +4226,12 @@ sqlite3 *sqlite3_db_handle(sqlite3_stmt *pStmt) {
     return res;
 }
 
-const char *sqlite3_db_filename(sqlite3 *db, const char *zDbName) {
+char *sqlite3_db_filename(sqlite3 *db, const char *zDbName) {
     __SQLITE_DB_R_ACCESS(db);
 
     sf_set_trusted_sink_ptr(zDbName);
     sf_buf_stop_at_null(zDbName);
-    SF_CHECKED_DEREF_READ(zDbName);
+    if (zDbName) SF_DEREF_READ(zDbName);
 
     return __get_nonfreeable_possible_null_string();
 }
@@ -4441,7 +4240,7 @@ int sqlite3_db_readonly(sqlite3 *db, const char *zDbName) {
     __SQLITE_DB_R_ACCESS(db);
 
     sf_buf_stop_at_null(zDbName);
-    SF_CHECKED_DEREF_READ(zDbName);
+    if (zDbName) SF_DEREF_READ(zDbName);
 
     return sf_get_values(-1, +1);
 }
@@ -4449,19 +4248,16 @@ int sqlite3_db_readonly(sqlite3 *db, const char *zDbName) {
 sqlite3_stmt *sqlite3_next_stmt(sqlite3 *db, sqlite3_stmt *pStmt) {
     __SQLITE_DB_R_ACCESS(db);
 
-    SF_CHECKED_DEREF_READ(pStmt);
+    if (pStmt) SF_DEREF_READ(pStmt);
 
     sqlite3_stmt *res = sf_get_uncontrolled_ptr();
     sf_set_possible_null(res);
     return res;
 }
 
-void *sqlite3_commit_hook(
-    sqlite3 *db,              /* Attach the hook to this database */
-    int (*xCallback)(void*),  /* Function to invoke on each commit */
-    void *pArg                /* Argument to the function */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+void *sqlite3_commit_hook( sqlite3 *db, /* Attach the hook to this database */ int (*xCallback)(void*), /* Function to invoke on each commit */ void *pArg /* Argument to the function */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_escape(xCallback); // ?
     //sf_escape(pArg); // ?
@@ -4469,12 +4265,9 @@ void *sqlite3_commit_hook(
     return sf_get_uncontrolled_ptr();
 }
 
-void *sqlite3_rollback_hook(
-    sqlite3 *db,              /* Attach the hook to this database */
-    void (*xCallback)(void*), /* Callback function */
-    void *pArg                /* Argument to the function */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+void *sqlite3_rollback_hook( sqlite3 *db, /* Attach the hook to this database */ void (*xCallback)(void*), /* Callback function */ void *pArg /* Argument to the function */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_escape(xCallback); // ?
     //sf_escape(pArg); // ?
@@ -4482,12 +4275,9 @@ void *sqlite3_rollback_hook(
     return sf_get_uncontrolled_ptr();
 }
 
-void *sqlite3_update_hook(
-    sqlite3 *db,              /* Attach the hook to this database */
-    void (*xCallback)(void*,int,char const *,char const *,sqlite_int64),
-    void *pArg                /* Argument to the function */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+void *sqlite3_update_hook( sqlite3 *db, /* Attach the hook to this database */ void (*xCallback)(void*, int, char const *, char const *, sqlite_int64), void *pArg /* Argument to the function */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_escape(xCallback); // ?
     //sf_escape(pArg); // ?
@@ -4505,7 +4295,8 @@ int sqlite3_release_memory(int n) {
 }
 
 int sqlite3_db_release_memory(sqlite3 *db) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int();
 }
 
@@ -4518,27 +4309,18 @@ void sqlite3_soft_heap_limit(int n) {
     sf_set_trusted_sink_nonnegative_int(n);
 }
 
-int sqlite3_table_column_metadata(
-    sqlite3 *db,                /* Connection handle */
-    const char *zDbName,        /* Database name or NULL */
-    const char *zTableName,     /* Table name */
-    const char *zColumnName,    /* Column name */
-    char const **pzDataType,    /* OUTPUT: Declared data type */
-    char const **pzCollSeq,     /* OUTPUT: Collation sequence name */
-    int *pNotNull,              /* OUTPUT: True if NOT NULL constraint exists */
-    int *pPrimaryKey,           /* OUTPUT: True if column part of PK */
-    int *pAutoinc               /* OUTPUT: True if column is auto-increment */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_table_column_metadata( sqlite3 *db, /* Connection handle */ const char *zDbName, /* Database name or NULL */ const char *zTableName, /* Table name */ const char *zColumnName, /* Column name */ char const **pzDataType, /* OUTPUT: Declared data type */ char const **pzCollSeq, /* OUTPUT: Collation sequence name */ int *pNotNull, /* OUTPUT: True if NOT NULL constraint exists */ int *pPrimaryKey, /* OUTPUT: True if column part of PK */ int *pAutoinc /* OUTPUT: True if column is auto-increment */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_buf_stop_at_null(zDbName);
-    SF_CHECKED_DEREF_READ(zDbName);
+    if (zDbName) SF_DEREF_READ(zDbName);
 
     sf_buf_stop_at_null(zTableName);
-    SF_DEREF_READ(zTableName);
+    { unsigned char tmp = *(unsigned char *)(zTableName); tmp++; };
 
     sf_buf_stop_at_null(zColumnName);
-    SF_CHECKED_DEREF_READ(zColumnName);
+    if (zColumnName) SF_DEREF_READ(zColumnName);
 
     if (pzDataType) *pzDataType = __get_nonfreeable_string(); // can it be null or not???
     if (pzCollSeq) *pzCollSeq = __get_nonfreeable_string(); // can it be null or not???
@@ -4549,27 +4331,33 @@ int sqlite3_table_column_metadata(
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_load_extension(
-    sqlite3 *db,          /* Load the extension into this database connection */
-    const char *zFile,    /* Name of the shared library containing extension */
-    const char *zProc,    /* Entry point.  Use "sqlite3_extension_init" if 0 */
-    char **pzErrMsg       /* Put error message here if not 0 */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_load_extension( sqlite3 *db, /* Load the extension into this database connection */ const char *zFile, /* Name of the shared library containing extension */ const char *zProc, /* Entry point. Use "sqlite3_extension_init" if 0 */ char **pzErrMsg /* Put error message here if not 0 */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zFile);
     sf_buf_stop_at_null(zFile);
-    SF_DEREF_READ(zFile);
+    { unsigned char tmp = *(unsigned char *)(zFile); tmp++; };
 
     sf_set_trusted_sink_ptr(zProc);
     sf_buf_stop_at_null(zProc);
-    SF_CHECKED_DEREF_READ(zProc);
+    if (zProc) SF_DEREF_READ(zProc);
 
-    __SQLITE_RETURN_RETCODE_AND_SET_ERROR_MESSAGE_VAR(pzErrMsg);
+    int rc = sf_get_some_int();
+    if (pzErrMsg) {
+    if (rc != SQLITE_OK) {
+    *(pzErrMsg) = __alloc_some_string();
+    } else {
+    *(pzErrMsg) = 0;
+    }
+    }
+    sf_must_be_checked(rc);
+    return rc;;
 }
 
 int sqlite3_enable_load_extension(sqlite3 *db, int onoff) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     sf_set_trusted_sink_nonnegative_int(onoff);
     return sf_get_some_int();
 }
@@ -4586,20 +4374,15 @@ int sqlite3_cancel_auto_extension(void(*xEntryPoint)(void)) {
     return sf_get_bool(); // must be checked ???
 }
 
-static int __create_module(
-    sqlite3 *db,
-    const char *zName,
-    const sqlite3_module *pModule,
-    void *pAux,
-    void (*xDestroy)(void *)
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int __create_module( sqlite3 *db, const char *zName, const sqlite3_module *pModule, void *pAux, void (*xDestroy)(void *)) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_buf_stop_at_null(zName);
-    SF_DEREF_READ(zName);
+    { unsigned char tmp = *(unsigned char *)(zName); tmp++; };
 
     // sf_set_must_be_not_null(pModule, "???"); // ?
-    SF_DEREF_READ(pModule); // ?
+    { unsigned char tmp = *(unsigned char *)(pModule); tmp++; }; // ?
 
     sf_escape(xDestroy); // ?
     if (xDestroy) {
@@ -4609,97 +4392,98 @@ static int __create_module(
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_create_module(
-    sqlite3 *db,                    /* Database in which module is registered */
-    const char *zName,              /* Name assigned to this module */
-    const sqlite3_module *pModule,  /* The definition of the module */
-    void *pAux                      /* Context pointer for xCreate/xConnect */
-) {
+int sqlite3_create_module( sqlite3 *db, /* Database in which module is registered */ const char *zName, /* Name assigned to this module */ const sqlite3_module *pModule, /* The definition of the module */ void *pAux /* Context pointer for xCreate/xConnect */) {
     return __create_module(db, zName, pModule, pAux, 0);
 }
 
-int sqlite3_create_module_v2(
-    sqlite3 *db,                    /* Database in which module is registered */
-    const char *zName,              /* Name assigned to this module */
-    const sqlite3_module *pModule,  /* The definition of the module */
-    void *pAux,                     /* Context pointer for xCreate/xConnect */
-    void (*xDestroy)(void *)        /* Module destructor function */
-) {
+int sqlite3_create_module_v2( sqlite3 *db, /* Database in which module is registered */ const char *zName, /* Name assigned to this module */ const sqlite3_module *pModule, /* The definition of the module */ void *pAux, /* Context pointer for xCreate/xConnect */ void (*xDestroy)(void *) /* Module destructor function */) {
     return __create_module(db, zName, pModule, pAux, xDestroy);
 }
 
 int sqlite3_declare_vtab(sqlite3 *db, const char *zSQL) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_buf_stop_at_null(zSQL);
     sf_set_trusted_sink_ptr(zSQL);
-    SF_DEREF_READ(zSQL);
+    { unsigned char tmp = *(unsigned char *)(zSQL); tmp++; };
 
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_overload_function(sqlite3 *db, const char *zFuncName, int nArg) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_buf_stop_at_null(zFuncName);
     sf_set_trusted_sink_ptr(zFuncName);
-    SF_DEREF_READ(zFuncName);
+    { unsigned char tmp = *(unsigned char *)(zFuncName); tmp++; };
 
     sf_set_must_be_positive(nArg + 2); // misuse if nArg<-2 - from implementation(?)
 
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_blob_open(
-    sqlite3 *db,
-    const char *zDb,
-    const char *zTable,
-    const char *zColumn,
-    sqlite3_int64 iRow,
-    int flags,
-    sqlite3_blob **ppBlob
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_blob_open( sqlite3 *db, const char *zDb, const char *zTable, const char *zColumn, sqlite3_int64 iRow, int flags, sqlite3_blob **ppBlob) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
-    SF_CHECKED_DEREF_READ(zDb);
+    if (zDb) SF_DEREF_READ(zDb);
     sf_buf_stop_at_null(zDb);
 
-    SF_CHECKED_DEREF_READ(zTable);
+    if (zTable) SF_DEREF_READ(zTable);
     sf_buf_stop_at_null(zTable);
 
-    SF_CHECKED_DEREF_READ(zColumn);
+    if (zColumn) SF_DEREF_READ(zColumn);
     sf_buf_stop_at_null(zColumn);
 
-    __SQLITE_ACQUIRE(sqlite3_blob, ppBlob, rc, SQLITE3_BLOB_CATEGORY);
+    int rc = sf_get_some_int_to_check();
+    {
+    sqlite3_blob *result;
+    sf_overwrite(&result);
+    sf_overwrite(result);
+    sf_uncontrolled_value((int)(long long int)result);
+    sf_uncontrolled_ptr(result);
+    if (rc != SQLITE_OK) {
+    sf_set_possible_null(result);
+    }
+    sf_handle_acquire(result, SQLITE3_BLOB_CATEGORY);
+    sf_not_acquire_if_eq(result, (int)(long long int)result, 0);
+    sf_not_acquire_if_less(result, rc, SQLITE_OK);
+    sf_not_acquire_if_greater(result, rc, SQLITE_OK);
+    *(ppBlob) = result;
+    };
 
     return rc;
 }
 
 int sqlite3_blob_reopen(sqlite3_blob *pBlob, sqlite3_int64 iRow) {
     sf_must_not_be_release(pBlob);
-    SF_CHECKED_DEREF_WRITE(pBlob); // ?
+    if (pBlob) { *(unsigned char *)(pBlob) = (unsigned char)sf_get_some_int(); }; // ?
 
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_blob_close(sqlite3_blob *pBlob) {
-    __SQLITE_RELEASE_IMPLEMENTATION(pBlob, SQLITE3_BLOB_CATEGORY)
+    sf_must_not_be_release(pBlob);
+    sf_handle_release(pBlob, SQLITE3_BLOB_CATEGORY);
+    
 }
 
 int sqlite3_blob_bytes(sqlite3_blob *pBlob) {
     sf_must_not_be_release(pBlob);
-    SF_CHECKED_DEREF_WRITE(pBlob);
+    if (pBlob) { *(unsigned char *)(pBlob) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_nonnegative_int();
 }
 
 int sqlite3_blob_read(sqlite3_blob *pBlob, void *z, int n, int iOffset) {
     sf_must_not_be_release(pBlob);
-    SF_CHECKED_DEREF_WRITE(pBlob); // ?
+    if (pBlob) { *(unsigned char *)(pBlob) = (unsigned char)sf_get_some_int(); }; // ?
 
     // sf_set_trusted_sink_int(n);
     // sf_set_trusted_sink_int(iOffset);
 
-    SF_DEREF_WRITE(z);
+    { *(unsigned char *)(z) = (unsigned char)sf_get_some_int(); };
     sf_overwrite(z);
     sf_bitinit(z);
     sf_buf_size_limit(z, n);
@@ -4713,12 +4497,12 @@ int sqlite3_blob_read(sqlite3_blob *pBlob, void *z, int n, int iOffset) {
 
 int sqlite3_blob_write(sqlite3_blob *pBlob, const void *z, int n, int iOffset) {
     sf_must_not_be_release(pBlob);
-    SF_CHECKED_DEREF_WRITE(pBlob); // ?
+    if (pBlob) { *(unsigned char *)(pBlob) = (unsigned char)sf_get_some_int(); }; // ?
 
     // sf_set_trusted_sink_int(n);
     // sf_set_trusted_sink_int(iOffset);
 
-    SF_DEREF_READ(z);
+    { unsigned char tmp = *(unsigned char *)(z); tmp++; };
     sf_use(z);
     sf_buf_size_limit_read(z, n);
 
@@ -4729,18 +4513,18 @@ int sqlite3_blob_write(sqlite3_blob *pBlob, const void *z, int n, int iOffset) {
 
 sqlite3_vfs *sqlite3_vfs_find(const char *zVfsName) {
     sf_set_trusted_sink_ptr(zVfsName);
-    SF_CHECKED_DEREF_READ(zVfsName);
+    if (zVfsName) SF_DEREF_READ(zVfsName);
     sf_buf_stop_at_null(zVfsName);
     return __get_nonfreeable_possible_null();
 }
 
 int sqlite3_vfs_register(sqlite3_vfs *pVfs, int makeDflt) {
-    SF_DEREF_WRITE(pVfs);
+    { *(unsigned char *)(pVfs) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_vfs_unregister(sqlite3_vfs *pVfs) {
-    SF_DEREF_WRITE(pVfs);
+    { *(unsigned char *)(pVfs) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_int_to_check();
 }
 
@@ -4802,19 +4586,14 @@ int sqlite3_file_control(sqlite3 *db, const char *zDbName, int op, void *pArg) {
 
     sf_set_trusted_sink_ptr(zDbName); // ?
     sf_buf_stop_at_null(zDbName);
-    SF_CHECKED_DEREF_READ(zDbName);
+    if (zDbName) SF_DEREF_READ(zDbName);
 
-    SF_DEREF_WRITE(pArg);
+    { *(unsigned char *)(pArg) = (unsigned char)sf_get_some_int(); };
 
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_status64(
-    int op,
-    sqlite3_int64 *pCurrent,
-    sqlite3_int64 *pHighwater,
-    int resetFlag
-) {
+int sqlite3_status64( int op, sqlite3_int64 *pCurrent, sqlite3_int64 *pHighwater, int resetFlag) {
     if (sf_get_some_int()) {
         SF_DEREF_READ(pCurrent);
         sf_overwrite(pCurrent);
@@ -4832,45 +4611,34 @@ int sqlite3_status(int op, int *pCurrent, int *pHighwater, int resetFlag) {
     return sqlite3_status64(op, pCurrent64, pHighwater64, resetFlag);
 }
 
-int sqlite3_db_status(
-    sqlite3 *db,          /* The database connection whose status is desired */
-    int op,               /* Status verb */
-    int *pCurrent,        /* Write current value here */
-    int *pHighwater,      /* Write high-water mark here */
-    int resetFlag         /* Reset high-water mark if true */
-) {
+int sqlite3_db_status( sqlite3 *db, /* The database connection whose status is desired */ int op, /* Status verb */ int *pCurrent, /* Write current value here */ int *pHighwater, /* Write high-water mark here */ int resetFlag /* Reset high-water mark if true */) {
     __SQLITE_DB_R_ACCESS(db);
 
-    SF_DEREF_WRITE(pCurrent);
-    SF_DEREF_WRITE(pHighwater);
+    { *(unsigned char *)(pCurrent) = (unsigned char)sf_get_some_int(); };
+    { *(unsigned char *)(pHighwater) = (unsigned char)sf_get_some_int(); };
 
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_stmt_status(sqlite3_stmt *pStmt, int op, int resetFlg) {
-    SF_DEREF_WRITE(pStmt);
+    { *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_int();
 }
 
-sqlite3_backup *sqlite3_backup_init(
-    sqlite3 *pDest,
-    const char *zDestName,
-    sqlite3 *pSource,
-    const char *zSourceName
-) {
+sqlite3_backup *sqlite3_backup_init( sqlite3 *pDest, const char *zDestName, sqlite3 *pSource, const char *zSourceName) {
     sf_must_not_be_release(pSource);
-    SF_DEREF_READ(pSource);
+    { unsigned char tmp = *(unsigned char *)(pSource); tmp++; };
 
     sf_must_not_be_release(pDest);
-    SF_DEREF_WRITE(pDest);
+    { *(unsigned char *)(pDest) = (unsigned char)sf_get_some_int(); };
 
     sf_set_trusted_sink_ptr(zSourceName);
     sf_buf_stop_at_null(zSourceName);
-    SF_DEREF_READ(zSourceName); // or checked deref ?
+    { unsigned char tmp = *(unsigned char *)(zSourceName); tmp++; }; // or checked deref ?
 
     sf_set_trusted_sink_ptr(zDestName);
     sf_buf_stop_at_null(zDestName);
-    SF_DEREF_READ(zDestName); // or checked deref?
+    { unsigned char tmp = *(unsigned char *)(zDestName); tmp++; }; // or checked deref?
 
     sqlite3_backup *res = sf_get_uncontrolled_ptr();
     sf_set_possible_null(res);
@@ -4882,7 +4650,7 @@ sqlite3_backup *sqlite3_backup_init(
 
 int sqlite3_backup_step(sqlite3_backup *p, int nPage) {
     sf_must_not_be_release(p);
-    SF_DEREF_WRITE(p);
+    { *(unsigned char *)(p) = (unsigned char)sf_get_some_int(); };
     return sf_get_some_int_to_check();
 }
 
@@ -4898,22 +4666,19 @@ int sqlite3_backup_finish(sqlite3_backup *p) {
 
 int sqlite3_backup_remaining(sqlite3_backup *p) {
     sf_must_not_be_release(p);
-    SF_DEREF_READ(p);
+    { unsigned char tmp = *(unsigned char *)(p); tmp++; };
     return sf_get_some_nonnegative_int();
 }
 
 int sqlite3_backup_pagecount(sqlite3_backup *p) {
     sf_must_not_be_release(p);
-    SF_DEREF_READ(p);
+    { unsigned char tmp = *(unsigned char *)(p); tmp++; };
     return sf_get_some_nonnegative_int();
 }
 
-int sqlite3_unlock_notify(
-    sqlite3 *db,                          /* Waiting connection */
-    void (*xNotify)(void **apArg, int nArg),    /* Callback function to invoke */
-    void *pArg                                  /* Argument to pass to xNotify */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_unlock_notify( sqlite3 *db, /* Waiting connection */ void (*xNotify)(void **apArg, int nArg), /* Callback function to invoke */ void *pArg /* Argument to pass to xNotify */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_escape(xNotify); // ?
     //sf_escape(pNotifyArg) // ?
@@ -4921,12 +4686,12 @@ int sqlite3_unlock_notify(
     return sf_get_some_int_to_check();
 }
 
-static int __xxx_strcmp(const char *z1, const char *z2) {
+int __xxx_strcmp(const char *z1, const char *z2) {
     sf_sanitize(z1);
-    SF_CHECKED_DEREF_READ(z1);
+    if (z1) SF_DEREF_READ(z1);
 
     sf_sanitize(z2);
-    SF_CHECKED_DEREF_READ(z2);
+    if (z2) SF_DEREF_READ(z2);
 
     int res;
     if (z1 == 0) {
@@ -4967,11 +4732,11 @@ int sqlite3_strnicmp(const char *z1, const char *z2, int n) {
 int sqlite3_strglob(const char *zGlobPattern, const char *zString) {
     sf_set_trusted_sink_ptr(zGlobPattern);
     sf_buf_stop_at_null(zGlobPattern);
-    SF_DEREF_READ(zGlobPattern);
+    { unsigned char tmp = *(unsigned char *)(zGlobPattern); tmp++; };
 
     sf_sanitize(zString);
     sf_buf_stop_at_null(zString);
-    SF_DEREF_READ(zString);
+    { unsigned char tmp = *(unsigned char *)(zString); tmp++; };
 
     return sf_get_some_int_to_check(); // ?
 }
@@ -4979,11 +4744,11 @@ int sqlite3_strglob(const char *zGlobPattern, const char *zString) {
 int sqlite3_strlike(const char *zPattern, const char *zStr, unsigned int esc) {
     sf_set_trusted_sink_ptr(zPattern);
     sf_buf_stop_at_null(zPattern);
-    SF_DEREF_READ(zPattern);
+    { unsigned char tmp = *(unsigned char *)(zPattern); tmp++; };
 
     sf_sanitize(zStr);
     sf_buf_stop_at_null(zStr);
-    SF_DEREF_READ(zStr);
+    { unsigned char tmp = *(unsigned char *)(zStr); tmp++; };
 
     return sf_get_some_int_to_check(); // ?
 }
@@ -4991,18 +4756,15 @@ int sqlite3_strlike(const char *zPattern, const char *zStr, unsigned int esc) {
 void sqlite3_log(int iErrCode, const char *zFormat, ...) {
     sf_buf_stop_at_null(zFormat);
     sf_use_format(zFormat); // for tainted
-    SF_DEREF_READ(zFormat);
+    { unsigned char tmp = *(unsigned char *)(zFormat); tmp++; };
 
     //sf_fun_printf_like(1); // SQLite extends standard library formats with %q, %Q, %w, and %z
     sf_fun_does_not_update_vargs(2);
 }
 
-void *sqlite3_wal_hook(
-    sqlite3 *db,                    /* Attach the hook to this db handle */
-    int(*xCallback)(void *, sqlite3*, const char*, int),
-    void *pArg                      /* First argument passed to xCallback() */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+void *sqlite3_wal_hook( sqlite3 *db, /* Attach the hook to this db handle */ int(*xCallback)(void *, sqlite3*, const char*, int), void *pArg /* First argument passed to xCallback() */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     // sf_escape(xCallback); // ?
     // sf_escape(pArg); // ?
@@ -5013,32 +4775,30 @@ void *sqlite3_wal_hook(
 }
 
 int sqlite3_wal_autocheckpoint(sqlite3 *db, int N) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int();
 }
 
 int sqlite3_wal_checkpoint(sqlite3 *db, const char *zDb) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zDb);
     sf_buf_stop_at_null(zDb);
-    SF_CHECKED_DEREF_READ(zDb);
+    if (zDb) SF_DEREF_READ(zDb);
 
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_wal_checkpoint_v2(
-    sqlite3 *db,                    /* Database handle */
-    const char *zDb,                /* Name of attached database (or NULL) */
-    int eMode,                      /* SQLITE_CHECKPOINT_* value */
-    int *pnLog,                     /* OUT: Size of WAL log in frames */
-    int *pnCkpt                     /* OUT: Total number of frames checkpointed */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_wal_checkpoint_v2( sqlite3 *db, /* Database handle */ const char *zDb, /* Name of attached database (or NULL) */ int eMode, /* SQLITE_CHECKPOINT_* value */ int *pnLog, /* OUT: Size of WAL log in frames */ int *pnCkpt /* OUT: Total number of frames checkpointed */) {
+    sf_must_not_be_release(db);
+    unsigned char tmp = *(unsigned char *)(db); tmp++;
+    *(unsigned char *)(db) = (unsigned char)sf_get_some_int();
 
     sf_set_trusted_sink_ptr(zDb);
     sf_buf_stop_at_null(zDb);
-    SF_CHECKED_DEREF_READ(zDb);
+    if (zDb) unsigned char tmp = *(unsigned char *)(zDb); tmp++;
 
     if (pnLog) {
         *pnLog = sf_get_values_with_min(-1);
@@ -5051,30 +4811,29 @@ int sqlite3_wal_checkpoint_v2(
 }
 
 int sqlite3_vtab_config(sqlite3 *db, int op, ...) {
-    __SQLITE_DB_RW_ACCESS(db);
+    sf_must_not_be_release(db);
+    unsigned char tmp = *(unsigned char *)(db); tmp++;
+    *(unsigned char *)(db) = (unsigned char)sf_get_some_int();
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_vtab_on_conflict(sqlite3 *db) {
-    __SQLITE_DB_RW_ACCESS(db);
+    sf_must_not_be_release(db);
+    unsigned char tmp = *(unsigned char *)(db); tmp++;
+    *(unsigned char *)(db) = (unsigned char)sf_get_some_int();
     return sf_get_some_int();
 }
 
-const char *sqlite3_vtab_collation(sqlite3_index_info *pIdxInfo, int iCons) {
-    SF_DEREF_READ(pIdxInfo);
+char *sqlite3_vtab_collation(sqlite3_index_info *pIdxInfo, int iCons) {
+    { unsigned char tmp = *(unsigned char *)(pIdxInfo); tmp++; };
     return __get_nonfreeable_possible_null();
 }
 
-int sqlite3_stmt_scanstatus(
-    sqlite3_stmt *pStmt,
-    int idx,
-    int iScanStatusOp,
-    void *pOut
-) {
+int sqlite3_stmt_scanstatus( sqlite3_stmt *pStmt, int idx, int iScanStatusOp, void *pOut) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt); // actual deref
+    *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); // actual deref
 
-    SF_DEREF_WRITE(pOut);
+    *(unsigned char *)(pOut) = (unsigned char)sf_get_some_int();
     sf_overwrite(pOut);
 
     return sf_get_some_int_to_check();
@@ -5082,49 +4841,59 @@ int sqlite3_stmt_scanstatus(
 
 void sqlite3_stmt_scanstatus_reset(sqlite3_stmt *pStmt) {
     sf_must_not_be_release(pStmt);
-    SF_DEREF_WRITE(pStmt); // actual deref
+    *(unsigned char *)(pStmt) = (unsigned char)sf_get_some_int(); // actual deref
 }
 
 int sqlite3_db_cacheflush(sqlite3 *db) {
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
     return sf_get_some_int_to_check();
 }
 
 int sqlite3_system_errno(sqlite3 *db) {
-    SF_CHECKED_DEREF_READ(db);
+    if (db) SF_DEREF_READ(db);
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_snapshot_get(
-    sqlite3 *db,
-    const char *zSchema,
-    sqlite3_snapshot **ppSnapshot
-) {
+int sqlite3_snapshot_get( sqlite3 *db, const char *zSchema, sqlite3_snapshot **ppSnapshot) {
     sf_vulnerable_fun_type("This interface is experimental and is subject to change without notice.", SQLITE);
 
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zSchema); // ?
     sf_buf_stop_at_null(zSchema);
-    SF_CHECKED_DEREF_READ(zSchema);
+    if (zSchema) SF_DEREF_READ(zSchema);
 
-    __SQLITE_ACQUIRE(sqlite3_snapshot, ppSnapshot, rc, SQLITE3_SNAPSHOT_CATEGORY);
+    int rc = sf_get_some_int_to_check();
+    {
+    sqlite3_snapshot *result;
+    sf_overwrite(&result);
+    sf_overwrite(result);
+    sf_uncontrolled_value((int)(long long int)result);
+    sf_uncontrolled_ptr(result);
+    if (rc != SQLITE_OK) {
+    sf_set_possible_null(result);
+    }
+    sf_handle_acquire(result, SQLITE3_SNAPSHOT_CATEGORY);
+    sf_not_acquire_if_eq(result, (int)(long long int)result, 0);
+    sf_not_acquire_if_less(result, rc, SQLITE_OK);
+    sf_not_acquire_if_greater(result, rc, SQLITE_OK);
+    *(ppSnapshot) = result;
+    };
 
     return rc;
 }
 
-int sqlite3_snapshot_open(
-    sqlite3 *db,
-    const char *zSchema,
-    sqlite3_snapshot *pSnapshot
-) {
+int sqlite3_snapshot_open( sqlite3 *db, const char *zSchema, sqlite3_snapshot *pSnapshot) {
     sf_vulnerable_fun_type("This interface is experimental and is subject to change without notice.", SQLITE);
 
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zSchema); // ?
     sf_buf_stop_at_null(zSchema);
-    SF_CHECKED_DEREF_READ(zSchema);
+    if (zSchema) SF_DEREF_READ(zSchema);
 
     return sf_get_some_int_to_check();
 }
@@ -5137,14 +4906,11 @@ void sqlite3_snapshot_free(sqlite3_snapshot *pSnapshot) {
     sf_overwrite(pSnapshot); // ?
 }
 
-int sqlite3_snapshot_cmp(
-    sqlite3_snapshot *p1,
-    sqlite3_snapshot *p2
-) {
+int sqlite3_snapshot_cmp( sqlite3_snapshot *p1, sqlite3_snapshot *p2) {
     sf_vulnerable_fun_type("This interface is experimental and is subject to change without notice.", SQLITE);
 
-    SF_DEREF_READ(p1);
-    SF_DEREF_READ(p2);
+    { unsigned char tmp = *(unsigned char *)(p1); tmp++; };
+    { unsigned char tmp = *(unsigned char *)(p2); tmp++; };
 
     return sf_get_values(-1, +1);
 }
@@ -5152,25 +4918,22 @@ int sqlite3_snapshot_cmp(
 int sqlite3_snapshot_recover(sqlite3 *db, const char *zDb) {
     sf_vulnerable_fun_type("This interface is experimental and is subject to change without notice.", SQLITE);
 
-    __SQLITE_DB_RW_ACCESS(db);
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zDb); // ?
     sf_buf_stop_at_null(zDb);
-    SF_CHECKED_DEREF_READ(zDb);
+    if (zDb) SF_DEREF_READ(zDb);
 
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_rtree_geometry_callback(
-    sqlite3 *db,                  /* Register SQL function on this connection */
-    const char *zGeom,            /* Name of the new SQL function */
-    int (*xGeom)(sqlite3_rtree_geometry*,int,RtreeDValue*,int*), /* Callback */
-    void *pContext                /* Extra data associated with the callback */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_rtree_geometry_callback( sqlite3 *db, /* Register SQL function on this connection */ const char *zGeom, /* Name of the new SQL function */ int (*xGeom)(sqlite3_rtree_geometry*, int, RtreeDValue*, int*), /* Callback */ void *pContext /* Extra data associated with the callback */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zGeom);
-    SF_DEREF_READ(zGeom); // return SQLITE_MISUSE_BKPT
+    { unsigned char tmp = *(unsigned char *)(zGeom); tmp++; }; // return SQLITE_MISUSE_BKPT
     sf_buf_stop_at_null(zGeom);
 
     //sf_escape(pContext); // ?
@@ -5178,17 +4941,12 @@ int sqlite3_rtree_geometry_callback(
     return sf_get_some_int_to_check();
 }
 
-int sqlite3_rtree_query_callback(
-    sqlite3 *db,                 /* Register SQL function on this connection */
-    const char *zQueryFunc,      /* Name of new SQL function */
-    int (*xQueryFunc)(sqlite3_rtree_query_info*), /* Callback */
-    void *pContext,              /* Extra data passed into the callback */
-    void (*xDestructor)(void*)   /* Destructor for the extra data */
-) {
-    __SQLITE_DB_RW_ACCESS(db);
+int sqlite3_rtree_query_callback( sqlite3 *db, /* Register SQL function on this connection */ const char *zQueryFunc, /* Name of new SQL function */ int (*xQueryFunc)(sqlite3_rtree_query_info*), /* Callback */ void *pContext, /* Extra data passed into the callback */ void (*xDestructor)(void*) /* Destructor for the extra data */) {
+    __SQLITE_db_R_ACCESS(db);
+    SF_DEREF_WRITE(db);
 
     sf_set_trusted_sink_ptr(zQueryFunc);
-    SF_DEREF_READ(zQueryFunc); // return SQLITE_MISUSE_BKPT
+    { unsigned char tmp = *(unsigned char *)(zQueryFunc); tmp++; }; // return SQLITE_MISUSE_BKPT
     sf_buf_stop_at_null(zQueryFunc);
 
     if (xDestructor) {
@@ -5208,8 +4966,7 @@ int chmod(const char *fname, int mode) {
 	return res;
 }
 
-int fchmod(int fd, mode_t mode)
-{
+int fchmod(int fd, mode_t mode) {
   int res;
   sf_use(fd);
   sf_overwrite(&res);
@@ -5294,7 +5051,7 @@ int stat64(const char *restrict fname, struct stat *restrict st) {
     return stat(fname, st);
 }
 
-int statfs(const char *path, struct statfs *buf){
+int statfs(const char *path, struct statfs *buf) {
     sf_bitinit(buf);
     sf_tocttou_check(path);
     sf_bitinit(buf);
@@ -5314,7 +5071,7 @@ int statfs(const char *path, struct statfs *buf){
     return ret_any();
 }
 
-int statfs64(const char *path, struct statfs *buf){
+int statfs64(const char *path, struct statfs *buf) {
     return statfs(path, buf);
 }
 
@@ -5829,112 +5586,13 @@ int utimes(const char *fname, const struct timeval times[2]) {
 }
 
 struct tm *localtime(const time_t *timer) {
-    DEREF(timer);
+    { char _qqq_ = *((char*)timer);};
     
-    MAY_RETURN_NULL
-}
-
-struct tm *localtime_r(const time_t *restrict timer, struct tm *restrict result) {
-    DEREF(timer);
-    sf_bitinit(result);
-    MAY_RETURN_NULL
-}
-
-struct tm *gmtime(const time_t *timer) {
-    DEREF(timer);
-    MAY_RETURN_NULL
-}
-
-struct tm *gmtime_r(const time_t *restrict timer, struct tm *restrict result) {
-    DEREF(timer);
-    sf_bitinit(result);
-    MAY_RETURN_NULL
-}
-
-char *ctime(const time_t *clock) {
-	MAY_RETURN_NULL
-}
-
-char *ctime_r(const time_t *clock, char *buf) {
-	MAY_RETURN_NULL
-}
-
-char *asctime(const struct tm *timeptr) {
-	MAY_RETURN_NULL
-}
-
-char *asctime_r(const struct tm *restrict tm, char *restrict buf) {
-	MAY_RETURN_NULL
-}
-
-size_t
-strftime(char *s, size_t maxsize, const char *format,
-         const struct tm *timeptr) {
-    DEREF(timeptr);
-    sf_bitinit(s);
-}
-
-time_t mktime(struct tm *timeptr) {
-    DEREF(timeptr);
-}
-
-time_t time(time_t *t) {
-    if(!t) {
-/* time(NULL) can fail only on clockless systems,
-   so assume it can't. */
-        time_t ret;
-        sf_overwrite(&ret);
-        return ret;
-    }
-
-    DEREF(t);
-
-    time_t ret;
-    sf_bitinit(t);
-    sf_overwrite(t);
-    sf_overwrite(&ret);
-    sf_set_possible_negative(ret);
-    return ret;
-}
-
-int clock_getres(clockid_t clk_id, struct timespec *res) {
-    int ret;
-    if(res != 0) {
-        sf_overwrite(res);
-    }
-    sf_overwrite(&ret);
-    sf_set_possible_negative(ret);
-    sf_bitinit(res);
-    return ret;
-}
-
-int clock_gettime(clockid_t clk_id, struct timespec *tp) {
-    int ret;
-    if(tp != 0) {
-        sf_overwrite(tp);
-    }
-    sf_overwrite(&ret);
-    sf_set_possible_negative(ret);
-    sf_bitinit(tp);
-    return ret;
-}
-
-int clock_settime(clockid_t clk_id, const struct timespec *tp) {
-    int ret;
-    DEREF(tp);
-    sf_overwrite(&ret);
-    sf_set_possible_negative(ret);
-    sf_bitinit(tp);
-    return ret;
-}
-
-int nanosleep(const struct timespec *req, struct timespec *rem) {
-    int ret;
-    DEREF(req);
-    sf_overwrite(&ret);
-    sf_set_possible_negative(ret);
-    sf_overwrite(rem);
-    return ret;
+    struct tm *ptr;
+    sf_overwrite(&ptr);
+    sf_bitinit(ptr);
+    sf_set_possible_null(ptr);
+    return ptr;
 }
 
 int access(const char *fname, int flags) {
@@ -5968,7 +5626,7 @@ int chroot(const char *fname) {
     return a;
 }
 
-int seteuid(uid_t euid){
+int seteuid(uid_t euid) {
     sf_vulnerable_fun("This function is unsafe.");
     int x;
     sf_overwrite(&x);
@@ -5978,7 +5636,7 @@ int seteuid(uid_t euid){
     return x;
 }
 
-int setegid(uid_t egid){
+int setegid(uid_t egid) {
     sf_vulnerable_fun("This function is unsafe.");
     int x;
     sf_overwrite(&x);
@@ -5988,7 +5646,7 @@ int setegid(uid_t egid){
     return x;
 }
 
-int sethostid(long hostid){
+int sethostid(long hostid) {
     sf_vulnerable_fun("This function is unsafe.");
     int x;
     sf_overwrite(&x);
@@ -6523,7 +6181,7 @@ int symlink(const char *path1, const char *path2) {
     sf_tocttou_access(path2);
 }
 
-long int     sysconf(int name) {
+long int sysconf(int name) {
     int x;
     sf_overwrite(&x);
     sf_set_possible_negative(x);
@@ -6673,7 +6331,7 @@ int uname (struct utsname *name) {
     return ret;
 }
 
-VOS_INT32 VOS_sprintf(VOS_CHAR * s, const VOS_CHAR * format,  ... ) {
+VOS_INT32 VOS_sprintf(VOS_CHAR * s, const VOS_CHAR * format, ... ) {
     char d1 = *s;
     char d2 = *format;
     sf_bitinit(s);
@@ -6690,7 +6348,7 @@ VOS_INT32 VOS_sprintf(VOS_CHAR * s, const VOS_CHAR * format,  ... ) {
     return res;
 }
 
-VOS_INT32 VOS_sprintf_Safe( VOS_CHAR * s, VOS_UINT32 uiDestLen, const VOS_CHAR *  format,  ... ) {
+VOS_INT32 VOS_sprintf_Safe( VOS_CHAR * s, VOS_UINT32 uiDestLen, const VOS_CHAR * format, ... ) {
     char d1 = *s;
     char d2 = *format;
     sf_bitinit(s);
@@ -6706,7 +6364,7 @@ VOS_INT32 VOS_sprintf_Safe( VOS_CHAR * s, VOS_UINT32 uiDestLen, const VOS_CHAR *
     return res;
 }
 
-VOS_INT VOS_vsnprintf_s(VOS_CHAR * str, VOS_SIZE_T destMax, VOS_SIZE_T count,  const VOS_CHAR * format, va_list  arglist) {
+VOS_INT VOS_vsnprintf_s(VOS_CHAR * str, VOS_SIZE_T destMax, VOS_SIZE_T count, const VOS_CHAR * format, va_list arglist) {
     if (format) {
         char d2 = *format;
     }
@@ -6717,7 +6375,7 @@ VOS_INT VOS_vsnprintf_s(VOS_CHAR * str, VOS_SIZE_T destMax, VOS_SIZE_T count,  c
     sf_buf_size_limit_strict(str, destMax);
 }
 
-VOS_VOID* VOS_MemCpy_Safe(VOS_VOID * dst, VOS_SIZE_T dstSize,const VOS_VOID *src, VOS_SIZE_T num) {
+VOS_VOID * VOS_MemCpy_Safe(VOS_VOID * dst, VOS_SIZE_T dstSize, const VOS_VOID *src, VOS_SIZE_T num) {
     if(dstSize>0 && num>0) {
         char d1 = *(char *)dst;
         char d2 = *(char *)src;
@@ -6733,7 +6391,7 @@ VOS_VOID* VOS_MemCpy_Safe(VOS_VOID * dst, VOS_SIZE_T dstSize,const VOS_VOID *src
     sf_buf_size_limit_read(src, num);
 }
 
-VOS_CHAR* VOS_strcpy_Safe(VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src) {
+VOS_CHAR * VOS_strcpy_Safe(VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src) {
     if(dstsz>0) {
         char d1 = *dst;
         char d2 = *src;
@@ -6748,7 +6406,7 @@ VOS_CHAR* VOS_strcpy_Safe(VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src) 
     sf_buf_stop_at_null(src);
 }
 
-VOS_CHAR* VOS_StrCpy_Safe(VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src) {
+VOS_CHAR * VOS_StrCpy_Safe(VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src) {
     if(dstsz>0) {
         char d1 = *dst;
         char d2 = *src;
@@ -6763,7 +6421,7 @@ VOS_CHAR* VOS_StrCpy_Safe(VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src) 
     sf_buf_stop_at_null(src);
 }
 
-VOS_CHAR* VOS_StrNCpy_Safe( VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src, VOS_SIZE_T count) {
+VOS_CHAR * VOS_StrNCpy_Safe( VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src, VOS_SIZE_T count) {
     if (count > 0 && dstsz>0) {
         char d1 = *dst;
         char d2 = *src;
@@ -6779,14 +6437,14 @@ VOS_CHAR* VOS_StrNCpy_Safe( VOS_CHAR *dst, VOS_SIZE_T dstsz, const VOS_CHAR *src
     sf_buf_stop_at_null(src);
 }
 
-VOS_UINT32 VOS_Que_Read	(VOS_UINT32	ulQueueID, VOS_UINTPTR aulQueMsg[4], VOS_UINT32 ulFlags, VOS_UINT32 ulTimeOut) {
+VOS_UINT32 VOS_Que_Read (VOS_UINT32 ulQueueID, VOS_UINTPTR aulQueMsg[4], VOS_UINT32 ulFlags, VOS_UINT32 ulTimeOut) {
     sf_overwrite(aulQueMsg);
     sf_set_tainted(aulQueMsg);
     sf_set_possible_nnts(aulQueMsg);
     sf_bitinit(aulQueMsg);
 }
 
-VOS_INT VOS_sscanf_s(const VOS_CHAR *buffer,  const VOS_CHAR *  format, ...) {
+VOS_INT VOS_sscanf_s(const VOS_CHAR *buffer, const VOS_CHAR * format, ...) {
     char d1 = *buffer;
     char d2 = *format;
     sf_use_format(format);
@@ -6825,25 +6483,19 @@ VOS_UINT32 VOS_StrLen(const VOS_CHAR *s) {
     return res;
 }
 
-int XAddHost(Display* dpy, XHostAddress* host)
-{
+int XAddHost(Display* dpy, XHostAddress* host) {
   sf_use(host);
 }
 
-int XRemoveHost(Display* dpy, XHostAddress* host)
-{
+int XRemoveHost(Display* dpy, XHostAddress* host) {
   sf_use(host);
 }
 
-int XChangeProperty(Display *dpy, Window w, Atom property,
-                    Atom type, int format, int mode,
-                    _Xconst unsigned char * data, int nelements)
-{
+int XChangeProperty(Display *dpy, Window w, Atom property, Atom type, int format, int mode, _Xconst unsigned char * data, int nelements) {
   sf_use(data); 
 }
 
-Bool XF86VidModeModModeLine(Display *dpy, int screen, XF86VidModeModeLine *modeline)
-{
+Bool XF86VidModeModModeLine(Display *dpy, int screen, XF86VidModeModeLine *modeline) {
   sf_use(modeline);
 }
 
@@ -6851,9 +6503,7 @@ void XtGetValues(Widget w, ArgList args, Cardinal num_args) {
   sf_bitinit_subelements(args);
 }
 
-XIDeviceInfo* XIQueryDevice(Display *display,
-                             int deviceid,
-                             int *ndevices_return) {
+XIDeviceInfo * XIQueryDevice(Display *display, int deviceid, int *ndevices_return) {
     XIDeviceInfo *res;
     sf_overwrite(&res);
     sf_overwrite(res);
