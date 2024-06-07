@@ -21,8 +21,7 @@ Memory Free Function:
     Unmark the input buffer it's library argument type using sf_lib_arg_type, e.g. sf_lib_arg_type(buffer, "MallocCategory");
 
 Overwrite:
-    Each overwritten function's parameter or variable must be checked using sf_overwrite, e.g. sf_overwrite(ptr).
-    Functions that overwrite data should use sf_overwrite to mark the variable as assigned the new correct data, e.g. sf_overwrite(buf).
+    Mark a memory location or variable as overwritten, indicating that it has been initialized, assigned a value, or returned from a function using sf_overwrite, e.g. sf_overwrite(var) or sf_overwrite(&var)
 
 Pure result:
     Functions that has purely determined by the parameters return value should use sf_pure with the first parameter always being the return value of the function that sf_pure is used in. The remaining parameters of sf_pure are the parameters of the function that sf_pure is used in. If the function has only one parameter, then sf_pure takes only one parameter (the return value of the function). If the function has multiple parameters, then sf_pure takes all of the parameters as its remaining parameters, e.g. sf_pure(res, arg).

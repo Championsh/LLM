@@ -59,7 +59,7 @@ def transformBody(bodyTree, definitionsTree) -> str:
         definition = definition[1]
         def_name = definition['def.name'].text.decode()
         def_params = [param.text.decode() for param in definition['def.params'].children] if 'def.params' in definition else ['']
-        def_value = '\n'.join(list(map(str.strip, definition['def.value'].text.decode().split('\\'))))
+        def_value = '\n'.join(list(val for val in map(str.strip, definition['def.value'].text.decode().split('\\')) if val))
 
         definitions[def_name] = definitions.setdefault(def_name, []) + [(def_params, def_value)]
     print(definitions)

@@ -3,6 +3,222 @@ import argparse
 from tree_sitter import Language, Parser
 
 
+class Comparator:
+    def __init__(self, baseDict: dict, curDict : dict, limit: int = 5):
+        self.outputLimit = limit
+        self.res = 0
+        self.compFull = 0
+        self.compMiss = 0
+        self.compExtr = 0
+        self.topMiss = {}
+        self.topExtr = {}
+        self.noSpec = []
+        self.noVar = []
+        self.functions = {}
+        self.baseDict = baseDict
+        self.curDict = curDict
+        self.funcAmount = len(baseDict)
+
+    def value_mapping(self, baseDict: dict, curDict: dict) -> dict: # Get variables' values mappings
+        mapping = {'' : ''}
+        for var in baseDict:
+            if var in curDict and baseDict[var] == curDict[var]:
+                mapping[var] = var
+            elif baseDict[var] in curDict.values() and \
+                    list(curDict.values()).count(baseDict[var]) > list(mapping.values()).count(baseDict[var]):
+                var_choices = [param for param in curDict \
+                                if curDict[param] == baseDict[var] and\
+                                    param not in mapping.values()]
+                if len(var_choices) == 0:
+                    mapping[var] = 'None'
+                else:
+                    mapping[var] = var_choices[0]
+            else:
+                mapping[var] ='None'
+
+
+                
+        return mapping
+        # print("Mapping: ", mapping)
+
+    def incRes(self, funcRes: tuple):
+        funcName, compFull, compMiss, compExtr, func = funcRes
+
+        self.res += func["val"]
+        self.compFull += compFull
+        self.compMiss += compMiss
+        self.compExtr += compExtr
+        self.functions[funcName] = func
+        # handle cur functions misses
+
+    def cmpFunctions(self, funcName: str, baseFunc, curFunc) -> tuple:
+        # Get variables' values mappings
+        mapping = self.value_mapping(baseFunc['param_types'], curFunc['param_types'])
+
+        # Get variables amount
+        var_amount = len(baseFunc.keys()) - 1
+        
+        # Functions with 0 variables handle
+        if var_amount == 0:
+            self.res += 1
+            self.noVar += [funcName]
+            return
+
+        # Init values
+        var_res = 0
+        var_compare_full = 0
+        var_compare_miss = 0
+        var_compare_extr = 0
+        funcValues = {"miss": [], "extr": [], "hit": [], "val": 0}
+
+        # print("baseFunc: ", baseFunc)
+        # print("curFunc: ", curFunc)
+        for var in baseFunc.keys():
+            if var == 'param_types':
+                continue
+            if mapping[var] == 'None':
+                for func in baseFunc[var]:
+                    self.topMiss[func] = self.topMiss.setdefault(func, 0) + 1
+                    funcValues["miss"] += [func]
+                var_compare_miss += 1
+                continue
+            
+            # Get dicts for the current variable to compare
+            baseVarFunctions, curVarFunctions = baseFunc[var], curFunc[mapping[var]]
+
+            # If some function's var is not used in specifications
+            var_functions_amount = len(baseVarFunctions)
+            if var_functions_amount == 0:
+                var_res += 1
+                for func in curVarFunctions:
+                    self.topExtr[func] = self.topExtr.setdefault(func, 0) + 1
+                    funcValues["extr"] += [func]
+                var_compare_extr += 1
+                continue
+            
+            cur_var_functions_res = 0
+            miss_fl, extr_fl = False, False
+            # Get info about the missed functions
+            for missFunction in list(set(baseVarFunctions).difference(curVarFunctions)):
+                self.topMiss[missFunction] = self.topMiss.setdefault(missFunction, 0) + 1
+                funcValues["miss"] += [missFunction]
+                miss_fl = True
+
+            # Get info about the extra functions
+            for extrFunction in list(set(curVarFunctions).difference(baseVarFunctions)):
+                self.topExtr[extrFunction] = self.topExtr.setdefault(extrFunction, 0) + 1
+                funcValues["miss"] += [extrFunction]
+                extr_fl = True
+
+            # Increase according to intersection of the functions
+            cur_var_functions_res += len(list(set(curVarFunctions) & set(baseVarFunctions)))
+
+            # for baseVarFunction in baseVarFunctions:
+            #     if baseVarFunction in curVarFunctions:
+            #         cur_var_functions_res += 1
+            #         curVarFunctions.remove(baseVarFunction) # TODO: Check squeezeCode for the need to "remove"
+            #     else:
+            #         self.topMiss[baseVarFunction] = self.topMiss.setdefault(baseVarFunction, 0) + 1
+            #         funcValues["miss"] += [baseVarFunction]
+                    
+            
+            tmp = cur_var_functions_res / var_functions_amount
+            var_res += tmp
+            if tmp == 1:
+                var_compare_full += 1
+            if miss_fl:
+                var_compare_miss += 1
+            if extr_fl:
+                var_compare_extr += 1
+
+        funcValues["val"] = var_res / var_amount
+        return funcName,\
+            var_compare_full / var_amount,\
+            var_compare_miss / var_amount,\
+            var_compare_extr / var_amount,\
+            funcValues
+
+    def getResult(self):
+        for funcName in self.baseDict:
+            # print(funcName)
+            
+            # Generation error functions counter
+            if funcName not in self.curDict:
+                self.noSpec += [funcName]
+                continue
+
+            # Get dicts for the current function to compare
+            baseFunc, curFunc = self.baseDict[funcName], self.curDict[funcName]
+
+            # Increase Result values according to the checked functions
+            self.incRes(self.cmpFunctions(funcName, baseFunc, curFunc))
+
+        return 100 * self.res / self.funcAmount,\
+            100 * self.compFull / self.funcAmount,\
+            100 * self.compMiss / self.funcAmount,\
+            100 * self.compExtr / self.funcAmount,\
+            100 * len(self.noSpec) / self.funcAmount,\
+            dictSort(self.topExtr, self.outputLimit),\
+            dictSort(self.topMiss, self.outputLimit),\
+            self.noSpec[:self.outputLimit],\
+            self.functions
+            # dict(filter(lambda x: x[1]["val"] < 0.5 , sorted(self.functions.items(), key=lambda x: x[1]["val"])))
+
+
+class Repeater:
+    def __init__(self):
+        self.value, self.repeat_functions, self.filename = .0, [], ""
+    
+    def update(self, value: float, repeat_functions: list[str], filename: str):
+        if value > self.value:
+            self.value = value
+            self.repeat_functions = repeat_functions
+            self.filename = filename
+    
+    def create(self, base_path: str):
+        directory = './apps/new/'
+        matches = []
+        with open(base_path, 'r') as reader:
+            baseCode = reader.read()
+            matches = parseCode(baseCode)
+
+        functions = {}
+        for i in range(len(matches)):
+            func = matches[i][1]
+
+            func_name = func['func.name'].text.decode()
+            functions[func_name] = {}
+            functions[func_name]['proto'] = func['func.type'].text.decode() + ' ' + func['func.declarator'].text.decode()
+            functions[func_name]['code'] = func['func'].text.decode()
+
+        i = 0
+        base_retry_path = directory + f"codes_{self.filename}.c"
+        retry_codes_path = base_retry_path
+        while(curNameBusy(retry_codes_path)):
+            i += 1
+            retry_codes_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
+
+        i = 0
+        base_retry_path = directory + f"protos_{self.filename}.c"
+        retry_protos_path = base_retry_path
+        while(curNameBusy(retry_protos_path)):
+            i += 1
+            retry_protos_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
+        print(retry_protos_path)
+        print(retry_codes_path)
+
+        with open(retry_codes_path, 'w') as codes_writer:
+            with open(retry_protos_path, 'w') as protos_writer:
+                for func_name, func_info in functions.items():
+                    if func_name not in self.repeat_functions:
+                        continue
+                    proto, code = func_info.values()
+                    codes_writer.write(code + '\n\n')
+                    protos_writer.write(proto + ';\n')
+
+        return functions
+
+
 def parseCode(code: str) -> list:
     Language.build_library(
         'build/my-languages.so',
@@ -103,52 +319,8 @@ def squeezeCode(code: str) -> dict:
     return functions
 
 
-def current_name_busy(name):
+def curNameBusy(name):
     return os.path.exists(name)
-
-
-def createRetry(base_file: str, retryFunctions: list[str], retry_filename: str):
-    directory = './apps/new/'
-    matches = []
-    with open(base_file, 'r') as reader:
-        baseCode = reader.read()
-        matches = parseCode(baseCode)
-
-    functions = {}
-    for i in range(len(matches)):
-        func = matches[i][1]
-
-        func_name = func['func.name'].text.decode()
-        functions[func_name] = {}
-        functions[func_name]['proto'] = func['func.type'].text.decode() + ' ' + func['func.declarator'].text.decode()
-        functions[func_name]['code'] = func['func'].text.decode()
-
-    i = 0
-    base_retry_path = directory + f"codes_{retry_filename}.c"
-    retry_codes_path = base_retry_path
-    while(current_name_busy(retry_codes_path)):
-        i += 1
-        retry_codes_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
-
-    i = 0
-    base_retry_path = directory + f"protos_{retry_filename}.c"
-    retry_protos_path = base_retry_path
-    while(current_name_busy(retry_protos_path)):
-        i += 1
-        retry_protos_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
-    print(retry_protos_path)
-    print(retry_codes_path)
-
-    with open(retry_codes_path, 'w') as codes_writer:
-        with open(retry_protos_path, 'w') as protos_writer:
-            for func_name, func_info in functions.items():
-                if func_name not in retryFunctions:
-                    continue
-                proto, code = func_info.values()
-                codes_writer.write(code + '\n\n')
-                protos_writer.write(proto + ';\n')
-
-    return functions
 
 
 def dictSort(var: dict, amount: int = None):
@@ -156,116 +328,7 @@ def dictSort(var: dict, amount: int = None):
     return dict(sorted(var.items(), key=lambda x: x[1], reverse=True)[:amount])
 
 
-def compare(baseDict: dict, curDict: dict):
-    extra_functions_amount = 5
-    compare_full = 0
-    compare_miss = 0
-    compare_extr = 0
-    top_miss = {}
-    top_extr = {}
-    no_spec = []
-    func_results = {}
-
-    functions_amount = len(baseDict)
-    res = 0
-    for funcName in baseDict:
-        # print(funcName)
-        if funcName not in curDict:
-            no_spec += [funcName]
-            continue
-        baseFunc = baseDict[funcName]
-        curFunc = curDict[funcName]
-
-        mapping = {'' : ''}
-        for var in baseFunc['param_types']:
-
-            if var in curFunc['param_types'] and baseFunc['param_types'][var] == curFunc['param_types'][var]:
-                mapping[var] = var
-            elif baseFunc['param_types'][var] in curFunc['param_types'].values() and \
-                    list(curFunc['param_types'].values()).count(baseFunc['param_types'][var]) > list(mapping.values()).count(baseFunc['param_types'][var]):
-                var_choices = [param for param in curFunc['param_types'] \
-                                if curFunc['param_types'][param] == baseFunc['param_types'][var] and\
-                                    param not in mapping.values()]
-                if len(var_choices) == 0:
-                    mapping[var] = 'None'
-                else:
-                    mapping[var] = var_choices[0]
-            else:
-                mapping[var] ='None'
-        # print("Mapping: ", mapping)
-
-        var_amount = len(baseFunc.keys()) - 1
-        if var_amount == 0:
-            res += 1
-            continue
-
-        cur_var_res = 0
-        var_compare_full = 0
-        var_compare_miss = 0
-        var_compare_extr = 0
-        # print("baseFunc: ", baseFunc)
-        # print("curFunc: ", curFunc)
-        for var in baseFunc.keys():
-            if var == 'param_types':
-                continue
-            if mapping[var] == 'None':
-                for func in baseFunc[var]:
-                    top_miss[func] = top_miss.setdefault(func, 0) + 1
-                var_compare_miss += 1
-                continue
-                    
-            baseVarFunctions = baseFunc[var]
-            curVarFunctions = curFunc[mapping[var]]
-
-            var_functions_amount = len(baseVarFunctions)
-            if var_functions_amount == 0:
-                cur_var_res += 1
-                for func in curVarFunctions:
-                    top_extr[func] = top_extr.setdefault(func, 0) + 1
-                var_compare_extr += 1
-                continue
-            
-            cur_var_functions_res = 0
-            for baseVarFunction in baseVarFunctions:
-                if baseVarFunction in curVarFunctions:
-                    cur_var_functions_res += 1
-                else:
-                    top_miss[baseVarFunction] = top_miss.setdefault(baseVarFunction, 0) + 1
-            
-            tmp = cur_var_functions_res / var_functions_amount
-            cur_var_res += tmp
-            if tmp < 1:
-                var_compare_miss += 1
-            else:
-                var_compare_full += 1
-            
-            extr_fl = False
-            for curVarFunction in curVarFunctions:
-                if curVarFunction not in baseVarFunctions:
-                    extr_fl = True
-                    top_extr[curVarFunction] = top_extr.setdefault(curVarFunction, 0) + 1
-            if extr_fl:
-                var_compare_extr += 1
-        
-        res += cur_var_res / var_amount
-        compare_full += var_compare_full / var_amount
-        compare_miss += var_compare_miss / var_amount
-        compare_extr += var_compare_extr / var_amount
-        
-        func_results[funcName] = cur_var_res / var_amount
-
-    return 100 * res / functions_amount,\
-        100 * compare_full / functions_amount,\
-        100 * compare_miss / functions_amount,\
-        100 * compare_extr / functions_amount,\
-        100 * len(no_spec) / functions_amount,\
-        dictSort(top_extr, extra_functions_amount),\
-        dictSort(top_miss, extra_functions_amount),\
-        no_spec[:extra_functions_amount],\
-        dict(filter(lambda x: x[1] < 0.5 , sorted(func_results.items(), key=lambda x: x[1])))
-
-
-def main(base_file, specs_path):
+def main(base_file, specs_path, retry_flag):
     pwd = []
     if os.path.isdir(specs_path):
         specs_template = specs_path + \
@@ -281,15 +344,18 @@ def main(base_file, specs_path):
         code = reader.read()
         baseDict = squeezeCode(code)
 
-    max_compare, max_retry_functions, max_filename = 0, [], ''
+    if retry_flag:
+        repeater = Repeater()
+
     for spec_file in pwd:
         code = ''
         with open(spec_file, "r") as reader:
             code = reader.read()
         curDict = squeezeCode(code)
 
+        cmp = Comparator(baseDict, curDict)
         compare_res, compare_full, compare_miss, compare_extr, noSpec, \
-            functions_extr, functions_miss, functions_noSpec, functions_lessHit = compare(baseDict, curDict)
+            functions_extr, functions_miss, functions_noSpec, functions = cmp.getResult()
 
         filename = spec_file.rsplit('/', 1)[-1].rsplit('.', 1)[0]
         print(f"{filename}:\n" + \
@@ -299,21 +365,24 @@ def main(base_file, specs_path):
               "\tExtra Specifications: {:.1f}%\n".format(compare_extr) + \
               "\tNo Specifications: {:.1f}%\n".format(noSpec) + \
               "\tTop extr functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_extr.items())) + \
-              "\tTop miss functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_miss.items())) + \
-              "\tLess hit similarity: {:.1f}%".format(100 * sum(functions_lessHit.values()) / len(functions_lessHit.values())))
-        if compare_res > max_compare:
-            max_compare = compare_res
-            max_retry_functions = functions_noSpec + list(functions_lessHit.keys())
-            max_filename = filename
-    createRetry(base_file, max_retry_functions, max_filename)
+              "\tTop miss functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_miss.items())) 
+            #   + \
+            #   "\tLess hit similarity: {:.1f}%".format(100 * sum(functions_lessHit.values()) / len(functions_lessHit.values()))
+              )
+        if retry_flag:
+            repeater.update(compare_res, functions_noSpec + list(functions.keys()))
+
+    if retry_flag:
+        repeater.create(base_file)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Specifications Comparator')
     parser.add_argument('-b', '--base-path', default="./apps/data/allSpecs.c")
     parser.add_argument('-s', '--specs-path', default="./apps/data/specs")
+    parser.add_argument('-r', '--retry', action="store_true")
     args = parser.parse_args()
 
     base_path = args.base_path
     specs_path = args.specs_path
-    main(base_path, specs_path)
+    main(base_path, specs_path, args.retry)

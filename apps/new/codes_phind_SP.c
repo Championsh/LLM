@@ -98,8 +98,7 @@ int isalnum(int c) {
     int res;
     sf_overwrite(&res);
     sf_pure(res, c);
-    return res
-    ;
+    return res;
 }
 
 int isalpha(int c) {
@@ -107,8 +106,7 @@ int isalpha(int c) {
     int res;
     sf_overwrite(&res);
     sf_pure(res, c);
-    return res
-    ;
+    return res;
 }
 
 int isascii(int c) {
