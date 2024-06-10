@@ -1,0 +1,27 @@
+phind_SP:
+    Similarity: 66.2%
+        Full Specifications: 3.5%
+        Missed Specifications: 32.6%
+        Extra Specifications: 79.8%
+        No Specifications: 2.7%
+        Top extr functions: sf_set_trusted_sink_int: 308, sf_set_must_be_not_null: 235, sf_bitcopy: 158, sf_set_trusted_sink_ptr: 152, sf_set_tainted: 148
+        Top miss functions: sf_overwrite: 221, sf_must_not_be_release: 91, sf_set_possible_negative: 65, sf_buf_stop_at_null: 63, sf_bitinit: 51
+
+
+
+body: (compound_statement
+          (declaration
+            type: (_) @func.body.decl))) @func
+
+body: (compound_statement [
+        	(declaration) @func.body.decl
+            (expression_statement) @func.body.expr
+        ])) @func
+
+body: (compound_statement [
+        	(declaration) @func.body.decl
+            (expression_statement) @func.body.expr
+        ]) @func.body
+
+
+{'func': <Node type=function_definition, start_point=(0, 0), end_point=(19, 1)>, 'func.type': <Node type=primitive_type, start_point=(0, 0), end_point=(0, 7)>, 'func.declarator': <Node type=function_declarator, start_point=(0, 8), end_point=(0, 74)>, 'func.name': <Node type=identifier, start_point=(0, 8), end_point=(0, 25)>, 'func.params': <Node type=parameter_list, start_point=(0, 25), end_point=(0, 74)>, 'func.body.expr': <Node type=expression_statement, start_point=(1, 4), end_point=(1, 21)>}

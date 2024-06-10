@@ -1,6 +1,6 @@
 import os
 import argparse
-from tree_sitter import Language, Parser
+from tree_sitter import Language, Parser, Tree, Node
 
 
 class Comparator:
@@ -19,7 +19,24 @@ class Comparator:
         self.curDict = curDict
         self.funcAmount = len(baseDict)
 
-    def value_mapping(self, baseDict: dict, curDict: dict) -> dict: # Get variables' values mappings
+    def varMapping(self, baseDict: dict, curDict: dict) -> dict: # Get variables' values mappings
+        intersection, baseDiff, curDiff = intersectDicts(baseDict, curDict)
+        mapping = {k: k for k in intersection}
+        mapping[''] = ''
+
+        for baseKey, baseVal in baseDiff.items():
+            for curKey, curVal in curDiff.items():
+                if cmpTypes(baseVal, curVal):
+                    mapping[baseKey] = curKey
+                    del curDiff[curKey]
+                    break
+            if baseKey not in mapping:
+                mapping[baseKey] = 'None'
+        # print(baseDict)
+        # print(curDict)
+        # print(mapping)
+        return mapping
+
         mapping = {'' : ''}
         for var in baseDict:
             if var in curDict and baseDict[var] == curDict[var]:
@@ -35,9 +52,6 @@ class Comparator:
                     mapping[var] = var_choices[0]
             else:
                 mapping[var] ='None'
-
-
-                
         return mapping
         # print("Mapping: ", mapping)
 
@@ -52,8 +66,9 @@ class Comparator:
         # handle cur functions misses
 
     def cmpFunctions(self, funcName: str, baseFunc, curFunc) -> tuple:
+        # print(funcName)
         # Get variables' values mappings
-        mapping = self.value_mapping(baseFunc['param_types'], curFunc['param_types'])
+        mapping = self.varMapping(baseFunc['param_types'], curFunc['param_types'])
 
         # Get variables amount
         var_amount = len(baseFunc.keys()) - 1
@@ -74,7 +89,7 @@ class Comparator:
         # print("baseFunc: ", baseFunc)
         # print("curFunc: ", curFunc)
         for var in baseFunc.keys():
-            if var == 'param_types':
+            if var == 'param_types' or var == 'body':
                 continue
             if mapping[var] == 'None':
                 for func in baseFunc[var]:
@@ -219,104 +234,237 @@ class Repeater:
         return functions
 
 
-def parseCode(code: str) -> list:
-    Language.build_library(
-        'build/my-languages.so',
-        [
-            '../tree-sitter-c'
-        ]
-    )
-    CPP_LANGUAGE = Language('build/my-languages.so', 'c')
+    def __init__(self):
+        queries = {
+            'codeQuery': """
+                // C# code query
+                """,
+            'bodyQuery': """
+                // C# body query
+                """
+        }
+        super().__init__('csharp', queries)
 
-    parser = Parser()
-    parser.set_language(CPP_LANGUAGE)
 
-    tree = parser.parse(
-        bytes(code, "utf8")
-    )
+class myParser:
+    def __init__(self, language: str, code_query: str, body_query: str):
+        Language.build_library('build/my-languages.so', ['../tree-sitter-' + language])
+        self.language = Language('build/my-languages.so', language)
+        self.parser = Parser()
+        self.parser.set_language(self.language)
+        self.code_query = code_query
+        self.body_query = body_query
+        self.functions = {}
 
-    func_query = CPP_LANGUAGE.query(
-        """
-    (function_definition
-    type: (_) @func.type
-    declarator: 
-    [
-        (pointer_declarator declarator: 
-            (function_declarator declarator: 
-                name: (identifier) @func.name
-                parameters: (_) @func.params
-            )
+    def __getTree(self, code: str) -> Tree:
+        return self.parser.parse(
+            bytes(code, "utf8")
         )
-        (function_declarator declarator: 
-            name: (identifier) @func.name
-            parameters: (_) @func.params
-        )
-    ] @func.declarator
-    body: (compound_statement) @func.body) @func
-    """)
 
-    return func_query.matches(tree.root_node)
+    def __parse(self, code: str, is_code: bool = True) -> list:
+        tree = self.__getTree(code)
+        query = self.language.query(self.code_query if is_code else self.body_query)
+        return query.matches(tree.root_node)
+    
+    def __incFunctions(self, funcName: str, incType: str, **kwargs):
+        self.functions.setdefault(funcName, {})
+        
+        incTypes = {
+            "dec": lambda _: self.functions[funcName].setdefault('param_types', {}),
+            "use": lambda x: self.functions[funcName].setdefault(x, []),
+        }
+        try:
+            incTypes[incType](kwargs['var'])
+        except Exception:
+            print(Exception)
+        
+        incActions = {
+            "dec": lambda dict: self.functions[funcName]['param_types'].update({dict['var']: {"type": dict['type'], "kind": dict['kind']}}),
+            "use": lambda x: self.functions[funcName].setdefault(x, []),
+        }
 
 
-def squeezeCode(code: str) -> dict:
-    matches = parseCode(code)
-    functions = {}
-    for i in range(len(matches)):
-        func = matches[i][1]
+    def __handleDeclartion(self, node: Node, funcName: str, declareKind: str):
+        # Switch for declarators' type, which returns a tuple:
+            # extra type symbols, declarator's name, (opt.) init value
+        declTypes = {
+            "identifier": lambda x: ('', x.text.decode()),
+            "pointer_declarator": lambda x: ('*', x.child_by_field_name("declarator").text.decode()),
+            "init_declarator": lambda x: (*declTypes[x.child_by_field_name("declarator").type](x.child_by_field_name("declarator")),
+                                          x.child_by_field_name("value").text.decode()),
+        }
+        # Get declarator's type
+        declType = node.child_by_field_name("type").text.decode()
 
-        func_name = func['func.name'].text.decode()
-        functions[func_name] = {}
-        functions[func_name][""] = []  # TODO: Remove this declarations without breaking the function
-        # print(func_name)
-        # print(func['func.params'].sexp())
-        param_types = {}
-        for param in func['func.params'].children:
-            if param.type != "parameter_declaration" or param.child_by_field_name("declarator") is None:
-                continue
-            param_type = param.child_by_field_name("type").text.decode()
-            param_type += '' if param.child_by_field_name("declarator").type == "identifier" else param.child_by_field_name("declarator").child(0).text.decode()
-            param_name = param.child_by_field_name("declarator").text.decode() if param.child_by_field_name("declarator").type == "identifier" else param.child_by_field_name("declarator").child(1).text.decode()
-            # print(param_name)
-            # print(param_type)
-            param_types[param_name] = param_type
-            functions[func_name][param_name] = []
-        functions[func_name]['param_types'] = param_types
+        # Get node's declartor
+        declarator = node.child_by_field_name("declarator")
+        print(declarator.type)
 
-        # print(func['func.body'].sexp())
-        for param in func['func.body'].children:
-            if param.type == "declaration":
+        # Handle node according to it's type
+        declRes = declTypes[declarator.type](declarator)
+        extraType, declName, declVal = '', None, None
+        if len(declRes) == 2:
+            extraType, declName = declRes
+        elif len(declRes) == 3:
+            extraType, declName, declVal = declRes
+        
+        if not declName:
+            return
+        declType += extraType
+
+        self.__incFunctions(self.functions[funcName], "dec", var=declName, type=declType, kind=declareKind)
+        if declVal:
+            self.__incFunctions(self.functions[funcName], "use", var=declName, type=declType, kind=declareKind)
+
+        print(declType)
+        print(declName)
+        print(declVal)
+
+    def __handleExpression(self, node: Node, curDict: dict):
+        pass
+
+    def __handleReturn(self, node: Node, curDict: dict):
+        pass
+
+    def __fillDict(self, func_name: str, node_type: str, node: Node):
+        action = {
+            "decl": self.__handleDeclartion,
+            "expr": self.__handleExpression,
+            "ret": self.__handleReturn
+        }
+        action[node_type](node, func_name)
+
+        # try:
+        #     action[node_type](self.functions[func_name], node)
+        # except Exception:
+        #     print(Exception)
+
+    def squeezeCode(self, code: str) -> dict:
+        matches = self.__parse(code)
+        for _, func in matches:
+            # Get function's name and Init dict with it
+            func_name = func['func.name'].text.decode()
+            self.functions[func_name] = {}
+            self.functions[func_name][""] = []  # TODO: Remove this declarations without breaking the function
+            # print(func_name)
+
+            # Handle function declarator
+            # print(func['func.params'].sexp())
+            param_types = {}
+            for param in func['func.params'].children:
+                if param.type != "parameter_declaration" or param.child_by_field_name("declarator") is None:
+                    continue
                 param_type = param.child_by_field_name("type").text.decode()
                 param_type += '' if param.child_by_field_name("declarator").type == "identifier" else param.child_by_field_name("declarator").child(0).text.decode()
                 param_name = param.child_by_field_name("declarator").text.decode() if param.child_by_field_name("declarator").type == "identifier" else param.child_by_field_name("declarator").child(1).text.decode()
                 # print(param_name)
                 # print(param_type)
-                functions[func_name]['param_types'][param_name] = param_type
-                functions[func_name][param_name] = []
-            elif param.type == "expression_statement":
-                # print(param.sexp())
-                if param.child(0).type == "call_expression":
-                    called_func = param.child(0).child_by_field_name("function").text.decode()
-                    called_func_arguments = param.child(0).child_by_field_name("arguments").children
+                param_types[param_name] = {"type": param_type, "kind": "p"}
+                # param_types[param_name] = param_type
+                self.functions[func_name][param_name] = []
+            self.functions[func_name]['param_types'] = param_types
 
-                    if len(called_func_arguments) == 2:
-                        functions[func_name][""] = functions[func_name].setdefault("", []) + [called_func]
+            # Handle function body
+            print(func_name)
+            inMatches = self.__parse(func['func.body'].text.decode(), False)
+            # print(inMatches)
+            for _, body in inMatches:
+                node_type, node = list(body.items())[0]
+                self.__fillDict(func_name, node_type, node)
 
-                    for argument in called_func_arguments:
-                        if argument.type != 'identifier' and argument.type != 'pointer_expression':
-                            continue
-                        argument_name = argument.text.decode() if argument.type == "identifier" else argument.child_by_field_name("argument").text.decode()
-                        # print(argument.sexp())
-                        # print(argument_name)
-                        if argument_name in functions[func_name]['param_types']:
-                            functions[func_name][argument_name] += [called_func]
-                
-                else:
-                    pass
 
-            elif param.type == "if_statement":
-                pass
-        # print(functions)
-    return functions
+            exit(1)
+            # for param in func['func.body'].children:
+            #     if param.type == "declaration":
+            #         param_type = param.child_by_field_name("type").text.decode()
+            #         param_type += '' if param.child_by_field_name("declarator").type == "identifier" else param.child_by_field_name("declarator").child(0).text.decode()
+            #         param_name = param.child_by_field_name("declarator").text.decode() if param.child_by_field_name("declarator").type == "identifier" else param.child_by_field_name("declarator").child(1).text.decode()
+            #         # print(param_name)
+            #         # print(param_type)
+            #         # if param_name == '=':
+            #             # print(param.sexp())
+            #         functions[func_name]['param_types'][param_name] = {"type": param_type, "kind": "d"}
+            #         # functions[func_name]['param_types'][param_name] = param_type
+            #         functions[func_name][param_name] = []
+
+            #     elif param.type == "expression_statement":
+            #         # print(param.sexp())
+            #         if param.child(0).type == "call_expression":
+            #             called_func = param.child(0).child_by_field_name("function").text.decode()
+            #             called_func_arguments = param.child(0).child_by_field_name("arguments").children
+
+            #             if len(called_func_arguments) == 2:
+            #                 functions[func_name][""] = functions[func_name].setdefault("", []) + [called_func]
+
+            #             for argument in called_func_arguments:
+            #                 if argument.type != 'identifier' and argument.type != 'pointer_expression':
+            #                     continue
+            #                 argument_name = argument.text.decode() if argument.type == "identifier" else argument.child_by_field_name("argument").text.decode()
+            #                 # print(argument.sexp())
+            #                 # print(argument_name)
+            #                 if argument_name in functions[func_name]['param_types']:
+            #                     functions[func_name][argument_name] += [called_func]
+                    
+            #         else:
+            #             pass
+
+            #     elif param.type == "if_statement":
+            #         pass
+            # print(functions)
+        return functions
+
+
+class CParser(myParser):
+    def __init__(self):
+        code_query = """
+            (function_definition
+                type: (_) @func.type
+                declarator:
+                [
+                    (pointer_declarator declarator: 
+                        (function_declarator declarator: 
+                            name: (identifier) @func.name
+                            parameters: (_) @func.params
+                        )
+                    )
+                    (function_declarator declarator: 
+                        name: (identifier) @func.name
+                        parameters: (_) @func.params
+                    )
+                ] @func.declarator
+                body: (_) @func.body
+                ) @func
+            """
+        body_query = """
+            (compound_statement [
+                (declaration) @decl
+                (expression_statement) @expr
+                (return_statement) @ret
+            ])
+            """
+        super().__init__('c', code_query, body_query)
+
+
+class JavaParser(myParser):
+    def __init__(self):
+        code_query = """
+            // Java code query
+            """
+        body_query = """
+            // Java body query
+            """
+        super().__init__('java', code_query, body_query)
+
+
+class CSharpParser(myParser):
+    def __init__(self):
+        code_query = """
+            // C# code query
+            """
+        body_query = """
+            // C# body query
+            """
+        super().__init__('csharp', code_query, body_query)
 
 
 def curNameBusy(name):
@@ -326,6 +474,17 @@ def curNameBusy(name):
 def dictSort(var: dict, amount: int = None):
     amount = len(var) if amount is None else amount
     return dict(sorted(var.items(), key=lambda x: x[1], reverse=True)[:amount])
+
+
+def cmpTypes(typeDict1: dict, typeDict2: dict) -> bool:
+    return typeDict1["type"] == typeDict2["type"] and typeDict1["kind"] == typeDict2["kind"]
+
+
+def intersectDicts(baseDict: dict, curDict: dict):
+    return\
+        {k: v for k, v in baseDict.items() if k in curDict and cmpTypes(curDict[k], v)},\
+        {k: v for k, v in baseDict.items() if k not in curDict or not cmpTypes(curDict[k], v)},\
+        {k: v for k, v in curDict.items() if k not in baseDict or not cmpTypes(baseDict[k], v)}
 
 
 def main(base_file, specs_path, retry_flag):
@@ -339,10 +498,12 @@ def main(base_file, specs_path, retry_flag):
     else:
         pwd = [specs_path]
 
+    parser = CParser()
+
     baseDict = {}
     with open(base_file, 'r') as reader:
         code = reader.read()
-        baseDict = squeezeCode(code)
+        baseDict = parser.squeezeCode(code)
 
     if retry_flag:
         repeater = Repeater()
@@ -351,7 +512,7 @@ def main(base_file, specs_path, retry_flag):
         code = ''
         with open(spec_file, "r") as reader:
             code = reader.read()
-        curDict = squeezeCode(code)
+        curDict = parser.squeezeCode(code)
 
         cmp = Comparator(baseDict, curDict)
         compare_res, compare_full, compare_miss, compare_extr, noSpec, \
