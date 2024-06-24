@@ -19,8 +19,10 @@ class Comparator:
         self.curDict = curDict
         self.funcAmount = len(baseDict)
 
-    def varMapping(self, baseDict: dict, curDict: dict) -> dict: # Get variables' values mappings
-        intersection, baseDiff, curDiff = intersectDicts(baseDict, curDict)
+    def varMapping(self, baseFunc: dict, curFunc: dict) -> dict: # Get variables' values mappings
+        intersection, baseDiff, curDiff = intersectDicts(baseFunc['param_types'], curFunc['param_types'])
+        # print(f"I: {intersection}; bD: {baseDiff}; cD: {curDiff}")
+
         mapping = {k: k for k in intersection}
 
         for baseKey, baseVal in baseDiff.items():
@@ -31,6 +33,16 @@ class Comparator:
                     break
             if baseKey not in mapping:
                 mapping[baseKey] = 'None'
+        
+        mapping['None'] = []
+        for curKey, _ in curDiff.items():
+            mapping['None'] += [curKey]
+
+        if '' in baseFunc:
+            if '' in curFunc:
+                mapping[''] = ''
+            else:
+                mapping[''] = 'None'
         return mapping
 
     def incRes(self, funcRes: tuple):
@@ -46,124 +58,81 @@ class Comparator:
     def cmpFunctions(self, funcName: str, baseFunc, curFunc) -> tuple:
         # print(funcName)
         # Get variables' values mappings
-        mapping = self.varMapping(baseFunc['param_types'], curFunc['param_types'])
-        if '' in baseFunc:
-            if '' in curFunc:
-                mapping[''] = ''
-            else:
-                mapping[''] = 'None'
+        mapping = self.varMapping(baseFunc, curFunc)
 
         # Get variables amount
-        var_amount = len(baseFunc.keys()) - 1
-        
+        var_amount = len(mapping) - 1
+
+        # Init values
+        var_res = 0
+        var_compare_full = True
+        var_compare_miss = 0
+        var_compare_extr = 0
+        funcValues = {"miss": [], "extr": [], "hit": [], "val": .0}
+
         # Functions with 0 variables handle
         if var_amount == 0:
             # print(f"{funcName} <-- has zero variables")
             self.res += 1
             self.noVar += [funcName]
-            return
+            return funcName, True, 0, 0, funcValues
 
-        # Init values
-    #     var_res = 0
-    #     var_compare_full = 0
-    #     var_compare_miss = 0
-    #     var_compare_extr = 0
-    #     funcValues = {"miss": [], "extr": [], "hit": [], "val": 0}
+        for var, dvar in mapping.items():
+            if var == 'param_types':
+                continue
 
-    # def cmpFunctions(self, funcName: str, baseFunc, curFunc) -> tuple:
-    #     print(funcName)
-    #     # Get variables' values mappings
-    #     mapping = self.varMapping(baseFunc['param_types'], curFunc['param_types'])
-    #     if '' in baseFunc:
-    #         if '' in curFunc:
-    #             mapping[''] = ''
-    #         else:
-    #             mapping[''] = 'None'
+            if dvar == 'None':
+                for func in baseFunc[var]:
+                    self.topMiss[func] = self.topMiss.setdefault(func, 0) + 1
+                    funcValues["miss"] += [func]
+                var_compare_miss += 1
+                continue
 
-    #     # Get variables amount
-    #     var_amount = len(baseFunc.keys()) - 1
+            if var == 'None':
+                for x in dvar:
+                    for func in curFunc[x]:
+                        self.topExtr[func] = self.topExtr.setdefault(func, 0) + 1
+                        funcValues["extr"] += [func]
+                    var_compare_extr += 1
+                continue
+
+            # Get dicts for the current variable to compare
+            baseVarFunctions, curVarFunctions = baseFunc[var], curFunc[dvar]
+
+            # print(f"{var} - {dvar}; In: {len(list(set(curVarFunctions) & set(baseVarFunctions)))}\
+            #     D1: {list(set(baseVarFunctions).difference(curVarFunctions))};\
+            #     D2: {list(set(curVarFunctions).difference(baseVarFunctions))};\n")
+            
+            miss_fl, extr_fl = False, False
+            # Get info about the missed functions
+            for missFunction in list(set(baseVarFunctions).difference(curVarFunctions)):
+                self.topMiss[missFunction] = self.topMiss.setdefault(missFunction, 0) + 1
+                funcValues["miss"] += [missFunction]
+                miss_fl = True
+
+            # Get info about the extra functions
+            for extrFunction in list(set(curVarFunctions).difference(baseVarFunctions)):
+                self.topExtr[extrFunction] = self.topExtr.setdefault(extrFunction, 0) + 1
+                funcValues["extr"] += [extrFunction]
+                extr_fl = True
+
+            # Increase according to intersection of the functions
+            var_res += len(list(set(curVarFunctions) & set(baseVarFunctions)))
+
+            if miss_fl:
+                var_compare_miss += 1
+                var_compare_full = False
+            if extr_fl:
+                var_compare_extr += 1
+                var_compare_full = False
         
-    #     # Functions with 0 variables handle
-    #     if var_amount == 0:
-    #         self.res += 1
-    #         self.noVar += [funcName]
-    #         return
-
-    #     # Init values
-    #     var_res = 0
-    #     var_compare_full = 0
-    #     var_compare_miss = 0
-    #     var_compare_extr = 0
-    #     funcValues = {"miss": [], "extr": [], "hit": [], "val": 0}
-
-    #     # print("baseFunc: ", baseFunc)
-    #     # print("curFunc: ", curFunc)
-    #     # print(mapping)
-    #     for var in mapping:
-    #         if var == 'param_types':
-    #             continue
-    #         if mapping[var] == 'None':
-    #             for func in baseFunc[var]:
-    #                 self.topMiss[func] = self.topMiss.setdefault(func, 0) + 1
-    #                 funcValues["miss"] += [func]
-    #             var_compare_miss += 1
-    #             continue
-            
-    #         # Get dicts for the current variable to compare
-    #         baseVarFunctions, curVarFunctions = baseFunc[var], curFunc[mapping[var]]
-
-    #         # If some function's var is not used in specifications
-    #         var_functions_amount = len(baseVarFunctions)
-    #         if var_functions_amount == 0:
-    #             print(var)
-    #             var_res += 1
-    #             for func in curVarFunctions:
-    #                 self.topExtr[func] = self.topExtr.setdefault(func, 0) + 1
-    #                 funcValues["extr"] += [func]
-    #             var_compare_extr += 1
-    #             continue
-            
-    #         cur_var_functions_res = 0
-    #         miss_fl, extr_fl = False, False
-    #         # Get info about the missed functions
-    #         for missFunction in list(set(baseVarFunctions).difference(curVarFunctions)):
-    #             self.topMiss[missFunction] = self.topMiss.setdefault(missFunction, 0) + 1
-    #             funcValues["miss"] += [missFunction]
-    #             miss_fl = True
-
-    #         # Get info about the extra functions
-    #         for extrFunction in list(set(curVarFunctions).difference(baseVarFunctions)):
-    #             self.topExtr[extrFunction] = self.topExtr.setdefault(extrFunction, 0) + 1
-    #             funcValues["miss"] += [extrFunction]
-    #             extr_fl = True
-
-    #         # Increase according to intersection of the functions
-    #         cur_var_functions_res += len(list(set(curVarFunctions) & set(baseVarFunctions)))
-
-    #         # for baseVarFunction in baseVarFunctions:
-    #         #     if baseVarFunction in curVarFunctions:
-    #         #         cur_var_functions_res += 1
-    #         #         curVarFunctions.remove(baseVarFunction) # TODO: Check squeezeCode for the need to "remove"
-    #         #     else:
-    #         #         self.topMiss[baseVarFunction] = self.topMiss.setdefault(baseVarFunction, 0) + 1
-    #         #         funcValues["miss"] += [baseVarFunction]
-                    
-            
-    #         tmp = cur_var_functions_res / var_functions_amount
-    #         var_res += tmp
-    #         if tmp == 1:
-    #             var_compare_full += 1
-    #         if miss_fl:
-    #             var_compare_miss += 1
-    #         if extr_fl:
-    #             var_compare_extr += 1
-
-    #     funcValues["val"] = var_res / var_amount
-    #     return funcName,\
-    #         var_compare_full / var_amount,\
-    #         var_compare_miss / var_amount,\
-    #         var_compare_extr / var_amount,\
-    #         funcValues
+        functions_len = len(funcValues["miss"]) + len(funcValues["extr"]) + var_res
+        funcValues["val"] = functions_len if functions_len else .0
+        return funcName,\
+            var_compare_full,\
+            var_compare_miss / var_amount,\
+            var_compare_extr / var_amount,\
+            funcValues
 
     def getResult(self):
         for funcName in self.baseDict:
@@ -177,10 +146,8 @@ class Comparator:
             # Get dicts for the current function to compare
             baseFunc, curFunc = self.baseDict[funcName], self.curDict[funcName]
 
-            # Increase Result values according to the checked functions
-            cmpRes = self.cmpFunctions(funcName, baseFunc, curFunc)
-            if cmpRes:
-                self.incRes(cmpRes)
+            # Increase Result values according to the checked function
+            self.incRes(self.cmpFunctions(funcName, baseFunc, curFunc))
 
         return 100 * self.res / self.funcAmount,\
             100 * self.compFull / self.funcAmount,\
@@ -449,9 +416,9 @@ def pairSort(var: dict, amount: int = None) -> dict:
     return dict(sorted(var.items(), key=lambda x: x[1], reverse=True)[:amount])
 
 
-def dictSort(var: dict, amount: int = None) -> dict:
+def dictSort(var: dict, amount: int = None, reverseFl: bool = True) -> dict:
     amount = len(var) if amount is None else amount
-    return dict(sorted(var.items(), key=lambda x: x[1]['val'], reverse=True)[:amount])
+    return dict(sorted(var.items(), key=lambda x: x[1]['val'], reverse=reverseFl)[:amount])
 
 
 def cmpTypes(typeDict1: dict, typeDict2: dict) -> bool:

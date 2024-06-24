@@ -233,98 +233,11 @@ void SysFreeString(BSTR bstrString) {
     sf_delete(bstrString, MALLOC_CATEGORY);
 }
 
-
-
-size_t SysStringLen(BSTR bstr) {
-    sf_set_trusted_sink_ptr(bstr);
-    sf_set_tainted(bstr);
-    sf_set_must_be_not_null(bstr, FREE_OF_NULL);
-    sf_set_possible_null(bstr);
-    sf_set_buf_size(bstr, strlen(bstr));
-    sf_set_buf_size_limit(bstr, strlen(bstr));
-    sf_set_buf_size_limit_read(bstr, strlen(bstr));
-    sf_set_buf_stop_at_null(bstr);
-    sf_set_strlen(bstr);
-    sf_set_strdup_res(bstr);
-    sf_set_append_string(bstr);
-    sf_set_null_terminated(bstr);
-    sf_set_buf_overlap(bstr);
-    sf_set_buf_copy(bstr);
-    sf_set_bitinit(bstr);
-    sf_set_bitcopy(bstr);
-    sf_set_password_use(bstr);
-    sf_set_password_set(bstr);
-    sf_set_overwrite(bstr);
-    sf_set_errno_if(bstr);
-    sf_set_no_errno_if(bstr);
-    sf_set_tocttou_check(bstr);
-    sf_set_tocttou_access(bstr);
-    sf_set_must_not_be_release(bstr);
-    sf_set_must_be_positive(bstr);
-    sf_set_lib_arg_type(bstr, "MallocCategory");
-    sf_set_long_time(bstr);
-    sf_set_terminate_path(bstr);
-    sf_set_possible_negative(bstr);
-    sf_set_uncontrolled_ptr(bstr);
-
-    return strlen(bstr);
-}
-
-int getch(void) {
-    sf_set_must_be_not_null(stdin, FREE_OF_NULL);
-    sf_set_possible_null(stdin);
-    sf_set_buf_size(stdin, sizeof(stdin));
-    sf_set_buf_size_limit(stdin, sizeof(stdin));
-    sf_set_buf_size_limit_read(stdin, sizeof(stdin));
-    sf_set_buf_stop_at_null(stdin);
-    sf_set_strlen(stdin);
-    sf_set_strdup_res(stdin);
-    sf_set_append_string(stdin);
-    sf_set_null_terminated(stdin);
-    sf_set_buf_overlap(stdin);
-    sf_set_buf_copy(stdin);
-    sf_set_bitinit(stdin);
-    sf_set_bitcopy(stdin);
-    sf_set_password_use(stdin);
-    sf_set_password_set(stdin);
-    sf_set_overwrite(stdin);
-    sf_set_errno_if(stdin);
-    sf_set_no_errno_if(stdin);
-    sf_set_tocttou_check(stdin);
-    sf_set_tocttou_access(stdin);
-    sf_set_must_not_be_release(stdin);
-    sf_set_must_be_positive(stdin);
-    sf_set_lib_arg_type(stdin, "MallocCategory");
-    sf_set_long_time(stdin);
-    sf_set_terminate_path(stdin);
-    sf_set_possible_negative(stdin);
-    sf_set_uncontrolled_ptr(stdin);
-
-    return getchar();
-}
-
-
-
-void *_getch(void) {
-    void *ptr;
-    sf_overwrite(&ptr);
-    sf_overwrite(ptr);
-    sf_uncontrolled_ptr(ptr);
-    sf_set_alloc_possible_null(ptr, size);
-    sf_new(ptr, MALLOC_CATEGORY);
-    sf_raw_new(ptr);
-    sf_set_buf_size(ptr, size);
-    sf_lib_arg_type(ptr, "MallocCategory");
-    return ptr;
-}
-
 void memory_full(void) {
     sf_set_must_be_not_null(buffer, FREE_OF_NULL);
     sf_delete(buffer, MALLOC_CATEGORY);
     sf_lib_arg_type(buffer, "MallocCategory");
 }
-
-
 
 void *_CrtDbgReport(int reportType, const char *filename, int linenumber, const char *moduleName, const char *format, ...) {
     // Memory Allocation and Reallocation Functions
