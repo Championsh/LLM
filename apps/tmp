@@ -7,21 +7,12 @@ phind_SP:
         Top extr functions: sf_set_trusted_sink_int: 308, sf_set_must_be_not_null: 235, sf_bitcopy: 158, sf_set_trusted_sink_ptr: 152, sf_set_tainted: 148
         Top miss functions: sf_overwrite: 221, sf_must_not_be_release: 91, sf_set_possible_negative: 65, sf_buf_stop_at_null: 63, sf_bitinit: 51
 
+phind_SP:
+    Similarity: 46.6%
+        Full Specifications: 5.3%
+        Missed Specifications: 52.3%
+        Extra Specifications: 68.7%
+        No Specifications: 3.5%
+        Top extr functions: ('call', 'sf_set_trusted_sink_int'): 312, ('call', 'sf_set_must_be_not_null'): 255, ('call', 'sf_bitcopy'): 176, ('call', 'sf_lib_arg_type'): 166, ('call', 'sf_set_trusted_sink_ptr'): 163
+        Top miss functions: ('call', 'sf_overwrite'): 234, ('call', 'sf_must_not_be_release'): 91, ('call', 'sf_set_possible_negative'): 64, ('call', 'sf_buf_stop_at_null'): 64, ('call', 'sf_bitinit'): 58
 
-
-body: (compound_statement
-          (declaration
-            type: (_) @func.body.decl))) @func
-
-body: (compound_statement [
-        	(declaration) @func.body.decl
-            (expression_statement) @func.body.expr
-        ])) @func
-
-body: (compound_statement [
-        	(declaration) @func.body.decl
-            (expression_statement) @func.body.expr
-        ]) @func.body
-
-
-{'func': <Node type=function_definition, start_point=(0, 0), end_point=(19, 1)>, 'func.type': <Node type=primitive_type, start_point=(0, 0), end_point=(0, 7)>, 'func.declarator': <Node type=function_declarator, start_point=(0, 8), end_point=(0, 74)>, 'func.name': <Node type=identifier, start_point=(0, 8), end_point=(0, 25)>, 'func.params': <Node type=parameter_list, start_point=(0, 25), end_point=(0, 74)>, 'func.body.expr': <Node type=expression_statement, start_point=(1, 4), end_point=(1, 21)>}
