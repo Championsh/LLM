@@ -8,11 +8,10 @@ phind_SP:
         Top miss functions: sf_overwrite: 221, sf_must_not_be_release: 91, sf_set_possible_negative: 65, sf_buf_stop_at_null: 63, sf_bitinit: 51
 
 phind_SP:
-    Similarity: 46.6%
-        Full Specifications: 5.3%
-        Missed Specifications: 52.3%
-        Extra Specifications: 68.7%
-        No Specifications: 3.5%
-        Top extr functions: ('call', 'sf_set_trusted_sink_int'): 312, ('call', 'sf_set_must_be_not_null'): 255, ('call', 'sf_bitcopy'): 176, ('call', 'sf_lib_arg_type'): 166, ('call', 'sf_set_trusted_sink_ptr'): 163
-        Top miss functions: ('call', 'sf_overwrite'): 234, ('call', 'sf_must_not_be_release'): 91, ('call', 'sf_set_possible_negative'): 64, ('call', 'sf_buf_stop_at_null'): 64, ('call', 'sf_bitinit'): 58
-
+    Similarity: 47.9%
+        Full Specifications: 8.6%
+        Missed Specifications: 51.1%
+        Extra Specifications: 77.7%
+        No Specifications: 3.9%
+        Top extr functions: ('call', 'sf_overwrite'): 555, ('call', 'sf_set_trusted_sink_int'): 346, ('call', 'sf_new'): 326, ('call', 'sf_lib_arg_type'): 325, ('call', 'sf_set_buf_size'): 296
+        Top miss functions: ('call', 'sf_overwrite'): 232, ('call', 'sf_must_not_be_release'): 91, ('call', 'sf_set_possible_negative'): 64, ('call', 'sf_buf_stop_at_null'): 64, ('call', 'sf_bitinit'): 58

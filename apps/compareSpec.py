@@ -1,4 +1,5 @@
 import os
+import re
 import argparse
 from tree_sitter import Language, Parser, Tree, Node
 
@@ -46,9 +47,9 @@ class Comparator:
         return mapping
 
     def incRes(self, funcRes: tuple):
-        funcName, compFull, compMiss, compExtr, func = funcRes
+        funcName, compRes, compFull, compMiss, compExtr, func = funcRes
 
-        self.res += func["val"]
+        self.res += compRes
         self.compFull += compFull
         self.compMiss += compMiss
         self.compExtr += compExtr
@@ -72,10 +73,10 @@ class Comparator:
 
         # Functions with 0 variables handle
         if var_amount == 0:
-            # print(f"{funcName} <-- has zero variables")
+            # print(f"{funcName} <-- has zero variables\n {baseFunc}")
             self.res += 1
             self.noVar += [funcName]
-            return funcName, True, 0, 0, funcValues
+            return funcName, 1.0, True, 0, 0, funcValues
 
         for var, dvar in mapping.items():
             if var == 'param_types':
@@ -117,7 +118,7 @@ class Comparator:
                 extr_fl = True
 
             # Increase according to intersection of the functions
-            var_res += len(list(set(curVarFunctions) & set(baseVarFunctions)))
+            var_res += len(list(set(curVarFunctions) & set(baseVarFunctions))) / len(baseVarFunctions) if baseVarFunctions else 1.0
 
             if miss_fl:
                 var_compare_miss += 1
@@ -126,9 +127,9 @@ class Comparator:
                 var_compare_extr += 1
                 var_compare_full = False
         
-        functions_len = len(funcValues["miss"]) + len(funcValues["extr"]) + var_res
-        funcValues["val"] = functions_len if functions_len else .0
+        funcValues["val"] = len(funcValues["miss"]) + len(funcValues["extr"]) + var_res
         return funcName,\
+            var_res / var_amount,\
             var_compare_full,\
             var_compare_miss / var_amount,\
             var_compare_extr / var_amount,\
@@ -257,20 +258,14 @@ class myParser:
             "use": lambda args: [self.functions[funcName].setdefault(arg, []) for arg in args\
                                  if arg in self.functions[funcName]['param_types'] or arg == ''],
         }
-        # try:
         incTypes[incType](kwargs['var'])
-        # except Exception:
-            # print(Exception)
         
         incActions = {
             "dec": lambda dict: self.functions[funcName]['param_types'].update({dict['var']: {"type": dict['type'], "kind": dict['kind']}}),
             "use": lambda dict: [self.functions[funcName][arg].append(dict['val']) for arg in dict['var']\
                                  if arg in self.functions[funcName]['param_types'] or arg == ''],
         }
-        # try:
         incActions[incType](kwargs)
-        # except Exception:
-            # print(Exception)
 
     def __handleDeclartion(self, node: Node, funcName: str, declareKind: str):
         # Switch for declarators' type, which returns a tuple:
@@ -283,7 +278,7 @@ class myParser:
 
             "init_declarator": lambda extr, x: (*(lambda res: (res[0] + extr, res[1]))((lambda val: declTypes[val.type]('', val))(x.child_by_field_name("declarator"))),
                                           x.child_by_field_name("value").text.decode()),
-            "function_declarator": lambda extr, x: (extr, "None"),
+            "function_declarator": lambda extr, _: (extr, "None"),
             "array_declarator": lambda extr, x: (extr, x.child_by_field_name("declarator").text.decode()),
         }
         # Get declarator's type
@@ -325,54 +320,52 @@ class myParser:
                                         if arg.type == 'identifier' or arg.type == 'pointer_expression']
         , val=("call", calledFunc))
 
-
-        # if len(calledFuncArgs) == 2:
-        #     self.functions[funcName][''] = self.functions[funcName].setdefault('', []) + [calledFunc]
-
-        # for arg in calledFuncArgs:
-        #     if arg.type != 'identifier' and arg.type != 'pointer_expression':
-        #         continue
-        #     argName = arg.text.decode() if arg.type == "identifier" else arg.child_by_field_name("argument").text.decode()
-
-            # if argName in self.functions[funcName]['param_types']:
-            #     self.functions[funcName][argName] += [calledFunc]
-        pass
-
     def __handleReturn(self, node: Node, curDict: dict, _: str):
         pass
 
-    def __fillDict(self, func_name: str, node_type: str, node: Node, decl_kind: str):
+    def __check(self):
+        def is_word(string):
+            pattern = r"^[a-zA-Z0-9_]*$"
+            return bool(re.match(pattern, string))
+        alertTemp = "ALERT, check for {%s}: {%s}\n"
+        
+        for func in self.functions:
+            for key, val in self.functions[func].items():
+                if key == 'param_types':
+                    if not val:
+                        print(alertTemp % (func, self.functions[func]))
+                        break
+                elif not is_word(key):
+                    print(alertTemp % (func, self.functions[func]))
+                    break
+
+    def squeezeCode(self, code: str) -> dict:
         action = {
             "decl": self.__handleDeclartion,
             "expr": self.__handleExpression,
             "ret": self.__handleReturn
         }
-        # try:
-        action[node_type](node, func_name, decl_kind)
-        # except Exception:
-        #     print(Exception)
 
-    def squeezeCode(self, code: str) -> dict:
         matches = self.__parse(code)
         for _, func in matches:
             # Get function's name and Init dict with it
             func_name = func['func.name'].text.decode()
-            # self.functions[func_name] = {}
-            # self.functions[func_name][""] = []  # TODO: Remove this declarations without breaking the function
             # print(func_name)
 
             # Handle function declarator
             for param in func['func.params'].children:
                 if param.type != "parameter_declaration" or param.child_by_field_name("declarator") is None:
                     continue
-                self.__fillDict(func_name, "decl", param, "p")
+                action["decl"](param, func_name, "p")
 
             # Handle function body
             inMatches = self.__parse(func['func.body'].text.decode(), False)
             for _, body in inMatches:
                 node_type, node = list(body.items())[0]
-                self.__fillDict(func_name, node_type, node, "d")
-            # print(self.functions)
+                action[node_type](node, func_name, "d")
+
+        # Check resulting functions correctness using "__check()" function
+        self.__check()
         return self.functions
 
 
@@ -478,9 +471,9 @@ def main(base_file, specs_path, retry_flag):
         if retry_flag:
             repeater.update(compare_res, functions_noSpec + list(functions.keys()))
         
-        for func, vals in functions.items():
-            print(f"{func} - {vals}")
-            print()
+        # for func, vals in functions.items():
+        #     print(f"{func} - {vals}")
+        #     print()
 
     if retry_flag:
         repeater.create(base_file)

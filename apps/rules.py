@@ -224,9 +224,6 @@ def gen_rules_prompt(spec_pwd):
     text_file.close()
 
 
-# def extract_comments(path):
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Main Specification File')
     parser.add_argument('-p', '--parse-scra')

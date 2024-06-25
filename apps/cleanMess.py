@@ -1,5 +1,12 @@
+# Clean messy prototype files
+
+# Mess ones are located at:
 rf_path = "./init-libs/protos/messy/%s"
+
+# Clean ones are located at:
 wf_path = "./init-libs/protos/res_%s"
+
+# Filter-keywords for resulting prototypes
 keywords = ["ENGINE", "X500", "SSL", "OPENSSL"]
 
 filename = str(input())
