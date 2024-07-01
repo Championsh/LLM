@@ -188,7 +188,7 @@ class myParser:
             # Handle function declarator
             funcParams = []
             for param in func['func.params'].named_children:
-                if param.type != "parameter_declaration" or param.text.decode() == 'void':
+                if param.type != "parameter_declaration" or param.text.decode() == 'void' or param.text.decode() == "...":
                     continue
 
                 action["decl"](param, funcName, "p")
@@ -310,7 +310,3 @@ class CParser(myParser):
             ) @call
             """
         super().__init__('c', code_query, body_query, preproc_query, defines_query)
-
-
-if __name__ == '__main__':
-    main()
