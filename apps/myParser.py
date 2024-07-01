@@ -177,7 +177,6 @@ class myParser:
         for _, func in matches:
             # Get function's name
             funcName = func['func.name'].text.decode()
-            # print(func_name)
             
             # Init Functions dict for current function
             self.functions.setdefault(funcName, {})
@@ -189,8 +188,9 @@ class myParser:
             # Handle function declarator
             funcParams = []
             for param in func['func.params'].named_children:
-                if param.text.decode() == 'void':
+                if param.type != "parameter_declaration" or param.text.decode() == 'void':
                     continue
+
                 action["decl"](param, funcName, "p")
                 funcParams += param.text.decode()
 
@@ -281,7 +281,7 @@ class CParser(myParser):
                     )
                 ] @func.declarator
                 body: (_) @func.body
-                ) @func
+            ) @func
             """
         body_query = """
             (compound_statement [
@@ -310,3 +310,7 @@ class CParser(myParser):
             ) @call
             """
         super().__init__('c', code_query, body_query, preproc_query, defines_query)
+
+
+if __name__ == '__main__':
+    main()
