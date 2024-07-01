@@ -1,7 +1,7 @@
 import os
-import re
 import argparse
-from tree_sitter import Language, Parser, Tree, Node
+from myParser import CParser
+from myRepeater import myRepeater
 
 
 class Comparator:
@@ -49,7 +49,7 @@ class Comparator:
     def incRes(self, funcRes: tuple):
         funcName, compRes, compFull, compMiss, compExtr, func = funcRes
 
-        self.res += compRes
+        self.res = min(self.res + compRes, self.funcAmount)
         self.compFull += compFull
         self.compMiss += compMiss
         self.compExtr += compExtr
@@ -62,7 +62,7 @@ class Comparator:
         mapping = self.varMapping(baseFunc, curFunc)
 
         # Get variables amount
-        var_amount = len(mapping) - 1
+        var_amount = len(mapping) + len(mapping.setdefault('None', [])) - 1
 
         # Init values
         var_res = 0
@@ -128,6 +128,14 @@ class Comparator:
                 var_compare_full = False
         
         funcValues["val"] = len(funcValues["miss"]) + len(funcValues["extr"]) + var_res
+        
+        # print(funcName,\
+        #     var_res / var_amount,\
+        #     var_compare_full,\
+        #     var_compare_miss / var_amount,\
+        #     var_compare_extr / var_amount,\
+        #     funcValues)
+        
         return funcName,\
             var_res / var_amount,\
             var_compare_full,\
@@ -160,248 +168,6 @@ class Comparator:
             self.noSpec[:self.outputLimit],\
             dictSort(self.functions, self.outputLimit)
             # dict(filter(lambda x: x[1]["val"] < 0.5 , sorted(self.functions.items(), key=lambda x: x[1]["val"])))
-
-
-class Repeater:
-    def __init__(self):
-        self.value, self.repeat_functions, self.filename = .0, [], ""
-    
-    def update(self, value: float, repeat_functions: list[str], filename: str):
-        if value > self.value:
-            self.value = value
-            self.repeat_functions = repeat_functions
-            self.filename = filename
-    
-    def create(self, base_path: str):
-        directory = './apps/new/'
-        matches = []
-        with open(base_path, 'r') as reader:
-            baseCode = reader.read()
-            matches = parseCode(baseCode)
-
-        functions = {}
-        for i in range(len(matches)):
-            func = matches[i][1]
-
-            func_name = func['func.name'].text.decode()
-            functions[func_name] = {}
-            functions[func_name]['proto'] = func['func.type'].text.decode() + ' ' + func['func.declarator'].text.decode()
-            functions[func_name]['code'] = func['func'].text.decode()
-
-        i = 0
-        base_retry_path = directory + f"codes_{self.filename}.c"
-        retry_codes_path = base_retry_path
-        while(curNameBusy(retry_codes_path)):
-            i += 1
-            retry_codes_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
-
-        i = 0
-        base_retry_path = directory + f"protos_{self.filename}.c"
-        retry_protos_path = base_retry_path
-        while(curNameBusy(retry_protos_path)):
-            i += 1
-            retry_protos_path = f'/{i}_'.join(base_retry_path.rsplit('/', 1))
-        print(retry_protos_path)
-        print(retry_codes_path)
-
-        with open(retry_codes_path, 'w') as codes_writer:
-            with open(retry_protos_path, 'w') as protos_writer:
-                for func_name, func_info in functions.items():
-                    if func_name not in self.repeat_functions:
-                        continue
-                    proto, code = func_info.values()
-                    codes_writer.write(code + '\n\n')
-                    protos_writer.write(proto + ';\n')
-
-        return functions
-
-
-    def __init__(self):
-        queries = {
-            'codeQuery': """
-                // C# code query
-                """,
-            'bodyQuery': """
-                // C# body query
-                """
-        }
-        super().__init__('csharp', queries)
-
-
-class myParser:
-    def __init__(self, language: str, code_query: str, body_query: str):
-        Language.build_library('build/my-languages.so', ['../tree-sitter-' + language])
-        self.language = Language('build/my-languages.so', language)
-        self.parser = Parser()
-        self.parser.set_language(self.language)
-        self.code_query = code_query
-        self.body_query = body_query
-        self.functions = {}
-
-    def __getTree(self, code: str) -> Tree:
-        return self.parser.parse(
-            bytes(code, "utf8")
-        )
-
-    def __parse(self, code: str, is_code: bool = True) -> list:
-        tree = self.__getTree(code)
-        query = self.language.query(self.code_query if is_code else self.body_query)
-        return query.matches(tree.root_node)
-    
-    def __incFunctions(self, funcName: str, incType: str, **kwargs):
-        # print(funcName)
-        self.functions.setdefault(funcName, {})
-        self.functions[funcName].setdefault('param_types', {})
-        
-        incTypes = {
-            "dec": lambda val: self.functions[funcName].setdefault(val, []),
-            "use": lambda args: [self.functions[funcName].setdefault(arg, []) for arg in args\
-                                 if arg in self.functions[funcName]['param_types'] or arg == ''],
-        }
-        incTypes[incType](kwargs['var'])
-        
-        incActions = {
-            "dec": lambda dict: self.functions[funcName]['param_types'].update({dict['var']: {"type": dict['type'], "kind": dict['kind']}}),
-            "use": lambda dict: [self.functions[funcName][arg].append(dict['val']) for arg in dict['var']\
-                                 if arg in self.functions[funcName]['param_types'] or arg == ''],
-        }
-        incActions[incType](kwargs)
-
-    def __handleDeclartion(self, node: Node, funcName: str, declareKind: str):
-        # Switch for declarators' type, which returns a tuple:
-            # extra type symbols, declarator's name, (opt.) init value
-        declTypes = {
-            "identifier": lambda extr, x: (extr, x.text.decode()),
-            # "pointer_declarator": lambda extr, x: (extr + '*', x.child_by_field_name("declarator").text.decode()),
-
-            "pointer_declarator": lambda extr, x: (lambda res: (res[0] + extr, res[1]))((lambda val: declTypes[val.type]('*', val))(x.child_by_field_name("declarator"))),
-
-            "init_declarator": lambda extr, x: (*(lambda res: (res[0] + extr, res[1]))((lambda val: declTypes[val.type]('', val))(x.child_by_field_name("declarator"))),
-                                          x.child_by_field_name("value").text.decode()),
-            "function_declarator": lambda extr, _: (extr, "None"),
-            "array_declarator": lambda extr, x: (extr, x.child_by_field_name("declarator").text.decode()),
-        }
-        # Get declarator's type
-        declType = node.child_by_field_name("type").text.decode()
-
-        # Get node's declartor
-        declarator = node.child_by_field_name("declarator")
-        if not declarator:
-            return
-        # print(funcName, declarator.type)
-
-        # Handle node according to it's type
-        declRes = declTypes[declarator.type]('', declarator)
-        extraType, declName, declVal = '', None, None
-        if not declRes:
-            return
-        elif len(declRes) == 2:
-            extraType, declName = declRes
-        elif len(declRes) == 3:
-            extraType, declName, declVal = declRes
-        
-        if not declName:
-            return
-        declType += extraType
-
-        # Update functions dict according to handled node type
-        self.__incFunctions(funcName, "dec", var=declName, type=declType, kind=declareKind)
-        if declVal:
-            self.__incFunctions(funcName, "use", var=[declName], val=("init", declVal))
-
-    def __handleExpression(self, node: Node, funcName: str, _: str):
-        calledFunc = node.child_by_field_name("function").text.decode()
-        calledFuncArgs = node.child_by_field_name("arguments").children
-
-        self.__incFunctions(funcName, "use", var=[''] if len(calledFuncArgs) == 2\
-                            else [arg.text.decode() if arg.type == "identifier"
-                                  else arg.child_by_field_name("argument").text.decode()
-                                    for arg in calledFuncArgs 
-                                        if arg.type == 'identifier' or arg.type == 'pointer_expression']
-        , val=("call", calledFunc))
-
-    def __handleReturn(self, node: Node, curDict: dict, _: str):
-        pass
-
-    def __check(self):
-        def is_word(string):
-            pattern = r"^[a-zA-Z0-9_]*$"
-            return bool(re.match(pattern, string))
-        alertTemp = "ALERT, check for {%s}: {%s}\n"
-        
-        for func in self.functions:
-            for key, val in self.functions[func].items():
-                if key == 'param_types':
-                    if not val:
-                        print(alertTemp % (func, self.functions[func]))
-                        break
-                elif not is_word(key):
-                    print(alertTemp % (func, self.functions[func]))
-                    break
-
-    def squeezeCode(self, code: str) -> dict:
-        action = {
-            "decl": self.__handleDeclartion,
-            "expr": self.__handleExpression,
-            "ret": self.__handleReturn
-        }
-
-        matches = self.__parse(code)
-        for _, func in matches:
-            # Get function's name and Init dict with it
-            func_name = func['func.name'].text.decode()
-            # print(func_name)
-
-            # Handle function declarator
-            for param in func['func.params'].children:
-                if param.type != "parameter_declaration" or param.child_by_field_name("declarator") is None:
-                    continue
-                action["decl"](param, func_name, "p")
-
-            # Handle function body
-            inMatches = self.__parse(func['func.body'].text.decode(), False)
-            for _, body in inMatches:
-                node_type, node = list(body.items())[0]
-                action[node_type](node, func_name, "d")
-
-        # Check resulting functions correctness using "__check()" function
-        self.__check()
-        return self.functions
-
-
-class CParser(myParser):
-    def __init__(self):
-        code_query = """
-            (function_definition
-                type: (_) @func.type
-                declarator:
-                [
-                    (pointer_declarator declarator: 
-                        (function_declarator declarator: 
-                            name: (identifier) @func.name
-                            parameters: (_) @func.params
-                        )
-                    )
-                    (function_declarator declarator: 
-                        name: (identifier) @func.name
-                        parameters: (_) @func.params
-                    )
-                ] @func.declarator
-                body: (_) @func.body
-                ) @func
-            """
-        body_query = """
-            (compound_statement [
-                (declaration) @decl
-                (expression_statement (call_expression) @expr)
-                (return_statement) @ret
-            ])
-            """
-        super().__init__('c', code_query, body_query)
-
-
-def curNameBusy(name):
-    return os.path.exists(name)
 
 
 def pairSort(var: dict, amount: int = None) -> dict:
@@ -443,7 +209,7 @@ def main(base_file, specs_path, retry_flag):
         baseDict = parser.squeezeCode(code)
 
     if retry_flag:
-        repeater = Repeater()
+        repeater = myRepeater()
 
     for spec_file in pwd:
         code = ''
@@ -469,7 +235,7 @@ def main(base_file, specs_path, retry_flag):
             #   "\tLess hit similarity: {:.1f}%".format(100 * sum(functions_lessHit.values()) / len(functions_lessHit.values()))
               )
         if retry_flag:
-            repeater.update(compare_res, functions_noSpec + list(functions.keys()))
+            repeater.update(compare_res, functions_noSpec + list(functions.keys()), filename)
         
         # for func, vals in functions.items():
         #     print(f"{func} - {vals}")

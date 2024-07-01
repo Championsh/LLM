@@ -300,7 +300,7 @@ def main(base_file, specs_path):
               "\tNo Specifications: {:.1f}%\n".format(noSpec) + \
               "\tTop extr functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_extr.items())) + \
               "\tTop miss functions: {:s}\n".format(', '.join(f'{key}: {value}' for key, value in functions_miss.items())) + \
-              "\tLess hit similarity: {:.1f}%".format(100 * sum(functions_lessHit.values()) / len(functions_lessHit.values())))
+              "\tLess hit similarity: {:.1f}%".format((100 * sum(functions_lessHit.values()) / len(functions_lessHit.values())) if len(functions_lessHit.values()) else 100))
         if compare_res > max_compare:
             max_compare = compare_res
             max_retry_functions = functions_noSpec + list(functions_lessHit.keys())

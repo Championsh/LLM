@@ -5,5 +5,9 @@
         "tmp_spec": "c",
         "allspec": "c",
         "allprotos": "c"
-    }
+    },
+    "python.analysis.extraPaths": [
+        "./apps",
+        "./apps"
+    ]
 }

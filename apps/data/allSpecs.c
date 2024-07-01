@@ -1,5 +1,10 @@
+#define WIDTH       80
+#define multiply( f1, f2 ) ( f1 * f2 )
+
 ssize_t archive_read_data(struct archive *archive, void *buff, size_t len) {
     sf_bitinit(buff);
+
+    size_t res = multiply(len, 3);
 
     sf_overwrite(buff);
     sf_set_tainted(buff);

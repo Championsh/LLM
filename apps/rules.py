@@ -46,32 +46,6 @@ def comment_remover(text):
     return re.sub(pattern, replacer, text)
 
 
-def squeeze_specs(specs_pwd: str):
-    pwd = []
-    if os.path.isdir(specs_pwd):
-        specs_template = specs_pwd + \
-                         ('' if specs_pwd.endswith('/') else '/') + '{}'
-        files = (os.fsdecode(file) for file in os.listdir(os.fsencode(specs_pwd)))
-        files = (file for file in files if not os.path.isdir(os.path.join(specs_pwd, file)))
-        pwd = [specs_template.format(file) for file in files]
-    else:
-        pwd = [specs_pwd]
-
-    for filename in pwd:
-        f = open(filename, "r")
-        text = f.read()
-        f.close()
-        specs = comment_remover(text)
-
-        pattern = r"{(?:[^{}]|(?R))*}"
-        res = regex.sub(pattern, ";", specs)
-
-        text_file = open(save_specs_path.format(filename.rsplit('/')[-1]), "w")
-        text_file.write(res.replace('( ', '(').replace(') ', ')'))
-
-        text_file.close()
-
-
 def get_protos(protos_pwd):
     f = open(protos_pwd, "r")
     protos = f.read()
@@ -234,7 +208,6 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--rule-numbers')
     parser.add_argument('-gr', '--gen-rules')
     parser.add_argument('-ur', '--unite-rules')
-    parser.add_argument('-ss', '--squeeze-specs')
 
     # parser.add_argument('-sp', '--save-path', default="/home/champion/Projects/LLM/usages/prompt{num}.txt")
     args = parser.parse_args()
@@ -247,7 +220,6 @@ if __name__ == '__main__':
     gen_rules_pwd = args.gen_rules
     unite_rules_pwd = args.unite_rules
     # save_path = args.save_path
-    squeeze_specs_pwd = args.squeeze_specs
 
     if parse_scra_path:
         parse_scra(parse_scra_path)
@@ -260,6 +232,3 @@ if __name__ == '__main__':
 
     if unite_rules_pwd:
         unite_rules(unite_rules_pwd)
-
-    if squeeze_specs_pwd:
-        squeeze_specs(squeeze_specs_pwd)
