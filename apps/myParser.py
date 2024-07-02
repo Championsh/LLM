@@ -1,10 +1,10 @@
-import re
-import random
+import re, random
+from collections import Counter
 from tree_sitter import Language, Parser, Tree, Node
 
 
 class myParser:
-    def __init__(self, language: str, code_query: str, body_query: str, preproc_query: str, defines_query: str):
+    def __init__(self, language: str, code_query: str, body_query: str, preproc_query: str, defines_query: str, types_query: str):
         Language.build_library('build/my-languages.so', ['../tree-sitter-' + language])
         self.language = Language('build/my-languages.so', language)
         self.parser = Parser()
@@ -13,6 +13,7 @@ class myParser:
         self.body_query = body_query
         self.preproc_query = preproc_query
         self.defines_query = defines_query
+        self.types_query = types_query
         self.functions = {}
 
     def __getTree(self, code: str) -> Tree:
@@ -25,12 +26,16 @@ class myParser:
             # 0 - source code -> functions,
             # 1 - functions' body -> defines, calls, returns,
             # 2 - source code -> preprocess defines,
-            # 3 - preprocess defines -> functions' body.
+            # 3 - preprocess defines -> functions' body,
+            # 4 - source code -> type defines,
+            # 5 - structure body -> field declarations,
         lvlQueries = {
             0: self.code_query,
             1: self.body_query,
             2: self.preproc_query,
-            3: self.defines_query
+            3: self.defines_query,
+            4: self.types_query,
+            5: self.struct_body_query,
         }
         tree = self.__getTree(code)
         query = self.language.query(lvlQueries[lvl])
@@ -51,6 +56,9 @@ class myParser:
                                  if arg in self.functions[funcName]['param_types'] or arg == ''],
         }
         incActions[incType](kwargs)
+
+    def __parseDeclarator(self, declarator: Node) -> tuple:
+        pass
 
     def __handleDeclartion(self, node: Node, funcName: str, declareKind: str):
         # Switch for declarators' type, which returns a tuple:
@@ -108,7 +116,7 @@ class myParser:
     def __handleReturn(self, node: Node, curDict: dict, _: str):
         pass
     
-    def __handlePreproc(self, definitions: dict) -> dict:
+    def __handlePreproc(self, definitions: dict) -> dict[str, list[tuple]]:
         resDefinitions = {}
         for _, definition in definitions:
             def_name = definition['name'].text.decode()
@@ -261,6 +269,67 @@ class myParser:
             # definitions[funcName] = [(funcParams, bodyText)]
         return self.__get_random_pairs(resFuncs, random)
 
+    def __getComplTypes(self, type: Node, params: Node, body: Node) -> list[str]:
+        complTypes = []
+
+        if type.type == "type_identifier":
+            complTypes += [type.text.decode()]
+        
+        for param in params:
+            if param.type == "type_identifier":
+                complTypes += [param.text.decode()]
+            elif param.type == "struct_specifier":
+                name = param.child_by_field_name("type").child_by_field_name("name")
+                if isinstance(name, Node) and name.type == "type_identifier":
+                    complTypes += [name.text.decode()]
+        
+        if body.type != "field_declaration_list":
+            return complTypes
+
+    def head(self, code: str) -> dict[str, str]:
+        definitions = self.__parse(code, 4)
+
+        defines = {}
+        resCode = ""
+        for _, definition in definitions:
+            defDecl = definition["decl"]
+
+            if "goodType" in definition:
+                defines[defDecl] = definition["goodType"].text.decode()
+
+
+    def head(self, code: str) -> dict[str, str]:
+        definitions = self.__parse(code, 4)
+
+        defines = {}
+        resCode = ""
+        for _, definition in definitions:
+            defName = definition["name"].text.decode()
+
+            defType, defParams, defBody = None, None, None
+            if "type" in definition:
+                defType = definition["type"]
+                if "params" in definition:
+                    defParams = definition["params"]
+            if "body" in definition:
+                defBody = definition["body"]
+            
+            defValue = definition["def"].text.decode()
+            if defValue.startswith("struct"):
+                defValue += ";"
+
+            defines[defName] = defines.setdefault(defName, []) + [(defValue, defType)]
+
+        res = {}
+        for key, vals in defines.items():
+            vals = Counter(vals)
+            val = vals.most_common()[0]
+            res[key] = val
+
+            resCode += val[-1] + "\n\n"
+        res["resCode"] = resCode
+        return res
+
 
 class CParser(myParser):
     def __init__(self):
@@ -291,17 +360,19 @@ class CParser(myParser):
             ])
             """
         preproc_query = """
-            ([
-                (preproc_function_def
-                    name: (_) @name
-                    parameters: (_) @params
-                    value: (_) @value
-                )
-                (preproc_def
-                    name: (_) @name
-                    value: (_) @value
-                )
-            ])
+            (translation_unit
+                ([
+                    (preproc_function_def
+                        name: (_) @name
+                        parameters: (_) @params
+                        value: (_) @value
+                    )
+                    (preproc_def
+                        name: (_) @name
+                        value: (_) @value
+                    )
+                ])
+            )
             """
         defines_query = """
             (call_expression
@@ -309,4 +380,32 @@ class CParser(myParser):
                 arguments: (_) @args
             ) @call
             """
-        super().__init__('c', code_query, body_query, preproc_query, defines_query)
+        types_query = """
+        (translation_unit([
+                (type_definition
+                    type: [
+                    [
+                        (type_identifier) @type.name
+                        (macro_type_specifier
+                            name: (_) @macro.name
+                            type: (_) @macro.type
+                        )
+                        (struct_specifier
+                            name: (_) @struct.name
+                            body: (_)? @struct.body
+                        )
+                    ] @complType
+                    [
+                        (sized_type_specifier)
+                        (primitive_type)
+                    ] @goodType]
+                    declarator: (_) @decl
+                )
+                (struct_specifier 
+                    name: (_) @name
+                    body: (_)? @body
+                )
+            ]) @def
+        )
+        """
+        super().__init__('c', code_query, body_query, preproc_query, defines_query, types_query)

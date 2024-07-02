@@ -1,0 +1,525 @@
+struct timeval {
+    time_t          tv_sec;         /* seconds */
+    suseconds_t     tv_usec;        /* and microseconds */
+};
+
+struct timespec
+{
+    time_t          tv_sec;         /* seconds.  */
+    long int        tv_nsec;        /* manoseconds.  */
+};
+
+struct tm {
+};
+
+struct archive;
+
+typedef wchar_t OLECHAR;
+
+typedef OLECHAR* BSTR;
+
+typedef const char* LPCSTR;
+
+typedef unsigned int DIR;
+
+struct stat;
+
+struct FTW;
+
+typedef int gcry_error_t;
+
+typedef int gcry_cipher_hd_t;
+
+typedef int gcry_md_hd_t;
+
+typedef struct _GList GList;
+
+typedef struct _GList GList;
+
+typedef unsigned int    guint;
+
+typedef unsigned int in_addr_t;
+
+typedef unsigned int uint32_t;
+
+typedef unsigned short uint16_t;
+
+struct in_addr {
+    in_addr_t s_addr;
+};
+
+typedef unsigned char   jboolean;
+
+typedef unsigned short  jchar;
+
+typedef short           jshort;
+
+typedef float           jfloat;
+
+typedef double          jdouble;
+
+typedef int          	jint;
+
+typedef jint            jsize;
+
+struct _jobject;
+
+typedef struct _jobject *jobject;
+
+typedef struct _jobject *jobject;
+
+typedef jobject jclass;
+
+typedef jobject jthrowable;
+
+typedef jobject jstring;
+
+typedef jobject jarray;
+
+typedef jarray jbooleanArray;
+
+typedef jarray jbyteArray;
+
+typedef jarray jcharArray;
+
+typedef jarray jshortArray;
+
+typedef jarray jintArray;
+
+typedef jarray jlongArray;
+
+typedef jarray jfloatArray;
+
+typedef jarray jdoubleArray;
+
+typedef jarray jobjectArray;
+
+struct JNIEnv_;
+
+typedef struct JNIEnv_ JNIEnv;
+
+typedef struct JNIEnv_ JNIEnv;
+
+struct	JsonGenerator;
+
+struct	JsonGeneratorClass;
+
+struct JsonNode;
+
+struct GCancellable;
+
+struct GError;
+
+typedef unsigned int guint;
+
+typedef int gboolean;
+
+typedef unsigned char gunichar;
+
+typedef char gchar;
+
+typedef size_t gsize;
+
+typedef unsigned gfp_t;
+
+struct raw_spinlock;
+
+typedef struct raw_spinlock raw_spinlock_t;
+
+typedef struct raw_spinlock raw_spinlock_t;
+
+typedef char vchar_t;
+
+typedef int bool;
+
+struct lua_State;
+
+struct mutex;
+
+struct addrinfo;
+
+typedef struct sha256_state_st SHA256_CTX;
+
+typedef struct sha256_state_st SHA256_CTX;
+
+typedef struct sha512_state_st SHA512_CTX;
+
+typedef struct sha512_state_st SHA512_CTX;
+
+typedef unsigned char uint8_t;
+
+typedef struct CMS_RecipientInfo CMS_RecipientInfo;
+
+typedef struct CMS_RecipientInfo CMS_RecipientInfo;
+
+typedef struct CMS_ContentInfo CMS_ContentInfo;
+
+typedef struct CMS_ContentInfo CMS_ContentInfo;
+
+typedef struct ASN1_GENERALIZEDTIME ASN1_GENERALIZEDTIME;
+
+typedef struct ASN1_GENERALIZEDTIME ASN1_GENERALIZEDTIME;
+
+typedef struct ASN1_OBJECT ASN1_OBJECT;
+
+typedef struct ASN1_OBJECT ASN1_OBJECT;
+
+typedef struct ASN1_TYPE ASN1_TYPE;
+
+typedef struct ASN1_TYPE ASN1_TYPE;
+
+typedef struct EVP_PKEY EVP_PKEY;
+
+typedef struct EVP_PKEY EVP_PKEY;
+
+typedef struct EVP_PKEY_CTX EVP_PKEY_CTX;
+
+typedef struct EVP_PKEY_CTX EVP_PKEY_CTX;
+
+typedef struct ENGINE ENGINE;
+
+typedef struct ENGINE ENGINE;
+
+typedef struct CTLOG CTLOG;
+
+typedef struct CTLOG CTLOG;
+
+typedef struct BIGNUM BIGNUM;
+
+typedef struct BIGNUM BIGNUM;
+
+typedef struct DH DH;
+
+typedef struct DH DH;
+
+typedef struct EVP_CIPHER EVP_CIPHER;
+
+typedef struct EVP_CIPHER EVP_CIPHER;
+
+typedef struct EVP_CIPHER_CTX EVP_CIPHER_CTX;
+
+typedef struct EVP_CIPHER_CTX EVP_CIPHER_CTX;
+
+typedef struct EVP_MD EVP_MD;
+
+typedef struct EVP_MD EVP_MD;
+
+typedef struct PKCS12 PKCS12;
+
+typedef struct PKCS12 PKCS12;
+
+typedef struct BF_KEY BF_KEY;
+
+typedef struct BF_KEY BF_KEY;
+
+typedef struct BIO BIO;
+
+typedef struct BIO BIO;
+
+typedef struct X509 X509;
+
+typedef struct X509 X509;
+
+typedef unsigned long int nfds_t;
+
+typedef unsigned long int nfds_t;
+
+struct pollfd {
+    int fd;     /* File descriptor to poll.  */
+    short int events;   /* Types of events poller cares about.  */
+    short int revents;    /* Types of events that actually occurred.  */
+};
+
+typedef void PGconn;
+
+struct PRFileDesc {
+    int stub;
+};
+
+struct pthread;
+
+typedef struct pthread pthread_t;
+
+typedef struct pthread pthread_t;
+
+struct pthread_attr;
+
+typedef struct pthread_attr pthread_attr_t;
+
+typedef struct pthread_attr pthread_attr_t;
+
+struct pthread_mutex;
+
+typedef struct pthread_mutex pthread_mutex_t;
+
+typedef struct pthread_mutex pthread_mutex_t;
+
+struct pthread_spinlock;
+
+typedef struct pthread_spinlock pthread_spinlock_t;
+
+typedef struct pthread_spinlock pthread_spinlock_t;
+
+struct pthread_mutexattr;
+
+typedef struct pthread_mutexattr pthread_mutexattr_t;
+
+typedef struct pthread_mutexattr pthread_mutexattr_t;
+
+struct __pthread_cleanup_frame {
+    void (*__cancel_routine) (void *);
+    void *__cancel_arg;
+    int __do_it;
+    int __cancel_type;
+};
+
+struct passwd {
+    char *pw_name;        /* Username.  */
+    char *pw_passwd;      /* Hashed passphrase, if shadow database
+                             not in use (see shadow.h).  */
+    uid_t pw_uid;         /* User ID.  */
+    gid_t pw_gid;         /* Group ID.  */
+    char *pw_gecos;       /* Real name.  */
+    char *pw_dir;         /* Home directory.  */
+    char *pw_shell;       /* Shell program.  */
+};
+
+typedef unsigned long int uint32;
+
+struct sem;
+
+typedef struct sem sem_t;
+
+typedef struct sem sem_t;
+
+typedef struct {
+    unsigned long int __val[_SIGSET_NWORDS];
+} __sigset_t;
+
+struct __jmp_buf_tag {
+    __jmp_buf __jmpbuf;         /* Calling environment.  */
+    int __mask_was_saved;       /* Saved the signal mask?  */
+    __sigset_t __saved_mask;    /* Saved signal mask.  */
+};
+
+typedef struct __jmp_buf_tag jmp_buf[1];
+
+typedef struct __jmp_buf_tag jmp_buf[1];
+
+typedef struct __jmp_buf_tag sigjmp_buf[1];
+
+typedef struct __jmp_buf_tag sigjmp_buf[1];
+
+typedef void (*sighandler_t)(int);
+
+typedef unsigned char u_int8_t;
+
+typedef unsigned short int sa_family_t;
+
+struct sockaddr {
+    u_int8_t    sa_len;         /* total length */
+    sa_family_t sa_family;      /* address family */
+    char        sa_data[14];    /* actually longer; address value */
+};
+
+typedef __builtin_va_list va_list;
+
+struct stat;
+
+typedef long __fsword_t;
+
+typedef unsigned long __fsblkcnt_t;
+
+typedef unsigned long __fsfilcnt_t;
+
+typedef unsigned long __fsblkcnt64_t;
+
+typedef struct __fsid_t { int __val[2]; } __fsid_t;
+
+typedef struct __fsid_t { int __val[2]; } __fsid_t;
+
+struct statfs {
+    __fsword_t f_type;
+    __fsword_t f_bsize;
+#ifndef __USE_FILE_OFFSET64
+    __fsblkcnt_t f_blocks;
+    __fsblkcnt_t f_bfree;
+    __fsblkcnt_t f_bavail;
+    __fsfilcnt_t f_files;
+    __fsfilcnt_t f_ffree;
+#else
+    __fsblkcnt64_t f_blocks;
+    __fsblkcnt64_t f_bfree;
+    __fsblkcnt64_t f_bavail;
+    __fsfilcnt64_t f_files;
+    __fsfilcnt64_t f_ffree;
+#endif
+    __fsid_t f_fsid;
+    __fsword_t f_namelen;
+    __fsword_t f_frsize;
+    __fsword_t f_flags;
+    __fsword_t f_spare[4];
+};
+
+typedef long __fsword_t;
+
+typedef unsigned long __fsblkcnt_t;
+
+typedef unsigned long __fsfilcnt_t;
+
+typedef unsigned long __fsblkcnt64_t;
+
+struct statvfs {
+    unsigned long int f_bsize;
+    unsigned long int f_frsize;
+#ifndef __USE_FILE_OFFSET64
+    __fsblkcnt_t f_blocks;
+    __fsblkcnt_t f_bfree;
+    __fsblkcnt_t f_bavail;
+    __fsfilcnt_t f_files;
+    __fsfilcnt_t f_ffree;
+    __fsfilcnt_t f_favail;
+#else
+    __fsblkcnt64_t f_blocks;
+    __fsblkcnt64_t f_bfree;
+    __fsblkcnt64_t f_bavail;
+    __fsfilcnt64_t f_files;
+    __fsfilcnt64_t f_ffree;
+    __fsfilcnt64_t f_favail;
+#endif
+    unsigned long int f_fsid;
+#ifdef _STATVFSBUF_F_UNUSED
+    int __f_unused;
+#endif
+    unsigned long int f_flag;
+    unsigned long int f_namemax;
+    int __f_spare[6];
+};
+
+struct timeval {
+    time_t          tv_sec;         /* seconds */
+    suseconds_t     tv_usec;        /* and microseconds */
+};
+
+struct timespec
+{
+    time_t          tv_sec;         /* seconds.  */
+    long int        tv_nsec;        /* manoseconds.  */
+};
+
+struct tm {
+};
+
+struct utimbuf;
+
+struct utsname
+  {
+    /* Name of the implementation of the operating system.  */
+    char sysname[_UTSNAME_SYSNAME_LENGTH];
+    /* Name of this node on the network.  */
+    char nodename[_UTSNAME_NODENAME_LENGTH];
+    /* Current release level of this implementation.  */
+    char release[_UTSNAME_RELEASE_LENGTH];
+    /* Current version level of this release.  */
+    char version[_UTSNAME_VERSION_LENGTH];
+    /* Name of the hardware type the system is running on.  */
+    char machine[_UTSNAME_MACHINE_LENGTH];
+#if _UTSNAME_DOMAIN_LENGTH - 0
+    /* Name of the domain of this node on the network.  */
+# ifdef __USE_GNU
+    char domainname[_UTSNAME_DOMAIN_LENGTH];
+# else
+    char __domainname[_UTSNAME_DOMAIN_LENGTH];
+# endif
+#endif
+  };
+
+typedef unsigned int VOS_UINT32;
+
+typedef int VOS_INT32;
+
+typedef int VOS_INT;
+
+typedef void VOS_VOID;
+
+typedef char VOS_CHAR;
+
+typedef size_t VOS_SIZE_T;
+
+typedef unsigned int* VOS_UINTPTR;
+
+typedef char *String;
+
+typedef unsigned long XID;
+
+typedef XID Window;
+
+typedef unsigned long Atom;
+
+typedef unsigned int Cardinal;
+
+struct _WidgetRec;
+
+typedef struct _WidgetRec *Widget;
+
+typedef struct _WidgetRec *Widget;
+
+struct _XDisplay;
+
+typedef struct _XDisplay Display;
+
+typedef struct _XDisplay Display;
+
+typedef struct {
+        int family;
+        int length;
+        char *address;
+} XHostAddress;
+
+typedef struct {
+    String  name;
+    XtArgVal    value;
+} Arg, *ArgList;
+
+typedef struct {
+    String  name;
+    XtArgVal    value;
+} Arg, *ArgList;
+
+typedef struct {
+    unsigned short      hdisplay;
+    unsigned short      hsyncstart;
+    unsigned short      hsyncend;
+    unsigned short      htotal;
+    unsigned short      hskew;
+    unsigned short      vdisplay;
+    unsigned short      vsyncstart;
+    unsigned short      vsyncend;
+    unsigned short      vtotal;
+    unsigned int        flags;
+    int                 privsize;
+#if defined(__cplusplus) || defined(c_plusplus)
+    /* private is a C++ reserved word */
+    INT32               *c_private;
+#else
+    INT32               *private;
+#endif
+} XF86VidModeModeLine;
+
+typedef struct {
+    int         type;
+    int         sourceid;
+} XIAnyClassInfo;
+
+typedef struct {
+    int                 deviceid;
+    char                *name;
+    int                 use;
+    int                 attachment;
+    Bool                enabled;
+    int                 num_classes;
+    XIAnyClassInfo      **classes;
+} XIDeviceInfo;
+
+struct Colormap;
+
